@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📨 VR-Guild 깃허브
+    url: https://github.com/VRGuild/VRGuild
+    about: Please ask and answer questions here.
+  - name: 🌎 문의 정보
+    url: https://github.com/VRGuild/VRGuild/discussions
+    about: 문의 사이트
