@@ -1,4 +1,0 @@
-[core]
-        editor= code --wait
-[commit]
-        template = .gitmessage.txt
