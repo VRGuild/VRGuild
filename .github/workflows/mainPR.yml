@@ -3,11 +3,17 @@ name: master just dev
 on:
   pull_request:
     branches: [ main ]
+    types: [ opened, synchronize ]
 
 jobs:
   check-master:
     runs-on: ubuntu-latest
     steps:
-      - name: master just dev
+      - name: Check source branch
         run: |
-          if [[ "$GITHUB_HEAD_REF" != 'dev' ]]; then exit 1; else exit 0; fi;
+          if [[ "$GITHUB_HEAD_REF" != "dev" ]]; then
+            echo "This PR must be from the 'dev' branch.";
+            exit 1;
+          else
+            echo "PR is from the correct branch.";
+          fi
