@@ -2,7 +2,7 @@ name: master just dev
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   check-master:
