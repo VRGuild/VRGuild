@@ -20,6 +20,11 @@ class VRGUILD_API ACPCBasePlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	ACPCBasePlayerController();
+	
+	UFUNCTION(BlueprintCallable)
+	void ConnectToServer();
+	UFUNCTION(BlueprintCallable)
+	void TravelToNextServer();
 
 protected:
 	// Function called when play begins
@@ -28,14 +33,17 @@ protected:
 	//Function to sign into EOS Game Services
 	void Login();
 
-	UFUNCTION(BlueprintCallable)
-	void ConnectToServer();
-
 	//Callback function. This function is ran when signing into EOS Game Services completes. 
 	void HandleLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
 
 	//Delegate to bind callback event for login. 
 	FDelegateHandle LoginDelegateHandle;
+
+	UFUNCTION(Server, Reliable)
+	void ServerGetPort();
+	UFUNCTION(Client, Reliable)
+	void ClientGetPort(int64 nextPort);
+	int32 NextPort = -1;
 
 	// Function to find EOS sessions. Hardcoded attribute key/value pair to keep things simple
 	UFUNCTION(BlueprintCallable)
@@ -63,4 +71,9 @@ protected:
 	FDelegateHandle JoinSessionDelegateHandle;
 
 	void OnTravelError(UWorld* World, ETravelFailure::Type ErrorType, const FString& ErrorString);
+
+private:
+	FDelegateHandle DestroySessionDelegateHandle;
+	virtual void OnDestroySessionComplete(FName sessionName, bool bWasSuccessful);
+	FName SessionName = "TESTSession";
 };

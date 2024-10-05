@@ -9,6 +9,7 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "GameFramework/PlayerState.h"
+#include "Global/Server/CGMBaseServer.h"
 
 ACGSSBaseGameSession::ACGSSBaseGameSession()
 {
@@ -22,10 +23,11 @@ void ACGSSBaseGameSession::BeginPlay()
     if (IsRunningDedicatedServer() && !bSessionExists)
     {
         FParse::Value(FCommandLine::Get(), TEXT("Value="), KeyValueStr);
+        
+        //SessionName = FName(FGuid::NewGuid().ToString());
 
         if (KeyValueStr != TEXT(""))
         {
-
             UE_LOG(LogTemp, Warning, TEXT("URL LOCAL: %s"), *GetWorld()->GetLocalURL());
             UE_LOG(LogTemp, Warning, TEXT("URL Address: %s"), *GetWorld()->GetAddressURL());
             UE_LOG(LogTemp, Warning, TEXT("KeyValue passed in to CommandLine: %s"), *KeyValueStr);
@@ -60,13 +62,21 @@ void ACGSSBaseGameSession::CreateSession(FName KeyName, FString KeyValue)
     SessionSettings->bAllowJoinViaPresence = false; // superset by bShouldAdvertise and will be true on the backend
     SessionSettings->bAllowJoinViaPresenceFriendsOnly = false; // superset by bShouldAdvertise and will be true on the backend
     SessionSettings->bAllowInvites = false;    //Allow inviting players into session. This requires presence and a local user. 
-    SessionSettings->bAllowJoinInProgress = false; //Once the session is started, no one can join.
+    SessionSettings->bAllowJoinInProgress = true; //Once the session is started, no one can join.
     SessionSettings->bIsDedicated = true; //Session created on dedicated server.
     SessionSettings->bUseLobbiesIfAvailable = false; //This is an EOS Session not an EOS Lobby as they aren't supported on Dedicated Servers.
     SessionSettings->bUseLobbiesVoiceChatIfAvailable = false;
     SessionSettings->bUsesStats = true; //Needed to keep track of player stats.
-    SessionSettings->NumPublicConnections = 2;
+    SessionSettings->NumPublicConnections = MaxNumberOfPlayersInSession;
     // This custom attribute will be used in searches on GameClients. 
+
+
+    auto GM = GetWorld()->GetAuthGameMode<ACGMBaseServer>();
+    if (GM)
+    {
+        SessionSettings->Settings.Add("Port", FOnlineSessionSetting(GM->GetNextPort(), EOnlineDataAdvertisementType::ViaOnlineService));
+    }
+    
     SessionSettings->Settings.Add(KeyName, FOnlineSessionSetting((KeyValue), EOnlineDataAdvertisementType::ViaOnlineService));
 
     // Create session.

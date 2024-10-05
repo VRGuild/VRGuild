@@ -7,13 +7,12 @@
 #include "OnlineSubsystemTypes.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "GameFramework/GameMode.h"
+#include "Global/Server/CGSSBaseGameSession.h"
 
 void UCGIGameInstance::Init()
 {
-	Super::Init();
-
-	UE_LOG(LogTemp, Warning, TEXT("Testing if I exist"));
-
+    Super::Init();
 }
 
 void UCGIGameInstance::Shutdown()
@@ -25,15 +24,26 @@ void UCGIGameInstance::Shutdown()
         Session->AddOnDestroySessionCompleteDelegate_Handle(FOnDestroySessionCompleteDelegate::CreateUObject(
             this,
             &ThisClass::OnDestroySessionComplete));
-    
-    UE_LOG(LogTemp, Warning, TEXT("ShutDown Called"));
 
-    if (!Session->DestroySession(TEXT("TestSession")))
+    UE_LOG(LogTemp, Warning, TEXT("ShutDown Called"));
+    
+    FName sessionName = "TESTSession";
+        
+    if (auto gM = GetWorld()->GetAuthGameMode())
+    {
+        if (auto gSession = Cast<ACGSSBaseGameSession>(gM->GameSession))
+        {
+            sessionName = gSession->GetSessionName();
+        }
+    }
+    
+    if (!Session->DestroySession(sessionName))
     {
         UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session.")); // Log to the UE logs that we are trying to log in. 
-        Session->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionDelegateHandle);
-        DestroySessionDelegateHandle.Reset();
     }
+
+    Session->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionDelegateHandle);
+    DestroySessionDelegateHandle.Reset();
 	Super::Shutdown();
 }
 

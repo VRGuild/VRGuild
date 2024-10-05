@@ -13,6 +13,9 @@ UCLASS()
 class VRGUILD_API ACGSSBaseGameSession : public AGameSession
 {
 	GENERATED_BODY()
+public:
+	FName GetSessionName() const { return SessionName; };
+
 protected:
 	// Class constructor. We won't use this in this tutorial. 
 	ACGSSBaseGameSession();
@@ -37,7 +40,7 @@ protected:
 	FName SessionName = "TestSession";
 
 	// Hardcoding the max number of players in a session 
-	const int MaxNumberOfPlayersInSession = 2;
+	const int MaxNumberOfPlayersInSession = 1;
 
 	// Variable to keep track of the number of players in a session  
 	int NumberOfPlayersInSession = 0;

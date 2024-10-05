@@ -15,7 +15,6 @@ class VRGUILD_API UCGIGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
-	
 protected:
 	virtual void Init() override;
 
