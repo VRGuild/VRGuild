@@ -3,7 +3,6 @@ name: master just dev
 on:
   pull_request:
     branches: [ main ]
-    types: [ opened, synchronize ]
 
 jobs:
   check-master:
