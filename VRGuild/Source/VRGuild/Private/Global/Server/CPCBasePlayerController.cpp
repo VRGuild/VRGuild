@@ -95,8 +95,6 @@ void ACPCBasePlayerController::ConnectToServer()
 	FindSessions();
 }
 
-
-
 void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
 {
 	/*
@@ -105,6 +103,7 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 	*/
 	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
 	IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
+
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Login callback completed!"));;
@@ -124,7 +123,7 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 	LoginDelegateHandle.Reset();
 }
 
-void ACPCBasePlayerController::FindSessions(FName SearchKey, FString SearchValue) //put default value for example 
+void ACPCBasePlayerController::FindSessions(FString searchValue, FName searchKey) //put default value for example 
 {
 	// Tutorial 4: This function will find our EOS Session that was created by our DedicatedServer. 
 
@@ -135,14 +134,27 @@ void ACPCBasePlayerController::FindSessions(FName SearchKey, FString SearchValue
 	// Remove the default search parameters that FOnlineSessionSearch sets up.
 	Search->QuerySettings.SearchParams.Empty();
 
-	Search->QuerySettings.Set(SearchKey, SearchValue, EOnlineComparisonOp::Equals); // Seach using our Key/Value pair
+	FString searchValueStr;
+
+	if (searchValue == TEXT(""))
+	{
+		FParse::Value(FCommandLine::Get(), TEXT("SearchValue="), searchValueStr);
+		if (searchValueStr == TEXT(""))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Could not find SearchValue in Commandline .\n Default value \"KeyValue\" added for SearchValueStr"));
+			searchValueStr = "KeyValue";
+		}
+	}
+	else searchValueStr = searchValue;
+	
+	Search->QuerySettings.Set(searchKey, searchValueStr, EOnlineComparisonOp::Equals); // Seach using our Key/Value pair
 	FindSessionsDelegateHandle =
 		Session->AddOnFindSessionsCompleteDelegate_Handle(FOnFindSessionsCompleteDelegate::CreateUObject(
 			this,
 			&ThisClass::HandleFindSessionsCompleted,
 			Search));
 
-	UE_LOG(LogTemp, Log, TEXT("Finding session."));
+	UE_LOG(LogTemp, Log, TEXT("Finding session: %s."), *searchValueStr);
 
 	if (!Session->FindSessions(0, Search))
 	{
@@ -178,7 +190,6 @@ void ACPCBasePlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, 
 				{
 				}
 				*/
-
 				//Ensure the connection string is resolvable and store the info in ConnectInfo and in SessionToJoin
 				if (Session->GetResolvedConnectString(SessionInSearchResult, NAME_GamePort, ConnectString))
 				{
@@ -222,7 +233,7 @@ void ACPCBasePlayerController::JoinSession()
 			this,
 			&ThisClass::HandleJoinSessionCompleted));
 
-	UE_LOG(LogTemp, Log, TEXT("Joining session."));
+	UE_LOG(LogTemp, Log, TEXT("Joining session: %s"), *SessionToJoin->GetSessionIdStr());
 	if (!Session->JoinSession(0, "TestSession", *SessionToJoin))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Join session failed"));

@@ -21,7 +21,16 @@ void ACGSSBaseGameSession::BeginPlay()
 
     if (IsRunningDedicatedServer() && !bSessionExists)
     {
-        CreateSession("KeyName", "KeyValue");
+        FParse::Value(FCommandLine::Get(), TEXT("Value="), KeyValueStr);
+
+        if (KeyValueStr != TEXT(""))
+        {
+
+            UE_LOG(LogTemp, Warning, TEXT("URL LOCAL: %s"), *GetWorld()->GetLocalURL());
+            UE_LOG(LogTemp, Warning, TEXT("URL Address: %s"), *GetWorld()->GetAddressURL());
+            UE_LOG(LogTemp, Warning, TEXT("KeyValue passed in to CommandLine: %s"), *KeyValueStr);
+            CreateSession("KeyName", KeyValueStr);
+        }
     }
 }
 
@@ -46,7 +55,6 @@ void ACGSSBaseGameSession::CreateSession(FName KeyName, FString KeyValue)
 
     // Set session settings 
     TSharedRef<FOnlineSessionSettings> SessionSettings = MakeShared<FOnlineSessionSettings>();
-    SessionSettings->NumPublicConnections = MaxNumberOfPlayersInSession; //We will test our sessions with 2 players to keep things simple
     SessionSettings->bShouldAdvertise = true; //This creates a public match and will be searchable. This will set the session as joinable via presence. 
     SessionSettings->bUsesPresence = false;   //No presence on dedicated server. This requires a local user.
     SessionSettings->bAllowJoinViaPresence = false; // superset by bShouldAdvertise and will be true on the backend
@@ -57,7 +65,7 @@ void ACGSSBaseGameSession::CreateSession(FName KeyName, FString KeyValue)
     SessionSettings->bUseLobbiesIfAvailable = false; //This is an EOS Session not an EOS Lobby as they aren't supported on Dedicated Servers.
     SessionSettings->bUseLobbiesVoiceChatIfAvailable = false;
     SessionSettings->bUsesStats = true; //Needed to keep track of player stats.
-
+    SessionSettings->NumPublicConnections = 2;
     // This custom attribute will be used in searches on GameClients. 
     SessionSettings->Settings.Add(KeyName, FOnlineSessionSetting((KeyValue), EOnlineDataAdvertisementType::ViaOnlineService));
 
@@ -255,6 +263,7 @@ void ACGSSBaseGameSession::NotifyLogout(const APlayerController* ExitingPlayer)
         // No one left in session. End session. end regardless if UnregisterPlayer failed. 
         if (NumberOfPlayersInSession == 0)
         {
+            //DestroySession();
             EndSession();
         }
     }
@@ -303,7 +312,6 @@ void ACGSSBaseGameSession::HandleEndSessionCompleted(FName EOSSessionName, bool 
 
 void ACGSSBaseGameSession::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    DestroySession();
     // Tutorial 3: Overide base function to destroy session at end of play. This happens on both dedicated server and client
     Super::EndPlay(EndPlayReason);
 }

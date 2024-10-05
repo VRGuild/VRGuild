@@ -38,7 +38,8 @@ protected:
 	FDelegateHandle LoginDelegateHandle;
 
 	// Function to find EOS sessions. Hardcoded attribute key/value pair to keep things simple
-	void FindSessions(FName SearchKey = "KeyName", FString SearchValue = "KeyValue");
+	UFUNCTION(BlueprintCallable)
+	void FindSessions(FString searchValue = "", FName searchKey = "KeyName");
 
 	// Callback function. This function will run when the session is found.
 	void HandleFindSessionsCompleted(bool bWasSuccessful, TSharedRef<FOnlineSessionSearch> Search);

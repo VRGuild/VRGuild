@@ -17,6 +17,7 @@ protected:
 	// Class constructor. We won't use this in this tutorial. 
 	ACGSSBaseGameSession();
 
+	FString KeyValueStr;
 	// Function called when play begins.
 	virtual void BeginPlay();
 
