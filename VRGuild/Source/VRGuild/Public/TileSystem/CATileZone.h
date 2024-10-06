@@ -38,6 +38,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	bool IsTileSpaceEmpty(FVector position);
+  
+	virtual class ACATileSpace* CreateNewTile(FVector position);
+	virtual bool DeleteTile(FVector position);
 
 	virtual class ACATileSpace* CreateNewTile(FVector position);
 	virtual class ACATileSpace* CreateNewTile(FVector position, ESpaceType spaceType);
