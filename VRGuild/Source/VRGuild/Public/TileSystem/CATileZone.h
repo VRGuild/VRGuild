@@ -27,8 +27,8 @@ public:
 
 	bool IsTileSpaceEmpty(FVector position);
 	
-	class ACATileSpace* CreateNewTile(FVector position);
-	bool DeleteTile(FVector position);
+	virtual class ACATileSpace* CreateNewTile(FVector position);
+	virtual bool DeleteTile(FVector position);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 	float TileSize = 36;
