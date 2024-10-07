@@ -19,17 +19,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PROJECT_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Get project information (replace with your project ID)
-          PROJECT_ID=<YOUR_PROJECT_ID>
-          
+          # Set the project ID (for the specific project)
+          PROJECT_ID=1 # This should be the project ID from the URL
+
           # Fetch the issue's project cards
           CARD_URL="https://api.github.com/projects/columns/cards?access_token=$GITHUB_TOKEN"
           CARDS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$CARD_URL")
-          
+
           # Update the start date of the relevant project card
           echo "$CARDS" | jq -r ".[] | select(.content_url | contains(\"issues/$ISSUE_NUMBER\")) | .id" | while read CARD_ID; do
             curl -X PATCH -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
-              -d "{\"date_start\":\"${{ env.start_date }}\"}" \
+              -d "{\"start\":\"${{ env.start_date }}\"}" \
               "https://api.github.com/projects/columns/cards/$CARD_ID"
           done
