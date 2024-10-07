@@ -49,6 +49,12 @@ void ACATileSpace::Initialize(ACATileZone* parentZone, FVector position)
 	this->SetActorScale3D(FVector(this->ParentZone->TileSize));
 }
 
+void ACATileSpace::Initialize(ACATileZone* parentZone, FVector position, ESpaceType spaceType)
+{
+	Initialize(parentZone, position);
+	this->SpaceType = spaceType;
+}
+
 // Called every frame
 void ACATileSpace::Tick(float DeltaTime)
 {
@@ -65,11 +71,9 @@ bool ACATileSpace::AddSpace(FVector relativeVector)
 	FVector normal = relativeVector* this->ParentZone->TileSize;
 	FVector gridVector = UFL_TileTools::SnapGridVector(normal, this->ParentZone->TileSize);
 
-	FVector position = gridVector + this->Position;
-
-	if (this->ParentZone->CreateNewTile(position))
+	if (this->ParentZone->InteractionCreate(this->Position, gridVector))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Create New Tile %s"), *gridVector.ToString());
+		UE_LOG(LogTemp, Display, TEXT("Wait to Create %s"), *gridVector.ToString());
 		return true;
 	}
 	return false;
@@ -77,9 +81,7 @@ bool ACATileSpace::AddSpace(FVector relativeVector)
 
 void ACATileSpace::DeleteSpace()
 {
-	if (this->ParentZone->DeleteTile(this->Position)) {
-		this->Destroy();
-	}
+	this->ParentZone->InteractionDelete(this->Position);
 }
 
 
