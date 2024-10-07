@@ -6,6 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "CATileSpace.generated.h"
 
+UENUM(BlueprintType)
+enum class ESpaceType : uint8
+{
+	None = 0 UMETA(DisplayName = "None"),
+	Floor = 1 UMETA(DisplayName = "Floor"),
+	Wall = 2 UMETA(DisplayName = "Wall"),
+};
+
 UCLASS()
 class VRGUILD_API ACATileSpace : public AActor
 {
@@ -29,9 +37,12 @@ protected:
 	
 	FVector Position;
 
+	ESpaceType SpaceType = ESpaceType::None;
+
 public:
 	// 생성자가 불가능 하여 기본 새팅 함수
 	void Initialize(ACATileZone* parentZone, FVector position);
+	void Initialize(ACATileZone* parentZone, FVector position, ESpaceType spaceType);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,4 +50,7 @@ public:
 	bool AddSpace(FVector relativeVector);
 
 	void DeleteSpace();
+
+	ESpaceType GetSpaceType() { return this->SpaceType; };
+	void SetSpaceType(ESpaceType spaceType) { this->SpaceType = spaceType; };
 };
