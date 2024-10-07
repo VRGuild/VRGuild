@@ -1,0 +1,10 @@
+on:
+  issues:
+    types: [assigned]
+jobs:
+  print-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name : Test Echo
+        run : echo "Assigned Changed"
