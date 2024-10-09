@@ -72,6 +72,10 @@ protected:
 
 	void OnTravelError(UWorld* World, ETravelFailure::Type ErrorType, const FString& ErrorString);
 
+	// API Call
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnLoginAPICall();
+
 private:
 	FDelegateHandle DestroySessionDelegateHandle;
 	virtual void OnDestroySessionComplete(FName sessionName, bool bWasSuccessful);

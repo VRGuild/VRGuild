@@ -7,7 +7,7 @@
 #include "Runtime/Online/HTTP/Public/Http.h"
 #include "CACBaseAPI.generated.h"
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACBaseAPI : public UActorComponent
 {
 	GENERATED_BODY()
@@ -20,7 +20,11 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	virtual void InitializeComponent() override;
+
 	bool bHttpWaitresponse = false;
+
+	AActor* Owner;
 
 public:	
 	// Called every frame
