@@ -5,7 +5,6 @@
 #include "Json.h"
 #include "JsonObjectConverter.h"
 
-
 template<typename T>
 FString UCBPLJsonParse::JsonStringfy(T someStruct)
 {

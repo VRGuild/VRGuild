@@ -60,6 +60,7 @@ void ACABaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, boo
 		if (res->GetResponseCode() == 200)
 		{
 			//성공 했을때 동작 추가
+			HttpSuccessLogic();
 		}
 	}
 	bHttpWaitresponse = false;
