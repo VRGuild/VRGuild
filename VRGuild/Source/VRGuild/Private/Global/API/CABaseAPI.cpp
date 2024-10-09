@@ -47,7 +47,6 @@ void ACABaseAPI::HttpPostCall(T sendData)
 	req->ProcessRequest();
 }
 
-template<typename T>
 void ACABaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnResHttpPostLoginCallBack"));

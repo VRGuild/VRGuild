@@ -10,6 +10,7 @@ UCACBaseAPI::UCACBaseAPI()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	bWantsInitializeComponent = true;
 
 	// ...
 }
@@ -22,6 +23,13 @@ void UCACBaseAPI::BeginPlay()
 
 	// ...
 	
+}
+
+void UCACBaseAPI::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	this->Owner = GetOwner();
 }
 
 
@@ -38,6 +46,10 @@ template<typename T>
 void UCACBaseAPI::HttpPostCall(T sendData)
 {
 	UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+	if (bHttpWaitresponse)
+		return;
+	bHttpWaitresponse = true;
+
 	FHttpModule& httpModule = FHttpModule::Get();
 
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
@@ -52,6 +64,7 @@ void UCACBaseAPI::HttpPostCall(T sendData)
 	req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpPostCallBack);
 
 	req->ProcessRequest();
+
 }
 
 void UCACBaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
