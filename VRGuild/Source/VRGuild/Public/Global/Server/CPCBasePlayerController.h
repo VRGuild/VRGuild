@@ -5,14 +5,28 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
+#include "VoiceChat.h"
 #include "CPCBasePlayerController.generated.h"
 
 /**
  * 
  */
-
 class FOnlineSessionSearch;
 class FOnlineSessionSearchResult;
+
+struct FEVIKChannelCredentials : public FJsonSerializable
+{
+	FString OverrideUserId;
+	FString ClientBaseUrl;
+	FString ParticipantToken;
+
+	BEGIN_JSON_SERIALIZER
+		JSON_SERIALIZE("override_userid", OverrideUserId);
+	JSON_SERIALIZE("client_base_url", ClientBaseUrl);
+	JSON_SERIALIZE("participant_token", ParticipantToken);
+	END_JSON_SERIALIZER
+};
 
 UCLASS()
 class VRGUILD_API ACPCBasePlayerController : public APlayerController
@@ -76,4 +90,13 @@ private:
 	FDelegateHandle DestroySessionDelegateHandle;
 	virtual void OnDestroySessionComplete(FName sessionName, bool bWasSuccessful);
 	FName SessionName = "TESTSession";
+
+protected:
+	virtual void OnRep_PlayerState() override;
+	void StartVoiceChat();
+
+	void GetEOSRoomToken(IVoiceChat* voiceChat, FString playerName_in);
+
+	void JoinVoiceServer(IVoiceChat* voiceChat, FString voiceRoomName, bool bEnableEcho, FString channelCredentialsJson);
+	IVoiceChatUser* VoiceChatUser;
 };

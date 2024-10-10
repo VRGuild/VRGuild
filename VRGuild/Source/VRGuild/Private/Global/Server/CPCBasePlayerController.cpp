@@ -120,6 +120,215 @@ void ACPCBasePlayerController::TravelToNextServer()
 	}
 }
 
+void ACPCBasePlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	StartVoiceChat();
+}
+
+void ACPCBasePlayerController::StartVoiceChat()
+{
+	if (IVoiceChat* voiceChat = IVoiceChat::Get())
+	{
+		if (voiceChat->Initialize())
+		{
+			voiceChat->Connect(FOnVoiceChatConnectCompleteDelegate::CreateLambda([this, voiceChat](const FVoiceChatResult& Result)
+				{
+					if (Result.IsSuccess())
+					{
+						const FPlatformUserId platformUserId = FPlatformMisc::GetPlatformUserForUserIndex(0);
+
+						FString playerName = "myPlayerName";
+
+						voiceChat->Login(platformUserId, playerName, "", FOnVoiceChatLoginCompleteDelegate::CreateLambda([this, voiceChat](const FString& playerName_in, const FVoiceChatResult& result)
+							{
+								if (result.IsSuccess())
+								{
+									GetEOSRoomToken(voiceChat, playerName_in);
+								}
+								else UE_LOG(LogTemp, Warning, TEXT("Voice chat login fail"));
+							}
+						)
+						);
+					}
+					else UE_LOG(LogTemp, Warning, TEXT("Voice chat connect unsuccessful"));
+
+				})
+			);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("Voice chat Initialize fail"));
+	}
+	else UE_LOG(LogTemp, Warning, TEXT("Voice chat get fail"));
+}
+
+void ACPCBasePlayerController::GetEOSRoomToken(IVoiceChat* voiceChat, FString playerName_in)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Voice chat login success: PlayerName: %s"), *playerName_in);
+
+	FString ConfigDeploymentId;
+	FString ConfigClientId;
+	FString ConfigClientSecret;
+	FString ConfigProductId;
+	FString VoiceRoomName = TEXT("VoiceRoomName");
+
+	GConfig->GetString(TEXT("EOSVoiceChat"), TEXT("DeploymentId"), ConfigDeploymentId, GEngineIni);
+	GConfig->GetString(TEXT("EOSVoiceChat"), TEXT("ClientId"), ConfigClientId, GEngineIni);
+	GConfig->GetString(TEXT("EOSVoiceChat"), TEXT("ClientSecret"), ConfigClientSecret, GEngineIni);
+	GConfig->GetString(TEXT("EOSVoiceChat"), TEXT("ProductId"), ConfigProductId, GEngineIni);
+
+	auto HttpRequest = FHttpModule::Get().CreateRequest();
+	const FString Base64Credentials = FBase64::Encode(FString::Printf(TEXT("%s:%s"), *ConfigClientId, *ConfigClientSecret));
+	const FString ContentString = FString::Printf(TEXT("grant_type=client_credentials&deployment_id=%s"), *ConfigDeploymentId);
+
+	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/x-www-form-urlencoded"));
+	HttpRequest->AppendToHeader(TEXT("Accept"), TEXT("application/json"));
+	HttpRequest->AppendToHeader(TEXT("Authorization"), *FString::Printf(TEXT("Basic %s"), *Base64Credentials));
+	HttpRequest->SetContentAsString(ContentString);
+	HttpRequest->SetURL("https://api.epicgames.dev/auth/v1/oauth/token");
+	HttpRequest->SetVerb("POST");
+
+	HttpRequest->OnProcessRequestComplete().BindLambda([this, ConfigDeploymentId, VoiceRoomName, playerName_in, voiceChat](FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bConnectedSuccessfully)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Response -> %s, PlayerName :%s"), *ResponsePtr->GetContentAsString(), *playerName_in);
+			FString AccessTokenString;
+			TSharedPtr<FJsonObject> JsonObject;
+
+			if (bConnectedSuccessfully && FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(ResponsePtr->GetContentAsString()), JsonObject) && JsonObject.IsValid())
+			{
+				TSharedPtr<FJsonValue> AccessTokenObject = JsonObject->TryGetField(TEXT("access_token"));
+				AccessTokenString = AccessTokenObject ? AccessTokenObject->AsString() : FString();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Voice chat login not successful"));
+				return;
+			}
+
+			if (AccessTokenString.IsEmpty())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Voice chat login not successful"));
+				return;
+			}
+
+			auto RoomTokenRequest = FHttpModule::Get().CreateRequest();
+
+			RoomTokenRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+			RoomTokenRequest->AppendToHeader(TEXT("Accept"), TEXT("application/json"));
+			RoomTokenRequest->AppendToHeader(TEXT("Authorization"), *FString::Printf(TEXT("Bearer %s"), *AccessTokenString));
+
+			const FString ProductUserId = playerName_in;
+			UE_LOG(LogTemp, Warning, TEXT("ProductUserId :%s"), *ProductUserId);
+			bool bHardMuted = false;
+
+			const FString JsonRequestString = FString::Printf(TEXT("{\"participants\":[{\"puid\":\"%s\",\"clientIp\":\"%s\",\"hardMuted\":%s}] }"), *ProductUserId, TEXT("10.0.0.1"), bHardMuted ? TEXT("true") : TEXT("false"));
+			RoomTokenRequest->SetContentAsString(JsonRequestString);
+			RoomTokenRequest->SetURL(FString::Printf(TEXT("https://api.epicgames.dev/rtc/v1/%s/room/%s"), *ConfigDeploymentId, *VoiceRoomName));
+			RoomTokenRequest->SetVerb("POST");
+
+			RoomTokenRequest->OnProcessRequestComplete().BindLambda([this, VoiceRoomName, playerName_in, voiceChat](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bConnectedSuccessfully)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Response -> %s"), *HttpResponsePtr->GetContentAsString());
+					FString TokenString, ClientBaseUrlString;
+
+					if (!bConnectedSuccessfully)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Voice chat login not successful"));
+						return;
+					}
+
+					TSharedPtr<FJsonObject> JsonObject;
+					const TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(HttpResponsePtr->GetContentAsString());
+					if (!FJsonSerializer::Deserialize(JsonReader, JsonObject) || !JsonObject.IsValid())
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Voice chat login not successful"));
+						return;
+					}
+
+					const TSharedPtr<FJsonValue> ClientBaseUrlObject = JsonObject->TryGetField(TEXT("clientBaseUrl"));
+					const TSharedPtr<FJsonValue> ParticipantsObject = JsonObject->TryGetField(TEXT("participants"));
+
+					if (!ParticipantsObject)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Voice chat login not successful"));
+						return;
+					}
+
+
+					ClientBaseUrlString = ClientBaseUrlObject->AsString();
+					UE_LOG(LogTemp, Warning, TEXT("ClientUrl -> %s"), *ClientBaseUrlString);
+					TArray<TSharedPtr<FJsonValue>> ParticipantsArray = ParticipantsObject->AsArray();
+
+					for (const auto& Element : ParticipantsArray)
+					{
+						if (Element->Type != EJson::Object)
+							continue;
+
+						auto& Object = Element->AsObject();
+						TokenString = Object->TryGetField(TEXT("token"))->AsString();
+						UE_LOG(LogTemp, Warning, TEXT("Token -> %s"), *TokenString);
+					}
+
+					if (TokenString.IsEmpty())
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Voice chat login not successful"));
+					}
+
+					FEVIKChannelCredentials ChannelCredentials;
+					ChannelCredentials.OverrideUserId = playerName_in;
+					ChannelCredentials.ClientBaseUrl = ClientBaseUrlString;
+					ChannelCredentials.ParticipantToken = TokenString;
+					UE_LOG(LogTemp, Warning, TEXT("Voice chat login successful %s"), *ChannelCredentials.ToJson());
+
+					JoinVoiceServer(voiceChat, VoiceRoomName, false, ChannelCredentials.ToJson(false));
+				});
+
+			RoomTokenRequest->ProcessRequest();
+		});
+
+	HttpRequest->ProcessRequest();
+}
+
+void ACPCBasePlayerController::JoinVoiceServer(IVoiceChat* voiceChat, FString voiceRoomName, bool bEnableEcho, FString channelCredentialsJson)
+{
+	FVoiceChatChannel3dProperties Properties;
+	Properties.AttenuationModel = EVoiceChatAttenuationModel::InverseByDistance;
+	Properties.MaxDistance = 100.f;
+	Properties.MinDistance = 1.f;
+	Properties.Rolloff = 0.5f;
+
+	TSharedPtr<FJsonObject> ChannelCredentialsObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(channelCredentialsJson);
+	if (!FJsonSerializer::Deserialize(JsonReader, ChannelCredentialsObject) || !ChannelCredentialsObject.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to parse channelCredentialsJson"));
+	}
+
+	FString ClientBaseUrl = ChannelCredentialsObject->GetStringField(TEXT("ClientBaseUrl"));
+	FString ParticipantToken = ChannelCredentialsObject->GetStringField(TEXT("ParticipantToken"));
+	EVoiceChatChannelType ChannelType = EVoiceChatChannelType::Positional;
+
+	if (bEnableEcho)
+	{
+		ChannelType = EVoiceChatChannelType::Echo;
+		UE_LOG(LogTemp, Warning, TEXT("Setting Echo -> %hhd"), bEnableEcho);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("bEnableEcho -> %hhd"), bEnableEcho);
+
+	voiceChat->JoinChannel(voiceRoomName, channelCredentialsJson, ChannelType, FOnVoiceChatChannelJoinCompleteDelegate::CreateLambda([&](const FString& ChannelName, const FVoiceChatResult& JoinResult)
+		{
+			if (JoinResult.IsSuccess())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("JoinVoiceServer Successful"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("JoinVoiceServer Fail"))
+			}
+		}), 
+		Properties
+	);
+}
+
 void ACPCBasePlayerController::OnDestroySessionComplete(FName sessionName, bool bWasSuccessful)
 {
 	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
@@ -129,7 +338,7 @@ void ACPCBasePlayerController::OnDestroySessionComplete(FName sessionName, bool 
 	{
 		UE_LOG(LogTemp, Log, TEXT("Destroyed session [%s], succesfully."), *sessionName.ToString());
 
-		if(GetWorld()) ServerGetPort();
+		if (GetWorld()) ServerGetPort();
 	}
 	else
 	{
@@ -248,7 +457,7 @@ void ACPCBasePlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, 
 			UE_LOG(LogTemp, Log, TEXT("[%d] [%s] Owning Username: %s"), count,
 				*SessionInSearchResult.Session.SessionInfo->GetSessionId().ToString(), *SessionInSearchResult.Session.OwningUserName);
 			;
-			
+
 			if (SessionInSearchResult.IsSessionInfoValid())
 			{
 				// Typically you want to check if the session is valid before joining. There is a bug in the EOS OSS where IsValid() returns false when the session is created on a DS. 
@@ -283,7 +492,7 @@ void ACPCBasePlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, 
 			count++;
 		}
 
-		if (bSuccess) 
+		if (bSuccess)
 		{
 			JoinSession();
 		}
@@ -332,13 +541,13 @@ void ACPCBasePlayerController::HandleJoinSessionCompleted(FName sessionName, EOn
 
 			UE_LOG(LogTemp, Log, TEXT("Joined session [%s] with ConnectString %s."), *sessionName.ToString(), *ConnectString);
 
-			
+
 			FString DedicatedServerJoinError;
 			auto DedicatedServerJoinStatus =
 
-			GEngine->OnTravelFailure().AddUObject(this, &ThisClass::OnTravelError);
+				GEngine->OnTravelFailure().AddUObject(this, &ThisClass::OnTravelError);
 			ClientTravel(ConnectString, ETravelType::TRAVEL_Partial);
-			
+
 			//FURL DedicatedServerURL(nullptr, *ConnectString, TRAVEL_Absolute);
 			//GEngine->Browse(GEngine->GetWorldContextFromWorldChecked(GetWorld()), DedicatedServerURL, DedicatedServerJoinError);	
 			/*if (DedicatedServerJoinStatus == EBrowseReturnVal::Failure)
