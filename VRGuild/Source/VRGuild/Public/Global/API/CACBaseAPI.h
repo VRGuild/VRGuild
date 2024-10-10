@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include "Json.h"
+#include "JsonObjectConverter.h"
+#include "Global/API/CBPLJsonParse.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
 #include "CACBaseAPI.generated.h"
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -22,7 +25,7 @@ protected:
 
 	virtual void InitializeComponent() override;
 
-	bool bHttpWaitresponse = false;
+	bool bHttpWaitResponse = false;
 
 	AActor* Owner;
 
@@ -39,13 +42,35 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FString HttpResult;
 
-
 	template<typename T>
-	void HttpPostCall(T sendData);
+	void HttpPostCall(T sendData) {
+		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		if (bHttpWaitResponse)
+			return;
+		bHttpWaitResponse = true;
+
+		FHttpModule& httpModule = FHttpModule::Get();
+
+		TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
+
+		FString jsonStr = "";
+		TSharedPtr<FJsonObject> JsonObject = FJsonObjectConverter::UStructToJsonObject<T>(sendData);
+		TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&jsonStr);
+
+		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
+
+		req->SetURL(this->URL);
+		req->SetVerb("POST");
+		req->SetHeader("content-type", "application/json");
+		req->SetContentAsString(jsonStr);
+
+		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpPostCallBack);
+
+		req->ProcessRequest();
+	};
 
 	void HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void HttpSuccessLogic();
+	virtual void OnSuccessAPI();
 };
 

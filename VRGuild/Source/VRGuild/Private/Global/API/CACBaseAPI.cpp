@@ -2,7 +2,6 @@
 
 
 #include "Global/API/CACBaseAPI.h"
-#include "Global/API/CBPLJsonParse.h"
 
 // Sets default values for this component's properties
 UCACBaseAPI::UCACBaseAPI()
@@ -41,35 +40,9 @@ void UCACBaseAPI::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	// ...
 }
 
-
-template<typename T>
-void UCACBaseAPI::HttpPostCall(T sendData)
-{
-	UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
-	if (bHttpWaitresponse)
-		return;
-	bHttpWaitresponse = true;
-
-	FHttpModule& httpModule = FHttpModule::Get();
-
-	TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
-
-	FString json = UCBPLJsonParse::JsonPerse<T>(sendData);
-
-	req->SetURL(this->URL);
-	req->SetVerb("POST");
-	req->SetHeader("content-type", "application/json");
-	req->SetContentAsString(json);
-
-	req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpPostCallBack);
-
-	req->ProcessRequest();
-
-}
-
 void UCACBaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnResHttpPostLoginCallBack"));
+	UE_LOG(LogTemp, Warning, TEXT("HttpPostCallBack"));
 	if (bConnectedSuccessfully)
 	{
 		FString jsonString = res->GetContentAsString();
@@ -79,8 +52,13 @@ void UCACBaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bo
 		if (res->GetResponseCode() == 200)
 		{
 			//성공 했을때 동작 추가
-			HttpSuccessLogic();
+			OnSuccessAPI();
 		}
 	}
-	bHttpWaitresponse = false;
+	bHttpWaitResponse = false;
+};
+
+void UCACBaseAPI::OnSuccessAPI()
+{
+	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI %s"), *this->HttpResult);
 }

@@ -62,5 +62,5 @@ void ACABaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, boo
 			HttpSuccessLogic();
 		}
 	}
-	bHttpWaitresponse = false;
+	bHttpWaitResponse = false;
 }
