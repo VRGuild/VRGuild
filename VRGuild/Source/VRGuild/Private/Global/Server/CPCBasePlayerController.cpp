@@ -7,15 +7,25 @@
 #include "OnlineSubsystemTypes.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "OnlineSessionSettings.h"
+#include "GameFramework/GameSession.h"
+#include "Kismet/GameplayStatics.h"
+#include "Global/Server/CGMBaseServer.h"
+#include "Global/CGIGameInstance.h"
 
 ACPCBasePlayerController::ACPCBasePlayerController()
 {
+
 }
 
 void ACPCBasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	Login();
+	if (IsLocalPlayerController())
+	{
+		NextPort = -1;
+		Login();
+		//SessionName = FName("TESTSession");//FName(FGuid::NewGuid().ToString());
+	}
 }
 
 void ACPCBasePlayerController::Login()
@@ -32,10 +42,11 @@ void ACPCBasePlayerController::Login()
 	// This can happen if your player travels to a dedicated server or different maps as BeginPlay() will be called each time.
 
 	FUniqueNetIdPtr NetId = Identity->GetUniquePlayerId(0);
-
 	if (NetId != nullptr && Identity->GetLoginStatus(0) == ELoginStatus::LoggedIn)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Already Logged in to EOS"));
+		OnLoginAPICall();
+
 		return;
 	}
 
@@ -95,7 +106,41 @@ void ACPCBasePlayerController::ConnectToServer()
 	FindSessions();
 }
 
+void ACPCBasePlayerController::TravelToNextServer()
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
 
+	DestroySessionDelegateHandle =
+		Session->AddOnDestroySessionCompleteDelegate_Handle(FOnDestroySessionCompleteDelegate::CreateUObject(
+			this,
+			&ThisClass::OnDestroySessionComplete));
+
+	if (!Session->DestroySession(SessionName))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session in PlayerController."));
+	}
+}
+
+void ACPCBasePlayerController::OnDestroySessionComplete(FName sessionName, bool bWasSuccessful)
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
+
+	if (bWasSuccessful)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Destroyed session [%s], succesfully."), *sessionName.ToString());
+
+		if(GetWorld()) ServerGetPort();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session."));
+	}
+
+	Session->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionDelegateHandle);
+	DestroySessionDelegateHandle.Reset();
+}
 
 void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
 {
@@ -105,6 +150,7 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 	*/
 	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
 	IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
+
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Login callback completed!"));;
@@ -112,6 +158,9 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 		//UE_LOG(LogTemp, Log, TEXT("Searching for a session..."));
 		//// Maybe via button or player action? Maybe add parameters here
 		//FindSessions();
+		
+		//APICall Check
+		OnLoginAPICall();
 	}
 	else //Login failed
 	{
@@ -124,7 +173,22 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 	LoginDelegateHandle.Reset();
 }
 
-void ACPCBasePlayerController::FindSessions(FName SearchKey, FString SearchValue) //put default value for example 
+void ACPCBasePlayerController::ServerGetPort_Implementation()
+{
+	auto GM = GetWorld()->GetAuthGameMode<ACGMBaseServer>();
+	if (GM)
+	{
+		ClientGetPort(GM->GetNextPort());
+	}
+}
+
+void ACPCBasePlayerController::ClientGetPort_Implementation(int64 nextPort)
+{
+	NextPort = nextPort;
+	FindSessions();
+}
+
+void ACPCBasePlayerController::FindSessions(FString searchValue, FName searchKey) //put default value for example 
 {
 	// Tutorial 4: This function will find our EOS Session that was created by our DedicatedServer. 
 
@@ -135,14 +199,35 @@ void ACPCBasePlayerController::FindSessions(FName SearchKey, FString SearchValue
 	// Remove the default search parameters that FOnlineSessionSearch sets up.
 	Search->QuerySettings.SearchParams.Empty();
 
-	Search->QuerySettings.Set(SearchKey, SearchValue, EOnlineComparisonOp::Equals); // Seach using our Key/Value pair
+	FString searchValueStr;
+
+	if (searchValue == TEXT(""))
+	{
+		FParse::Value(FCommandLine::Get(), TEXT("SearchValue="), searchValueStr);
+		if (searchValueStr == TEXT(""))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Could not find SearchValue in Commandline .\n Default value \"KeyValue\" added for SearchValueStr"));
+			searchValueStr = "KeyValue";
+		}
+	}
+	else searchValueStr = searchValue;
+
+	Search->QuerySettings.Set(searchKey, searchValueStr, EOnlineComparisonOp::Equals); // Seach using our Key/Value pair
+
+	if (NextPort != -1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Searching port : %d"), NextPort);
+		Search->QuerySettings.Set("Port", NextPort, EOnlineComparisonOp::Equals); // Search for next server's port number;
+	}
+
+
 	FindSessionsDelegateHandle =
 		Session->AddOnFindSessionsCompleteDelegate_Handle(FOnFindSessionsCompleteDelegate::CreateUObject(
 			this,
 			&ThisClass::HandleFindSessionsCompleted,
 			Search));
 
-	UE_LOG(LogTemp, Log, TEXT("Finding session."));
+	UE_LOG(LogTemp, Log, TEXT("Finding session: %s."), *searchValueStr);
 
 	if (!Session->FindSessions(0, Search))
 	{
@@ -178,12 +263,20 @@ void ACPCBasePlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, 
 				{
 				}
 				*/
-
 				//Ensure the connection string is resolvable and store the info in ConnectInfo and in SessionToJoin
 				if (Session->GetResolvedConnectString(SessionInSearchResult, NAME_GamePort, ConnectString))
 				{
 					SessionToJoin = &SessionInSearchResult;
 					bSuccess = true;
+
+					if (NextPort != -1)
+					{
+						TArray<FString> Parts;
+						ConnectString.ParseIntoArray(Parts, TEXT(":"), true);
+						Parts[1] = FString::FromInt(NextPort);
+						ConnectString = Parts[0] + TEXT(":") + Parts[1];
+					}
+
 					UE_LOG(LogTemp, Log, TEXT("[%d] ConnectString: %s"), count,
 						*ConnectString);
 				}
@@ -222,14 +315,14 @@ void ACPCBasePlayerController::JoinSession()
 			this,
 			&ThisClass::HandleJoinSessionCompleted));
 
-	UE_LOG(LogTemp, Log, TEXT("Joining session."));
-	if (!Session->JoinSession(0, "TestSession", *SessionToJoin))
+	UE_LOG(LogTemp, Log, TEXT("Joining session: %s"), *SessionToJoin->GetSessionIdStr());
+	if (!Session->JoinSession(0, SessionName, *SessionToJoin))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Join session failed"));
 	}
 }
 
-void ACPCBasePlayerController::HandleJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+void ACPCBasePlayerController::HandleJoinSessionCompleted(FName sessionName, EOnJoinSessionCompleteResult::Type Result)
 {
 	// Tutorial 4: This function is triggered via the callback we set in JoinSession once the session is joined (or there is a failure)
 
@@ -237,24 +330,30 @@ void ACPCBasePlayerController::HandleJoinSessionCompleted(FName SessionName, EOn
 	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
 	if (Result == EOnJoinSessionCompleteResult::Success)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Joined session."));
 		if (GEngine)
 		{
 			// For the purposes of this tutorial overriding the ConnectString to point to localhost as we are testing locally. In a real game no need to override. Make sure you can connect over UDP to the ip:port of your server!
 			//ConnectString = "127.0.0.1:7777";
-			FURL DedicatedServerURL(nullptr, *ConnectString, TRAVEL_Absolute);
+
+			UE_LOG(LogTemp, Log, TEXT("Joined session [%s] with ConnectString %s."), *sessionName.ToString(), *ConnectString);
+
+			
 			FString DedicatedServerJoinError;
-			auto DedicatedServerJoinStatus = GEngine->Browse(GEngine->GetWorldContextFromWorldChecked(GetWorld()), DedicatedServerURL, DedicatedServerJoinError);
+			auto DedicatedServerJoinStatus =
 
 			GEngine->OnTravelFailure().AddUObject(this, &ThisClass::OnTravelError);
-
-			if (DedicatedServerJoinStatus == EBrowseReturnVal::Failure)
+			ClientTravel(ConnectString, ETravelType::TRAVEL_Partial);
+			
+			//FURL DedicatedServerURL(nullptr, *ConnectString, TRAVEL_Absolute);
+			//GEngine->Browse(GEngine->GetWorldContextFromWorldChecked(GetWorld()), DedicatedServerURL, DedicatedServerJoinError);	
+			/*if (DedicatedServerJoinStatus == EBrowseReturnVal::Failure)
 			{
 				UE_LOG(LogTemp, Error, TEXT("Failed to browse for dedicated server. Error is: %s"), *DedicatedServerJoinError);
-			}
+			}*/
 
 			// To be thorough here you should modify your derived UGameInstance to handle the NetworkError and TravelError events. 
 			// As we are testing locally, and for the purposes of keeping this tutorial simple, this is omitted. 
+			// API Call Login
 		}
 	}
 	Session->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionDelegateHandle);

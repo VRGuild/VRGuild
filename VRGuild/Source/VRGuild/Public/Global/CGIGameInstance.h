@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Interfaces/OnlineSessionDelegates.h"
 #include "CGIGameInstance.generated.h"
 
 /**
@@ -14,9 +15,11 @@ class VRGUILD_API UCGIGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
-	
 protected:
+	virtual void Init() override;
+
 	virtual void Shutdown() override;
 		
+	FDelegateHandle DestroySessionDelegateHandle;
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 };
