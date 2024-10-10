@@ -36,15 +36,12 @@ protected:
 	virtual void InitializeComponent() override;
 
 	class ACPCBasePlayerController* OwnerPlayerController;
-public:
-	UFUNCTION(BlueprintCallable)
-	void LoginPostAPI();
 
-	void LoginPostAPICallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
+	UFUNCTION(BlueprintCallable)
+	void LoginPostCall();
+
+	virtual void OnSuccessAPI() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnLoginAPISuccess(FJsonLogin resultData);
-
-	FString JsonStringfy(FJsonLogin someStruct);
-	FJsonLogin JsonPerse(FString someString);
+	void OnLoginComple();
 };

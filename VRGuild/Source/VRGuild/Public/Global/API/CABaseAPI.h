@@ -36,7 +36,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	bool bHttpWaitresponse = false;
+	bool bHttpWaitResponse = false;
 
 public:	
 	// Called every frame
