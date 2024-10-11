@@ -54,7 +54,7 @@ public:
 	template <typename T>
 	void HttpPostCall(T sendData);
 
-	void HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
+	void HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HttpSuccessLogic();
