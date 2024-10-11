@@ -12,7 +12,7 @@ UCACLoginAPI::UCACLoginAPI()
 	PrimaryComponentTick.bCanEverTick = false;
 	bWantsInitializeComponent = true;
 	
-	this->URL = "http://localhost:3000/api";
+	this->URL = "http://125.132.216.190:15530/api/auth/epicgames/callback";
 }
 
 void UCACLoginAPI::BeginPlay()

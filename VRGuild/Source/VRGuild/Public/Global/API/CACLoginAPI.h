@@ -11,12 +11,12 @@ struct FJsonLogin
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	FJsonLogin() : Token("Empty"){};
+	FJsonLogin() : Code("Empty"){};
 
-	FJsonLogin(FString token) : Token(token) { };
+	FJsonLogin(FString code) : Code(code) { };
 
 	UPROPERTY(BlueprintReadOnly)
-	FString Token;
+	FString Code;
 };
 
 /**
