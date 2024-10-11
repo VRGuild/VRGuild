@@ -42,8 +42,13 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FString HttpResult;
 
+	UPROPERTY(BlueprintReadOnly)
+	FString OAuthToken;
+	
+	void SetOAuthToken(FString token) { OAuthToken = "Bearer " + token; };
+
 	template<typename T>
-	void HttpPostCall(T sendData) {
+	void HttpJsonContentTypeCall(T sendData, FString Verb) {
 		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
 		if (bHttpWaitResponse)
 			return;
@@ -60,17 +65,45 @@ public:
 		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
 
 		req->SetURL(this->URL);
-		req->SetVerb("POST");
+		req->SetVerb(Verb);
 		req->SetHeader("content-type", "application/json");
+		if (OAuthToken.IsEmpty())
+			req->SetHeader("Authorization", OAuthToken);
 		req->SetContentAsString(jsonStr);
 
-		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpPostCallBack);
+		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpCallBack);
 
 		req->ProcessRequest();
 	};
 
-	void HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
+	template<typename T>
+	void HttpGetCall(T sendData) {
+		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		HttpJsonContentTypeCall<T>(sendData, "GET");
+	};
+
+	template<typename T>
+	void HttpPostCall(T sendData) {
+		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		HttpJsonContentTypeCall<T>(sendData, "POST");
+	};
+
+	template<typename T>
+	void HttpDeleteCall(T sendData) {
+		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		HttpJsonContentTypeCall<T>(sendData, "DELETE");
+	};
+
+	template<typename T>
+	void HttpPatchCall(T sendData) {
+		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		HttpJsonContentTypeCall<T>(sendData, "PATCH");
+	};
+
+	void HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 
 	virtual void OnSuccessAPI();
+
+
 };
 

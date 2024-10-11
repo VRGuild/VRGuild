@@ -31,7 +31,6 @@ void UCACBaseAPI::InitializeComponent()
 	this->Owner = GetOwner();
 }
 
-
 // Called every frame
 void UCACBaseAPI::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -40,7 +39,7 @@ void UCACBaseAPI::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	// ...
 }
 
-void UCACBaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
+void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("HttpPostCallBack"));
 	if (bConnectedSuccessfully)

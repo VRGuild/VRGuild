@@ -42,12 +42,12 @@ void ACABaseAPI::HttpPostCall(T sendData)
 	req->SetHeader("content-type", "application/json");
 	req->SetContentAsString(json);
 
-	req->OnProcessRequestComplete().BindUObject(this, &ACABaseAPI::HttpPostCallBack);
+	req->OnProcessRequestComplete().BindUObject(this, &ACABaseAPI::HttpCallBack);
 
 	req->ProcessRequest();
 }
 
-void ACABaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
+void ACABaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnResHttpPostLoginCallBack"));
 	if (bConnectedSuccessfully)
