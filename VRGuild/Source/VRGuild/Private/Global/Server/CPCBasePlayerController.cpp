@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Global/Server/CGMBaseServer.h"
 #include "Global/CGIGameInstance.h"
+#include "GameFramework/PlayerState.h"
 
 ACPCBasePlayerController::ACPCBasePlayerController()
 {
@@ -24,6 +25,69 @@ void ACPCBasePlayerController::BeginPlay()
 		NextPort = -1;
 		Login();
 		//SessionName = FName("TESTSession");//FName(FGuid::NewGuid().ToString());
+	}
+}
+
+//static TAutoConsoleVariable<bool> CVarVoiceChat(TEXT("jk.DebugVoiceChat"), false, TEXT("Display voicechat debug"), ECVF_Cheat);
+
+void ACPCBasePlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	TotalTime += DeltaTime;
+	if (TotalTime > MaxTime)
+	{
+		if (VoiceChatUser)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Connected to voice chat"));
+			if (IOnlineIdentityPtr Identity = Online::GetSubsystem(GetWorld())->GetIdentityInterface())
+			{
+				//const FUniqueNetIdRepl nice = PlayerState->GetUniqueId();
+				//*nice.GetUniqueNetId()
+				FString PlayerName = Identity->GetPlayerNickname(0);
+				if (PlayerName != "")
+				{
+					for (FString Channel : VoiceChatUser->GetChannels())
+					{
+						UE_LOG(LogTemp, Warning, TEXT("------[%s]------"), *Channel);
+
+						for (FString player : VoiceChatUser->GetPlayersInChannel(Channel))
+						{
+							UE_LOG(LogTemp, Warning, TEXT("[%s] %s"), *Channel, *player);
+						}
+						UE_LOG(LogTemp, Warning, TEXT("------------"));
+					}
+
+					FString name = VoiceChatUser->GetInputDeviceInfo().DisplayName;
+					if (VoiceChatUser->GetAudioInputDeviceMuted())
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Audio device is Muted %s"), *name);
+					}
+					else UE_LOG(LogTemp, Warning, TEXT("Audio device %s"), *name);
+
+					if (VoiceChatUser->IsPlayerMuted(PlayerName))
+					{
+						UE_LOG(LogTemp, Warning, TEXT("%s is Muted"), *PlayerName);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("%s is not Muted"), *PlayerName);
+						if (VoiceChatUser->IsPlayerTalking(*PlayerName))
+						{
+							UE_LOG(LogTemp, Warning, TEXT("%s is Talking"), *PlayerName);
+						}
+						else UE_LOG(LogTemp, Warning, TEXT("%s is not Talking"), *PlayerName);
+					}
+				}
+				else UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
+			}
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("No VoiceChatUser"));
+		/*if (CVarVoiceChat.GetValueOnGameThread())
+		{
+
+		}*/
+		TotalTime = 0;
 	}
 }
 
@@ -138,13 +202,19 @@ void ACPCBasePlayerController::StartVoiceChat()
 					{
 						const FPlatformUserId platformUserId = FPlatformMisc::GetPlatformUserForUserIndex(0);
 
-						FString playerName = "myPlayerName";
+						IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+						IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
 
-						voiceChat->Login(platformUserId, playerName, "", FOnVoiceChatLoginCompleteDelegate::CreateLambda([this, voiceChat](const FString& playerName_in, const FVoiceChatResult& result)
+						FString playerName = Identity->GetPlayerNickname(0);
+						UE_LOG(LogTemp, Warning, TEXT("Getting EOS Room token with name %s"), *playerName);
+
+						VoiceChatUser = voiceChat->CreateUser();
+
+						VoiceChatUser->Login(platformUserId, playerName, "", FOnVoiceChatLoginCompleteDelegate::CreateLambda([this](const FString& playerName, const FVoiceChatResult& result)
 							{
 								if (result.IsSuccess())
 								{
-									GetEOSRoomToken(voiceChat, playerName_in);
+									GetEOSRoomToken(VoiceChatUser->GetLoggedInPlayerName());
 								}
 								else UE_LOG(LogTemp, Warning, TEXT("Voice chat login fail"));
 							}
@@ -161,9 +231,9 @@ void ACPCBasePlayerController::StartVoiceChat()
 	else UE_LOG(LogTemp, Warning, TEXT("Voice chat get fail"));
 }
 
-void ACPCBasePlayerController::GetEOSRoomToken(IVoiceChat* voiceChat, FString playerName_in)
+void ACPCBasePlayerController::GetEOSRoomToken(FString playerName)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Voice chat login success: PlayerName: %s"), *playerName_in);
+	UE_LOG(LogTemp, Warning, TEXT("Voice chat login success: PlayerName: %s"), *playerName);
 
 	FString ConfigDeploymentId;
 	FString ConfigClientId;
@@ -187,9 +257,9 @@ void ACPCBasePlayerController::GetEOSRoomToken(IVoiceChat* voiceChat, FString pl
 	HttpRequest->SetURL("https://api.epicgames.dev/auth/v1/oauth/token");
 	HttpRequest->SetVerb("POST");
 
-	HttpRequest->OnProcessRequestComplete().BindLambda([this, ConfigDeploymentId, VoiceRoomName, playerName_in, voiceChat](FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bConnectedSuccessfully)
+	HttpRequest->OnProcessRequestComplete().BindLambda([this, ConfigDeploymentId, playerName, VoiceRoomName](FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bConnectedSuccessfully)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Response -> %s, PlayerName :%s"), *ResponsePtr->GetContentAsString(), *playerName_in);
+			UE_LOG(LogTemp, Warning, TEXT("Response -> %s"), *ResponsePtr->GetContentAsString());
 			FString AccessTokenString;
 			TSharedPtr<FJsonObject> JsonObject;
 
@@ -216,7 +286,7 @@ void ACPCBasePlayerController::GetEOSRoomToken(IVoiceChat* voiceChat, FString pl
 			RoomTokenRequest->AppendToHeader(TEXT("Accept"), TEXT("application/json"));
 			RoomTokenRequest->AppendToHeader(TEXT("Authorization"), *FString::Printf(TEXT("Bearer %s"), *AccessTokenString));
 
-			const FString ProductUserId = playerName_in;
+			const FString ProductUserId = playerName;
 			UE_LOG(LogTemp, Warning, TEXT("ProductUserId :%s"), *ProductUserId);
 			bool bHardMuted = false;
 
@@ -225,7 +295,7 @@ void ACPCBasePlayerController::GetEOSRoomToken(IVoiceChat* voiceChat, FString pl
 			RoomTokenRequest->SetURL(FString::Printf(TEXT("https://api.epicgames.dev/rtc/v1/%s/room/%s"), *ConfigDeploymentId, *VoiceRoomName));
 			RoomTokenRequest->SetVerb("POST");
 
-			RoomTokenRequest->OnProcessRequestComplete().BindLambda([this, VoiceRoomName, playerName_in, voiceChat](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bConnectedSuccessfully)
+			RoomTokenRequest->OnProcessRequestComplete().BindLambda([this, VoiceRoomName, playerName](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bConnectedSuccessfully)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Response -> %s"), *HttpResponsePtr->GetContentAsString());
 					FString TokenString, ClientBaseUrlString;
@@ -274,12 +344,12 @@ void ACPCBasePlayerController::GetEOSRoomToken(IVoiceChat* voiceChat, FString pl
 					}
 
 					FEVIKChannelCredentials ChannelCredentials;
-					ChannelCredentials.OverrideUserId = playerName_in;
+					ChannelCredentials.OverrideUserId = playerName;
 					ChannelCredentials.ClientBaseUrl = ClientBaseUrlString;
 					ChannelCredentials.ParticipantToken = TokenString;
 					UE_LOG(LogTemp, Warning, TEXT("Voice chat login successful %s"), *ChannelCredentials.ToJson());
 
-					JoinVoiceServer(voiceChat, VoiceRoomName, false, ChannelCredentials.ToJson(false));
+					JoinChannel(VoiceRoomName, true, ChannelCredentials.ToJson(false));
 				});
 
 			RoomTokenRequest->ProcessRequest();
@@ -288,7 +358,7 @@ void ACPCBasePlayerController::GetEOSRoomToken(IVoiceChat* voiceChat, FString pl
 	HttpRequest->ProcessRequest();
 }
 
-void ACPCBasePlayerController::JoinVoiceServer(IVoiceChat* voiceChat, FString voiceRoomName, bool bEnableEcho, FString channelCredentialsJson)
+void ACPCBasePlayerController::JoinChannel(FString voiceRoomName, bool bEnableEcho, FString channelCredentialsJson)
 {
 	FVoiceChatChannel3dProperties Properties;
 	Properties.AttenuationModel = EVoiceChatAttenuationModel::InverseByDistance;
@@ -303,8 +373,8 @@ void ACPCBasePlayerController::JoinVoiceServer(IVoiceChat* voiceChat, FString vo
 		UE_LOG(LogTemp, Error, TEXT("Failed to parse channelCredentialsJson"));
 	}
 
-	FString ClientBaseUrl = ChannelCredentialsObject->GetStringField(TEXT("ClientBaseUrl"));
-	FString ParticipantToken = ChannelCredentialsObject->GetStringField(TEXT("ParticipantToken"));
+	FString ClientBaseUrl = ChannelCredentialsObject->GetStringField(TEXT("client_base_url"));
+	FString ParticipantToken = ChannelCredentialsObject->GetStringField(TEXT("participant_token"));
 	EVoiceChatChannelType ChannelType = EVoiceChatChannelType::Positional;
 
 	if (bEnableEcho)
@@ -314,17 +384,28 @@ void ACPCBasePlayerController::JoinVoiceServer(IVoiceChat* voiceChat, FString vo
 	}
 	UE_LOG(LogTemp, Warning, TEXT("bEnableEcho -> %hhd"), bEnableEcho);
 
-	voiceChat->JoinChannel(voiceRoomName, channelCredentialsJson, ChannelType, FOnVoiceChatChannelJoinCompleteDelegate::CreateLambda([&](const FString& ChannelName, const FVoiceChatResult& JoinResult)
+	VoiceChatUser->JoinChannel(voiceRoomName, channelCredentialsJson, ChannelType, FOnVoiceChatChannelJoinCompleteDelegate::CreateLambda([this](const FString& ChannelName, const FVoiceChatResult& JoinResult)
 		{
 			if (JoinResult.IsSuccess())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("JoinVoiceServer Successful"));
+				UE_LOG(LogTemp, Warning, TEXT("JoinVoiceServer Successful %s"), *ChannelName);
+
+				for (FString Channel : VoiceChatUser->GetChannels())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("------[%s]------"), *Channel);
+
+					for (FString player : VoiceChatUser->GetPlayersInChannel(Channel))
+					{
+						UE_LOG(LogTemp, Warning, TEXT("[%s] %s"), *Channel, *player);
+					}
+					UE_LOG(LogTemp, Warning, TEXT("------------"));
+				}
 			}
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("JoinVoiceServer Fail"))
 			}
-		}), 
+		}),
 		Properties
 	);
 }
@@ -365,6 +446,8 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 		//UE_LOG(LogTemp, Log, TEXT("Searching for a session..."));
 		//// Maybe via button or player action? Maybe add parameters here
 		//FindSessions();
+
+		StartVoiceChat();
 	}
 	else //Login failed
 	{

@@ -44,6 +44,8 @@ protected:
 	// Function called when play begins
 	virtual void BeginPlay();
 
+	virtual void Tick(float DeltaTime) override;
+
 	//Function to sign into EOS Game Services
 	void Login();
 
@@ -93,10 +95,13 @@ private:
 
 protected:
 	virtual void OnRep_PlayerState() override;
+
+private:
+	//=============EOS Voice Chat===============
 	void StartVoiceChat();
-
-	void GetEOSRoomToken(IVoiceChat* voiceChat, FString playerName_in);
-
-	void JoinVoiceServer(IVoiceChat* voiceChat, FString voiceRoomName, bool bEnableEcho, FString channelCredentialsJson);
+	void GetEOSRoomToken(FString playerName);
+	void JoinChannel(FString voiceRoomName, bool bEnableEcho, FString channelCredentialsJson);
 	IVoiceChatUser* VoiceChatUser;
+	float TotalTime = 0.f;
+	float MaxTime = 2.f;
 };
