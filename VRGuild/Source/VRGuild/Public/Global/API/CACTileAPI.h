@@ -12,16 +12,15 @@ struct FJsonTile
 	GENERATED_USTRUCT_BODY()
 
 public:
-	FJsonTile() : CreateDate(FDateTime::Now()), Position(FVector(0)) {};
+	FJsonTile() : Position(FVector(0)) {};
 
-	FJsonTile(FVector position) : CreateDate(FDateTime::Now()), Position(position) {};
-
-	UPROPERTY(BlueprintReadOnly)
-	FDateTime CreateDate;
+	FJsonTile(FVector position) :  Position(position) {};
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector Position;
 
+	UPROPERTY(BlueprintReadOnly)
+	int64  type;
 };
 
 USTRUCT(BlueprintType, Atomic)
@@ -30,9 +29,24 @@ struct FJsonZone
 	GENERATED_USTRUCT_BODY()
 
 public:
-	FJsonZone() : CreateDate(FDateTime::Now()), OnwerID("Defualt") { };
+	FJsonZone() { };
 
-	FJsonZone(FString token) : OnwerID(token) { };
+	FJsonZone(FString ownerId) { };
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FJsonTile> TilesData;
+};
+
+
+USTRUCT(BlueprintType, Atomic)
+struct FJsonZoneRespone
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	FJsonZoneRespone() : CreateDate(FDateTime::Now()), OnwerID("Defualt") { };
+
+	FJsonZoneRespone(FString token) : OnwerID(token) { };
 
 	UPROPERTY(BlueprintReadOnly)
 	FDateTime CreateDate;
@@ -43,6 +57,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FJsonTile> TilesData;
 };
+
 
 /**
  * 
@@ -64,10 +79,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void TilePostCall();
 
-	virtual void OnSuccessAPI() override;
+	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnTileZoneDataUpdateComple();
 
 
 };
+
+

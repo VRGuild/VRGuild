@@ -11,14 +11,22 @@ struct FJsonLogin
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	FJsonLogin() : Token("Empty"){};
+	FJsonLogin() : Code("Empty"){};
 
-	FJsonLogin(FString token) : Token(token) { };
+	FJsonLogin(FString code) : Code(code) { };
 
 	UPROPERTY(BlueprintReadOnly)
-	FString Token;
+	FString Code;
 };
 
+
+UENUM()
+enum class ELoginApiTypes
+{
+	EpicLogin,
+	EpicUserInfo,
+	LocalUserInfo
+};
 /**
  * 
  */
@@ -37,12 +45,11 @@ protected:
 
 	class ACPCBasePlayerController* OwnerPlayerController;
 
-
 	UFUNCTION(BlueprintCallable)
-	void LoginPostCall();
+	void EpicLoginPostCall();
 
-	virtual void OnSuccessAPI() override;
-
+	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnLoginComple();
+	void OnEpicLoginComple();
 };

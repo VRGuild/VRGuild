@@ -102,7 +102,7 @@ public:
 
 	void HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 
-	virtual void OnSuccessAPI();
+	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res);
 
 
 };

@@ -44,7 +44,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EtherPostCall();
 
-	virtual void OnSuccessAPI() override;
+	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 

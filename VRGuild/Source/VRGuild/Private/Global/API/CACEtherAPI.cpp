@@ -36,7 +36,7 @@ void UCACEtherAPI::EtherPostCall()
 
 }
 
-void UCACEtherAPI::OnSuccessAPI()
+void UCACEtherAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	OnEtherComple();
 }
