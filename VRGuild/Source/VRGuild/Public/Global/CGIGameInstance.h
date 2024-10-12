@@ -22,4 +22,8 @@ protected:
 		
 	FDelegateHandle DestroySessionDelegateHandle;
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+
+public:
+	// 토큰을 저장하기 위한 변수 입니다.
+	FString TokenID;
 };
