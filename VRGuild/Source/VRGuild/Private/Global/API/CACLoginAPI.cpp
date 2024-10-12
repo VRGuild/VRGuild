@@ -12,7 +12,6 @@ UCACLoginAPI::UCACLoginAPI()
 	PrimaryComponentTick.bCanEverTick = false;
 	bWantsInitializeComponent = true;
 	
-	this->URL = "http://125.132.216.190:15530/api/auth/epicgames/callback";
 }
 
 void UCACLoginAPI::BeginPlay()
@@ -32,8 +31,10 @@ void UCACLoginAPI::InitializeComponent()
 	}
 }
 
-void UCACLoginAPI::LoginPostCall()
+void UCACLoginAPI::EpicLoginPostCall()
 {
+	this->URL = "http://125.132.216.190:15530/api/auth/epicgames/callback";
+
 	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
 	IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
 	FJsonLogin loginToken = FJsonLogin(Identity->GetAuthToken(0));
@@ -41,7 +42,11 @@ void UCACLoginAPI::LoginPostCall()
 	HttpPostCall<FJsonLogin>(loginToken);
 }
 
-void UCACLoginAPI::OnSuccessAPI()
+void UCACLoginAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	OnLoginComple();
+	if (req->GetURL() == "http://125.132.216.190:15530/api/auth/epicgames/callback")
+	{
+		res->GetContentAsString();
+		OnEpicLoginComple();
+	}
 }

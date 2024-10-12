@@ -19,6 +19,14 @@ public:
 	FString Code;
 };
 
+
+UENUM()
+enum class ELoginApiTypes
+{
+	EpicLogin,
+	EpicUserInfo,
+	LocalUserInfo
+};
 /**
  * 
  */
@@ -37,12 +45,11 @@ protected:
 
 	class ACPCBasePlayerController* OwnerPlayerController;
 
-
 	UFUNCTION(BlueprintCallable)
-	void LoginPostCall();
+	void EpicLoginPostCall();
 
-	virtual void OnSuccessAPI() override;
-
+	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnLoginComple();
+	void OnEpicLoginComple();
 };

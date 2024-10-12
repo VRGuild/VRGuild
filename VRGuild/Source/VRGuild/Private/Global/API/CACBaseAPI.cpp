@@ -51,13 +51,13 @@ void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool b
 		if (res->GetResponseCode() == 200)
 		{
 			//성공 했을때 동작 추가
-			OnSuccessAPI();
+			OnSuccessAPI(req, res);
 		}
 	}
 	bHttpWaitResponse = false;
 };
 
-void UCACBaseAPI::OnSuccessAPI()
+void UCACBaseAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI %s"), *this->HttpResult);
 }

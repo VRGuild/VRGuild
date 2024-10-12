@@ -31,13 +31,12 @@ void UCACTileAPI::InitializeComponent()
 void UCACTileAPI::TilePostCall()
 {
 	FJsonZone tileZoneData;
-	tileZoneData.OnwerID = "hi";
 	tileZoneData.TilesData.Add(FJsonTile(FVector(0)));
 
 	HttpPostCall<FJsonZone>(tileZoneData);
 }
 
-void UCACTileAPI::OnSuccessAPI()
+void UCACTileAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	OnTileZoneDataUpdateComple();
 }
