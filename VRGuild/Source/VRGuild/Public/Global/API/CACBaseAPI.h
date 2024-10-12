@@ -99,7 +99,7 @@ public:
 		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
 		HttpJsonContentTypeCall<T>(sendData, "PATCH");
 	};
-
+	
 	void HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res);
