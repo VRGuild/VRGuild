@@ -19,6 +19,14 @@ public:
 	FString Code;
 };
 
+USTRUCT(BlueprintType, Atomic)
+struct FJsonGetLoginInfo
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FJsonGetLoginInfo() {};
+};
+
 
 UENUM()
 enum class ELoginApiTypes
@@ -48,8 +56,14 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EpicLoginPostCall();
 
+	UFUNCTION(BlueprintCallable)
+	void EpicLoginInfoGetCall();
+
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEpicLoginComple();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnEpicGetLoginInfoComple();
 };
