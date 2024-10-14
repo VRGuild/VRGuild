@@ -1,11 +1,13 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CWCharacterCustom.h"
+#include "Character/Customize/CWCharacterCustom.h"
 #include "Components/Button.h"
-#include "CACCharacterHead.h"
+#include "Character/Customize/CACCharacterHead.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/Customize/CACCharacterPartBase.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+
 
 void UCWCharacterCustom::NativeConstruct()
 {
@@ -26,7 +28,7 @@ void UCWCharacterCustom::CustomHead0()
 {
 	if (nullptr != CharacterHeadComponent)
 	{
-		CharacterHeadComponent->SwitchHead(0);
+		CharacterHeadComponent->SwitchSKM(0);
 	}
 }
 
@@ -34,7 +36,7 @@ void UCWCharacterCustom::CustomHead1()
 {
 	if (nullptr != CharacterHeadComponent)
 	{
-		CharacterHeadComponent->SwitchHead(1);
+		CharacterHeadComponent->SwitchSKM(1);
 	}
 }
 
@@ -42,7 +44,7 @@ void UCWCharacterCustom::CustomHead2()
 {
 	if (nullptr != CharacterHeadComponent)
 	{
-		CharacterHeadComponent->SwitchHead(2);
+		CharacterHeadComponent->SwitchSKM(2);
 	}
 }
 
