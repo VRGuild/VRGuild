@@ -1,8 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CACCustomInteraction.h"
-#include "CWCharacterCustom.h"
+#include "Character/Customize/CACCustomInteraction.h"
+#include "Character/Customize/CWCharacterCustom.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 
 // Sets default values for this component's properties
