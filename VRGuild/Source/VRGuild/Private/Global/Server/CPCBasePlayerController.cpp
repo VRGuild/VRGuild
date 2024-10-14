@@ -15,6 +15,7 @@
 
 ACPCBasePlayerController::ACPCBasePlayerController()
 {
+
 }
 
 void ACPCBasePlayerController::BeginPlay()
@@ -105,10 +106,11 @@ void ACPCBasePlayerController::Login()
 	// This can happen if your player travels to a dedicated server or different maps as BeginPlay() will be called each time.
 
 	FUniqueNetIdPtr NetId = Identity->GetUniquePlayerId(0);
-
 	if (NetId != nullptr && Identity->GetLoginStatus(0) == ELoginStatus::LoggedIn)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Already Logged in to EOS"));
+		OnLoginAPICall();
+
 		return;
 	}
 
@@ -447,7 +449,10 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 		//// Maybe via button or player action? Maybe add parameters here
 		//FindSessions();
 
-		StartVoiceChat();
+		//
+		
+		//APICall Check
+		OnLoginAPICall();
 	}
 	else //Login failed
 	{
@@ -640,6 +645,7 @@ void ACPCBasePlayerController::HandleJoinSessionCompleted(FName sessionName, EOn
 
 			// To be thorough here you should modify your derived UGameInstance to handle the NetworkError and TravelError events. 
 			// As we are testing locally, and for the purposes of keeping this tutorial simple, this is omitted. 
+			// API Call Login
 		}
 	}
 	Session->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionDelegateHandle);

@@ -42,13 +42,12 @@ void ACABaseAPI::HttpPostCall(T sendData)
 	req->SetHeader("content-type", "application/json");
 	req->SetContentAsString(json);
 
-	req->OnProcessRequestComplete().BindUObject(this, &ACABaseAPI::HttpPostCallBack);
+	req->OnProcessRequestComplete().BindUObject(this, &ACABaseAPI::HttpCallBack);
 
 	req->ProcessRequest();
 }
 
-template<typename T>
-void ACABaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
+void ACABaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnResHttpPostLoginCallBack"));
 	if (bConnectedSuccessfully)
@@ -60,7 +59,8 @@ void ACABaseAPI::HttpPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res, boo
 		if (res->GetResponseCode() == 200)
 		{
 			//성공 했을때 동작 추가
+			HttpSuccessLogic();
 		}
 	}
-	bHttpWaitresponse = false;
+	bHttpWaitResponse = false;
 }
