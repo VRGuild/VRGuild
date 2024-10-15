@@ -4,18 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Character/Customize/CACCharacterPartBase.h"
-#include "CACCharacterHead.generated.h"
+#include "CACCharacterLower.generated.h"
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class VRGUILD_API UCACCharacterHead : public UCACCharacterPartBase
+/**
+ * 
+ */
+UCLASS()
+class VRGUILD_API UCACCharacterLower : public UCACCharacterPartBase
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
-	UCACCharacterHead();
+	UCACCharacterLower();
 
 protected:
-
+	
 };
