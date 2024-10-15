@@ -80,7 +80,14 @@ void ACPCBasePlayerController::Tick(float DeltaTime)
 						else UE_LOG(LogTemp, Warning, TEXT("%s is not Talking"), *PlayerName);
 					}
 				}
-				else UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
+				else
+				{
+					if (PlayerState)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
+					}	
+					else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));
+				}
 			}
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("No VoiceChatUser"));
