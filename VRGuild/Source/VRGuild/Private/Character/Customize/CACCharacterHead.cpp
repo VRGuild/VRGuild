@@ -29,10 +29,5 @@ UCACCharacterHead::UCACCharacterHead()
 	}
 }
 
-// Called when the game starts
-void UCACCharacterHead::BeginPlay()
-{
-	Super::BeginPlay();
-}
 
 
