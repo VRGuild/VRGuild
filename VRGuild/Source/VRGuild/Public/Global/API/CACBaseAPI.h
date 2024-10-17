@@ -49,7 +49,7 @@ public:
 
 	template<typename T>
 	void HttpJsonContentTypeCall(T sendData, FString Verb) {
-		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		UE_LOG(LogTemp, Display, TEXT("HttpJsonContentTypeCall"));
 		if (bHttpWaitResponse)
 			return;
 		bHttpWaitResponse = true;
@@ -68,7 +68,7 @@ public:
 		req->SetVerb(Verb);
 		req->SetHeader("content-type", "application/json");
 		if (OAuthToken.IsEmpty())
-			req->SetHeader("Authorization", OAuthToken);
+			req->SetHeader("Authorization", "Bearer " + OAuthToken);
 		req->SetContentAsString(jsonStr);
 
 		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpCallBack);
@@ -78,25 +78,40 @@ public:
 
 	template<typename T>
 	void HttpGetCall(T sendData) {
-		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
-		HttpJsonContentTypeCall<T>(sendData, "GET");
+		UE_LOG(LogTemp, Display, TEXT("HttpGetCall"));
+		if (bHttpWaitResponse)
+			return;
+		bHttpWaitResponse = true;
+
+		FHttpModule& httpModule = FHttpModule::Get();
+
+		TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
+
+		req->SetURL(this->URL);
+		req->SetVerb("GET");
+		req->SetHeader("content-type", "application/json");
+		req->SetHeader("Authorization", "Bearer " + OAuthToken);;
+
+		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpCallBack);
+
+		req->ProcessRequest();
 	};
 
 	template<typename T>
 	void HttpPostCall(T sendData) {
-		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		UE_LOG(LogTemp, Display, TEXT("HttpPostCall"));
 		HttpJsonContentTypeCall<T>(sendData, "POST");
 	};
 
 	template<typename T>
 	void HttpDeleteCall(T sendData) {
-		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		UE_LOG(LogTemp, Display, TEXT("HttpDeleteCall"));
 		HttpJsonContentTypeCall<T>(sendData, "DELETE");
 	};
 
 	template<typename T>
 	void HttpPatchCall(T sendData) {
-		UE_LOG(LogTemp, Display, TEXT("HttpPostLoginCall"));
+		UE_LOG(LogTemp, Display, TEXT("HttpPatchCall"));
 		HttpJsonContentTypeCall<T>(sendData, "PATCH");
 	};
 	
