@@ -7,32 +7,22 @@
 #include "Global/API/CBPLJsonParse.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
-#include "CACBaseAPI.generated.h"
+#include "Blueprint/UserWidget.h"
+#include "CWGBaseAPI.generated.h"
 
-UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class VRGUILD_API UCACBaseAPI : public UActorComponent
+/**
+ * 
+ */
+UCLASS()
+class VRGUILD_API UCWGBaseAPI : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
-	UCACBaseAPI();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	virtual void InitializeComponent() override;
-
 	bool bHttpWaitResponse = false;
 
-	AActor* Owner;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "API")
 	FString URL = "";
 
@@ -44,7 +34,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	FString OAuthToken;
-	
+
 	void SetOAuthToken();// { OAuthToken = "Bearer " + token; };
 
 	template<typename T>
@@ -73,7 +63,7 @@ public:
 			req->SetHeader("Authorization", "Bearer " + OAuthToken);
 		req->SetContentAsString(jsonStr);
 
-		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpCallBack);
+		req->OnProcessRequestComplete().BindUObject(this, &UCWGBaseAPI::HttpCallBack);
 
 		req->ProcessRequest();
 	};
@@ -97,7 +87,7 @@ public:
 		if (!OAuthToken.IsEmpty())
 			req->SetHeader("Authorization", "Bearer " + OAuthToken);;
 
-		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpCallBack);
+		req->OnProcessRequestComplete().BindUObject(this, &UCWGBaseAPI::HttpCallBack);
 
 		req->ProcessRequest();
 	};
@@ -119,11 +109,9 @@ public:
 		UE_LOG(LogTemp, Display, TEXT("HttpPatchCall"));
 		HttpJsonContentTypeCall<T>(sendData, "PATCH");
 	};
-	
+
 	void HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res);
 
-
 };
-

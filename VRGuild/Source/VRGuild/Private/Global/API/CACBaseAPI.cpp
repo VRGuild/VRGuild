@@ -2,6 +2,8 @@
 
 
 #include "Global/API/CACBaseAPI.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSubsystemUtils.h"
 
 // Sets default values for this component's properties
 UCACBaseAPI::UCACBaseAPI()
@@ -39,9 +41,19 @@ void UCACBaseAPI::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	// ...
 }
 
+void UCACBaseAPI::SetOAuthToken()
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	if (Subsystem)
+	{
+		IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
+		this->OAuthToken = Identity->GetAuthToken(0);
+	}
+}
+
 void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
-	UE_LOG(LogTemp, Warning, TEXT("HttpPostCallBack"));
+	UE_LOG(LogTemp, Warning, TEXT("HttpCallBack"));
 	if (bConnectedSuccessfully)
 	{
 		FString jsonString = res->GetContentAsString();
