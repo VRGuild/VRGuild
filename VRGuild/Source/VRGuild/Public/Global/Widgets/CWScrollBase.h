@@ -20,6 +20,8 @@ class VRGUILD_API UCWScrollBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	bool Init(TSubclassOf<UUserWidget> widgetToDisplay);
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;

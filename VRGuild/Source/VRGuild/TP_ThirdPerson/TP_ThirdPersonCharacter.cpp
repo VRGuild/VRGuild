@@ -10,6 +10,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Blueprint/UserWidget.h"
+#include "Global/Widgets/CWScrollBase.h"
+#include "Net/UnrealNetwork.h"
+
+#include "Global/Components/CACInteraction.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -52,12 +57,21 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	InteractionComponent = CreateDefaultSubobject<UCACInteraction>("InteractionComponent");
 }
 
 void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void ATP_ThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATP_ThirdPersonCharacter, ActorInHand);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,5 +140,57 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ATP_ThirdPersonCharacter::HoldPoster(TSubclassOf<AActor> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay)
+{
+	if (WidgetToDisplay)
+	{
+		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
+
+		if (ScrollBaseWidget && ScrollBaseWidget->Init(WidgetToDisplay))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("2222"));
+			ServerHoldPoster(ActorToHold);
+		}
+	}
+}
+
+void ATP_ThirdPersonCharacter::ServerHoldPoster_Implementation(TSubclassOf<AActor> ActorToHold)
+{
+	UE_LOG(LogTemp, Warning, TEXT("3333"));
+	if (ActorToHold)
+	{
+		ActorInHand = GetWorld()->SpawnActor<AActor>(ActorToHold, GetActorTransform());
+		if (ActorInHand)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s Success %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"),
+				*GetNameSafe(ActorInHand));
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("%s Failed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));			
+	}		
+}
+
+void ATP_ThirdPersonCharacter::OnRep_ActorInHand()
+{
+	if (IsLocallyControlled())
+	{
+		if (ActorInHand)
+		{
+			if (ScrollBaseWidget)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("4444"));
+				ScrollBaseWidget->AddToViewport();
+			}
+		}
+		else
+		{
+			if (!ScrollBaseWidget)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("5555"));
+				ScrollBaseWidget->RemoveFromViewport();
+			}
+		}
 	}
 }
