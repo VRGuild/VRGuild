@@ -23,70 +23,29 @@ void UCWCharacterCustom::NativeConstruct()
 		CharacterBodyComponent = PlayerCharacter->FindComponentByClass<UCACCharacterBody>();
 		CharacterLowerComponent = PlayerCharacter->FindComponentByClass<UCACCharacterLower>();
 		CharacterCustomComponent = PlayerCharacter->FindComponentByClass<UCACCustomInteraction>();
+		OnPlayerComponentLoaded();
 	}
-	Bt_HeadMesh0->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomHead0);
-	Bt_HeadMesh1->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomHead1);
-	Bt_HeadMesh2->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomHead2);
-	Bt_BodyMesh1->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomBody1);
-	Bt_BodyMesh2->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomBody2);
-	Bt_LowerMesh1->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomLower1);
-	Bt_LowerMesh2->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomLower2);
-	Bt_CustomEnd->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomEnd);
 }
 
-void UCWCharacterCustom::CustomHead0()
+void UCWCharacterCustom::CustomHead(int32 index)
 {
 	if (nullptr != CharacterHeadComponent)
-	{
-		CharacterHeadComponent->SwitchSKM(0);
-	}
+		CharacterHeadComponent->SwitchSKM(index);
 }
 
-void UCWCharacterCustom::CustomHead1()
-{
-	if (nullptr != CharacterHeadComponent)
-	{
-		CharacterHeadComponent->SwitchSKM(1);
-	}
-}
-
-void UCWCharacterCustom::CustomHead2()
-{
-	if (nullptr != CharacterHeadComponent)
-	{
-		CharacterHeadComponent->SwitchSKM(2);
-	}
-}
-
-void UCWCharacterCustom::CustomBody1()
+void UCWCharacterCustom::CustomBody(int32 index)
 {
 	if (nullptr != CharacterBodyComponent)
 	{
-		CharacterBodyComponent->SwitchSKM(1);
+		CharacterBodyComponent->SwitchSKM(index);
 	}
 }
 
-void UCWCharacterCustom::CustomBody2()
-{
-	if (nullptr != CharacterBodyComponent)
-	{
-		CharacterBodyComponent->SwitchSKM(2);
-	}
-}
-
-void UCWCharacterCustom::CustomLower1()
+void UCWCharacterCustom::CustomLower(int32 index)
 {
 	if (nullptr != CharacterLowerComponent)
 	{
 		CharacterLowerComponent->SwitchSKM(1);
-	}
-}
-
-void UCWCharacterCustom::CustomLower2()
-{
-	if (nullptr != CharacterLowerComponent)
-	{
-		CharacterLowerComponent->SwitchSKM(2);
 	}
 }
 

@@ -7,6 +7,20 @@
 #include "CACCharacterPartBase.generated.h"
 
 
+USTRUCT(BlueprintType, Atomic)
+struct FCustomCharacterInfo
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FCustomCharacterInfo(){};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class USkeletalMesh* CustomSkeletalMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UTexture2D* CustomImage;
+};
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACCharacterPartBase : public UActorComponent
 {
@@ -27,11 +41,10 @@ protected:
 	class AActor* Owner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TMap<int, class USkeletalMesh*> SkeletalMeshBox;
+    TMap<int, FCustomCharacterInfo> SkeletalMeshBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMeshComponent* CharacterSKM;
-
 
 	UFUNCTION(Server, Unreliable)
 	void ServerSwitchSKM(int value);

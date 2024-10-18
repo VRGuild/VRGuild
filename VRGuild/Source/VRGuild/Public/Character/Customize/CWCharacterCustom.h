@@ -17,64 +17,31 @@ class VRGUILD_API UCWCharacterCustom : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_HeadMesh0;
+	UFUNCTION(BlueprintCallable)
+	void CustomHead(int32 index);
+	
+	UFUNCTION(BlueprintCallable)
+	void CustomBody(int32 index);
+	
+	UFUNCTION(BlueprintCallable)
+	void CustomLower(int32 index);
 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_HeadMesh1;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_HeadMesh2;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_BodyMesh1;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_BodyMesh2;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_LowerMesh1;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_LowerMesh2;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Bt_CustomEnd;
-	// Head 
-	UFUNCTION()
-	void CustomHead0();
-
-	UFUNCTION()
-	void CustomHead1();
-
-	UFUNCTION()
-	void CustomHead2();
-	// Body
-	UFUNCTION()
-	void CustomBody1();
-
-	UFUNCTION()
-	void CustomBody2();
-	// Lower
-	UFUNCTION()
-	void CustomLower1();
-
-	UFUNCTION()
-	void CustomLower2();
 	// Custom End 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void CustomEnd();
 
 	// Cast 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn))
 	class UCACCharacterHead* CharacterHeadComponent;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UCACCharacterBody* CharacterBodyComponent;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UCACCharacterLower* CharacterLowerComponent;
 
 	class UCACCustomInteraction* CharacterCustomComponent;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPlayerComponentLoaded();
 };
