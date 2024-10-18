@@ -10,9 +10,13 @@ void UCWScrollBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	OffsetSpeed = 100.f;
+	WheelScrollMultiplier = 5.f;
+	bIsHidden = false;
+
 	if (WidgetToDisplay)
 	{
-		if (auto Widget = CreateWidget(WidgetToDisplay)) 
+		if (auto Widget = CreateWidget(GetOwningPlayer(), WidgetToDisplay))
 		{
 			ScrollBox->AddChild(Widget);
 			ScrollBox->SetConsumeMouseWheel(EConsumeMouseWheel::Never);
@@ -40,19 +44,23 @@ void UCWScrollBase::NativeDestruct()
 			Subsystem->RemoveMappingContext(ScrollingInputContext);
 		}
 	}
-	
+
 	Super::NativeDestruct();
 }
 
 void UCWScrollBase::OnScrollActive(const FInputActionValue& Action)
 {
 	float value = Action.Get<float>();
-	
-	if (IsPlayingAnimation()) return;
 
+	if (IsPlayingAnimation())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Playing Anim"));
+		return;
+	}
+
+	//This code moves the scroller in the same direction as the mouse scroll direction
 	Offset += value * OffsetSpeed;
-
-	if (bIsHidden && Offset > 0.f)
+	if (bIsHidden && Offset < 0.f)
 	{
 		Offset = 0.f;
 	}
@@ -69,7 +77,7 @@ void UCWScrollBase::OnScrollActive(const FInputActionValue& Action)
 			PlayAnimForward();
 			Offset = 0.f;
 			ScrollBox->SetWheelScrollMultiplier(0.f);
-		}
+		}		
 	}
 	else if (Offset > 0.f)
 	{
@@ -82,6 +90,7 @@ void UCWScrollBase::OnScrollActive(const FInputActionValue& Action)
 void UCWScrollBase::OnAnimationFinishedPlaying(UUMGSequencePlayer& Player)
 {
 	Super::OnAnimationFinishedPlaying(Player);
+	UE_LOG(LogTemp, Warning, TEXT("Offset %f"), Offset);
 
 	if (bIsHidden)
 	{
