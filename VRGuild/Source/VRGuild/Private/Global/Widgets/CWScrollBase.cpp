@@ -13,6 +13,7 @@ void UCWScrollBase::NativeConstruct()
 	OffsetSpeed = 100.f;
 	WheelScrollMultiplier = 5.f;
 	bIsHidden = false;
+	bUIMode = false;
 
 	if (WidgetToDisplay)
 	{
@@ -22,27 +23,28 @@ void UCWScrollBase::NativeConstruct()
 			ScrollBox->SetConsumeMouseWheel(EConsumeMouseWheel::Never);
 		}
 	}
-
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetOwningPlayer()->GetLocalPlayer()))
+	EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetOwningPlayer()->GetLocalPlayer());
+	if (EnhancedInputSubsystem)
 	{
-		Subsystem->AddMappingContext(ScrollingInputContext, 0);
+		EnhancedInputSubsystem->AddMappingContext(ScrollingInputContext, 0);
+		EnhancedInputSubsystem->AddMappingContext(UIModeContext, 0);
 	}
 
 	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(GetOwningPlayer()->InputComponent);
 	if (EnhancedInput)
 	{
 		EnhancedInput->BindAction(IA_Scroll, ETriggerEvent::Triggered, this, &UCWScrollBase::OnScrollActive);
+		EnhancedInput->BindAction(IA_UIMode, ETriggerEvent::Started, this, &UCWScrollBase::OnUIModeActive);
+		EnhancedInput->BindAction(IA_UIMode, ETriggerEvent::Completed, this, &UCWScrollBase::OnUIModeActive);
 	}
 }
 
 void UCWScrollBase::NativeDestruct()
 {
-	if (GetOwningPlayer())
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetOwningPlayer()->GetLocalPlayer()))
-		{
-			Subsystem->RemoveMappingContext(ScrollingInputContext);
-		}
+	if (GetOwningPlayer() && EnhancedInputSubsystem)
+	{		
+		EnhancedInputSubsystem->RemoveMappingContext(ScrollingInputContext);
+		EnhancedInputSubsystem->RemoveMappingContext(UIModeContext);
 	}
 
 	Super::NativeDestruct();
@@ -52,14 +54,14 @@ void UCWScrollBase::OnScrollActive(const FInputActionValue& Action)
 {
 	float value = Action.Get<float>();
 
-	if (IsPlayingAnimation())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Playing Anim"));
-		return;
-	}
+	if (IsPlayingAnimation()) return;
 
 	//This code moves the scroller in the same direction as the mouse scroll direction
 	Offset += value * OffsetSpeed;
+
+	UE_LOG(LogTemp, Warning, TEXT("Offset %f"), Offset);
+	UE_LOG(LogTemp, Warning, TEXT("Max: %f"), ScrollBox->GetScrollOffsetOfEnd());
+
 	if (bIsHidden && Offset < 0.f)
 	{
 		Offset = 0.f;
@@ -77,7 +79,9 @@ void UCWScrollBase::OnScrollActive(const FInputActionValue& Action)
 			PlayAnimForward();
 			Offset = 0.f;
 			ScrollBox->SetWheelScrollMultiplier(0.f);
-		}		
+		}
+
+		CheckIfUIMode();
 	}
 	else if (Offset > 0.f)
 	{
@@ -87,15 +91,70 @@ void UCWScrollBase::OnScrollActive(const FInputActionValue& Action)
 	}
 }
 
+void UCWScrollBase::OnUIModeActive(const FInputActionValue& Action)
+{
+	if (bUIMode || bIsHidden) return;
+
+	bool value = Action.Get<bool>();
+	UE_LOG(LogTemp, Warning, TEXT("Keyboard down %d"), value);
+
+	if (EnhancedInputSubsystem)
+	{
+		if (value)
+		{
+			EnhancedInputSubsystem->RemoveMappingContext(ScrollingInputContext);
+		}
+		else EnhancedInputSubsystem->AddMappingContext(ScrollingInputContext, 0);
+	}
+	
+	ChangeInputModeToUI(value);
+}
+
+void UCWScrollBase::ChangeInputModeToUI(bool bEnable)
+{
+	if (bEnable)
+	{
+		GetOwningPlayer()->SetShowMouseCursor(true);
+		if (EnhancedInputSubsystem)
+		{
+			EnhancedInputSubsystem->RemoveMappingContext(DefaultInputContext);
+		}
+	}
+	else
+	{
+		GetOwningPlayer()->SetShowMouseCursor(false);
+		if (EnhancedInputSubsystem)
+		{
+			EnhancedInputSubsystem->AddMappingContext(DefaultInputContext, 0);
+		}
+		GetOwningPlayer()->SetInputMode(FInputModeGameOnly());
+	}
+}
+
 void UCWScrollBase::OnAnimationFinishedPlaying(UUMGSequencePlayer& Player)
 {
 	Super::OnAnimationFinishedPlaying(Player);
-	UE_LOG(LogTemp, Warning, TEXT("Offset %f"), Offset);
 
 	if (bIsHidden)
 	{
 		bIsHidden = false;
 		ScrollBox->SetWheelScrollMultiplier(WheelScrollMultiplier);
 	}
-	else bIsHidden = true;
+	else
+	{
+		bIsHidden = true;
+	}
+}
+
+void UCWScrollBase::CheckIfUIMode()
+{
+	if (!bUIMode && Offset > 750.f)
+	{
+		bUIMode = true;
+	}
+	else if (bUIMode && Offset < 750.f)
+	{
+		bUIMode = false;
+	}
+	ChangeInputModeToUI(bUIMode);
 }
