@@ -13,20 +13,6 @@ UCACCharacterHead::UCACCharacterHead()
 	// off to improve performance if you don't need them.
 	CharacterSKM = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterHead"));
 
-	SkeletalMeshBox.Add(0, nullptr);
-
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>TempHead1(TEXT("/Script/Engine.SkeletalMesh'/Engine/EditorMeshes/SkeletalMesh/DefaultSkeletalMesh.DefaultSkeletalMesh'"));
-	if (TempHead1.Succeeded())
-	{ // TempHead1 Referecne 경로 수정 예정 
-		USkeletalMesh* HeadMesh1 = TempHead1.Object;
-		SkeletalMeshBox.Add(1, HeadMesh1);
-	}
-	
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>TempHead2(TEXT("/Script/Engine.SkeletalMesh'/Engine/EngineMeshes/SkeletalCube.SkeletalCube'"));
-	{ // TempHead2 Referecne 경로 수정 예정 
-		USkeletalMesh* HeadMesh2 = TempHead2.Object;
-		SkeletalMeshBox.Add(2, HeadMesh2);
-	}
 }
 
 
