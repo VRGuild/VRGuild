@@ -6,6 +6,17 @@
 #include "EnhancedInputComponent.h"
 #include "Components/ScrollBox.h"
 
+bool UCWScrollBase::Init(TSubclassOf<UUserWidget> widgetToDisplay)
+{
+	if (widgetToDisplay)
+	{
+		WidgetToDisplay = widgetToDisplay;
+		return true;
+	}
+
+	return false;	
+}
+
 void UCWScrollBase::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -14,6 +25,8 @@ void UCWScrollBase::NativeConstruct()
 	WheelScrollMultiplier = 5.f;
 	bIsHidden = false;
 	bUIMode = false;
+
+	ChangeInputModeToUI(bUIMode);
 
 	if (WidgetToDisplay)
 	{
@@ -123,7 +136,7 @@ void UCWScrollBase::ChangeInputModeToUI(bool bEnable)
 	else
 	{
 		GetOwningPlayer()->SetShowMouseCursor(false);
-		if (EnhancedInputSubsystem)
+		if (EnhancedInputSubsystem && !EnhancedInputSubsystem->HasMappingContext(DefaultInputContext))
 		{
 			EnhancedInputSubsystem->AddMappingContext(DefaultInputContext, 0);
 		}
@@ -151,10 +164,11 @@ void UCWScrollBase::CheckIfUIMode()
 	if (!bUIMode && Offset > 750.f)
 	{
 		bUIMode = true;
+		ChangeInputModeToUI(bUIMode);
 	}
 	else if (bUIMode && Offset < 750.f)
 	{
 		bUIMode = false;
+		ChangeInputModeToUI(bUIMode);
 	}
-	ChangeInputModeToUI(bUIMode);
 }
