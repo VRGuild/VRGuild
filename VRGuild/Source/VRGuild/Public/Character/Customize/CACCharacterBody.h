@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UCACCharacterBody : public UCACCharacterPartBase
 {
 	GENERATED_BODY()

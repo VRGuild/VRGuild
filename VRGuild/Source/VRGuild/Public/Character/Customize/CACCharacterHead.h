@@ -7,7 +7,7 @@
 #include "CACCharacterHead.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACCharacterHead : public UCACCharacterPartBase
 {
 	GENERATED_BODY()

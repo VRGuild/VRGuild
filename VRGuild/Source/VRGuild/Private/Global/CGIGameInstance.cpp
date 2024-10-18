@@ -9,6 +9,7 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "GameFramework/GameMode.h"
 #include "Global/Server/CGSSBaseGameSession.h"
+#include <VRGuild/TP_ThirdPerson/TP_ThirdPersonCharacter.h>
 
 void UCGIGameInstance::Init()
 {
@@ -64,3 +65,15 @@ void UCGIGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSucc
     Session->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionDelegateHandle);
     DestroySessionDelegateHandle.Reset();   
 }
+
+void UCGIGameInstance::AttachCustomSelections(ACharacter* NewCharacter)
+{
+    if (NewCharacter)
+    {
+        for (int i = 0; i < CharacterPartComponents.Num(); ++i)
+        {
+             NewCharacter->AddComponentByClass(CharacterPartComponents[i], 1, NewCharacter->GetTransform(), 0);
+        }
+    }
+}
+

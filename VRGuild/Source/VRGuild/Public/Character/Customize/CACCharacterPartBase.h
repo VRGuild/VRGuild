@@ -18,8 +18,10 @@ public:
 
 	virtual void InitializeComponent() override;
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SwitchSKM(int value);
+
+	int ValueSelected;
 
 protected:	
 	class AActor* Owner;

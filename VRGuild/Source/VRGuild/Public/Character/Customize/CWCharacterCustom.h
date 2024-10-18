@@ -75,4 +75,6 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UCACCharacterLower* CharacterLowerComponent;
 
+	class UCACCustomInteraction* CharacterCustomComponent;
+
 };

@@ -43,6 +43,7 @@ void UCACCharacterPartBase::MulticastSwitchSKM_Implementation(int value)
 {
 	if (nullptr != CharacterSKM && SkeletalMeshBox.Find(value) != nullptr)
 	{
-		CharacterSKM->SetSkeletalMesh(SkeletalMeshBox[value]);
+		ValueSelected = value;
+		CharacterSKM->SetSkeletalMesh(SkeletalMeshBox[ValueSelected]);
 	}
 }

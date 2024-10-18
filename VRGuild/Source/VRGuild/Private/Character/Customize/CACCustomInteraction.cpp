@@ -4,6 +4,7 @@
 #include "Character/Customize/CACCustomInteraction.h"
 #include "Character/Customize/CWCharacterCustom.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "Global/CGIGameInstance.h"
 
 // Sets default values for this component's properties
 UCACCustomInteraction::UCACCustomInteraction()
@@ -19,7 +20,6 @@ UCACCustomInteraction::UCACCustomInteraction()
 void UCACCustomInteraction::BeginPlay()
 {
 	Super::BeginPlay();
-
 	ShowWidget();
 	// ...
 }
@@ -47,6 +47,26 @@ void UCACCustomInteraction::ShowWidget()
 			if (pc)
 			{
 				pc->SetShowMouseCursor(true);
+			}
+		}
+	}
+}
+
+void UCACCustomInteraction::SaveCustomData(FCharacterCustomData data)
+{
+	auto GameInstance = GetWorld()->GetGameInstance<UCGIGameInstance>();
+	if (GameInstance)
+	{
+		GameInstance->CustomData = data;
+
+		if (Owner)
+		{
+			if (auto characterOwner = Cast<ACharacter>(Owner))
+			{
+				if(auto playerController = characterOwner->GetController<APlayerController>())
+				{
+					playerController->ClientTravel(TEXT("127.0.0.1:7777"), ETravelType::TRAVEL_Absolute);
+				}
 			}
 		}
 	}

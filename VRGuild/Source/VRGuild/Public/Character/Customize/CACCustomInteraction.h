@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+#include "Global/CGIGameInstance.h"
+
 #include "CACCustomInteraction.generated.h"
 
 
@@ -36,5 +39,8 @@ public:
 
 	UFUNCTION()
 	void ShowWidget();
-		
+	
+	void SaveCustomData(FCharacterCustomData data);
+
+	FCharacterCustomData CustomData;
 };

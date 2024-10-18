@@ -9,6 +9,7 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Character/Customize/CACCharacterBody.h"
 #include "Character/Customize/CACCharacterLower.h"
+#include "Character/Customize/CACCustomInteraction.h"
 
 
 void UCWCharacterCustom::NativeConstruct()
@@ -21,6 +22,7 @@ void UCWCharacterCustom::NativeConstruct()
 		CharacterHeadComponent = PlayerCharacter->FindComponentByClass<UCACCharacterHead>();
 		CharacterBodyComponent = PlayerCharacter->FindComponentByClass<UCACCharacterBody>();
 		CharacterLowerComponent = PlayerCharacter->FindComponentByClass<UCACCharacterLower>();
+		CharacterCustomComponent = PlayerCharacter->FindComponentByClass<UCACCustomInteraction>();
 	}
 	Bt_HeadMesh0->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomHead0);
 	Bt_HeadMesh1->OnClicked.AddDynamic(this, &UCWCharacterCustom::CustomHead1);
@@ -90,5 +92,13 @@ void UCWCharacterCustom::CustomLower2()
 
 void UCWCharacterCustom::CustomEnd()
 {
-	this->RemoveFromParent();
+	if (nullptr != CharacterCustomComponent)
+	{
+		FCharacterCustomData Data; 
+		Data.Selections.Add(CharacterHeadComponent->ValueSelected);
+		Data.Selections.Add(CharacterBodyComponent->ValueSelected);
+		Data.Selections.Add(CharacterLowerComponent->ValueSelected);
+		CharacterCustomComponent->SaveCustomData(Data);
+		this->RemoveFromParent();
+	}	
 }
