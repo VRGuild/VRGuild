@@ -49,4 +49,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
 	TArray<TSubclassOf<UActorComponent>> CharacterPartComponents;
+
+	UFUNCTION(BlueprintCallable)
+	void DisplayMessage(bool bDisplay, FString msg);
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = Settings, meta=(AllowPrivateAccess))
+	TSubclassOf<UUserWidget> DisplayMsgWidgetClass;
+	TObjectPtr<UUserWidget> DisplayWidget;
 };

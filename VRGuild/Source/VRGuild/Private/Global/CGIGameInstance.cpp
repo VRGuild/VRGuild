@@ -10,6 +10,7 @@
 #include "GameFramework/GameMode.h"
 #include "Global/Server/CGSSBaseGameSession.h"
 #include <VRGuild/TP_ThirdPerson/TP_ThirdPersonCharacter.h>
+#include "Blueprint/UserWidget.h"
 
 void UCGIGameInstance::Init()
 {
@@ -77,3 +78,22 @@ void UCGIGameInstance::AttachCustomSelections(ACharacter* NewCharacter)
     }
 }
 
+void UCGIGameInstance::DisplayMessage(bool bDisplay, FString msg)
+{
+    if (!DisplayWidget)
+    {
+        if (!ensure(DisplayMsgWidgetClass)) return;
+
+        DisplayWidget = CreateWidget(GetWorld(), DisplayMsgWidgetClass);
+        
+        if (!DisplayWidget) return;
+
+        DisplayWidget->AddToViewport();
+    }
+    
+    if (bDisplay)
+    {
+        DisplayWidget->SetVisibility(ESlateVisibility::Visible);
+    }
+    else DisplayWidget->SetVisibility(ESlateVisibility::Hidden);
+}
