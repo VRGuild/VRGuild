@@ -28,14 +28,12 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual bool CanInteract() const override;
 	virtual void BeginTrace() override;
 	virtual void EndTrace() override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 private:
-	bool bCanInteract;
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess))
 	FString TraceMessage;
 	TObjectPtr<UCGIGameInstance> GameInstance;

@@ -3,7 +3,9 @@
 
 #include "Hall/Actors/CACommissionPoster.h"
 #include "Components/StaticMeshComponent.h"
+
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "Global/Components/CACCarry.h"
 
 ACACommissionPoster::ACACommissionPoster()
 {
@@ -29,12 +31,14 @@ void ACACommissionPoster::BeginInteract(ACharacter* Initiator)
 	Super::BeginInteract(Initiator);
 	UE_LOG(LogTemp, Warning, TEXT("ACACommisionPoster BeginInteract"));
 
-	auto character = Cast<ATP_ThirdPersonCharacter>(Initiator);
-	if (character)
+	if (Initiator)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("1111"));
-		character->HoldPoster(SelfActor, PosterWidgetToDisplayClass);
-	}
+		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("1111"));
+			carryComponent->StartCarry(ECarriedType::COMMISSION, SelfActor, PosterWidgetToDisplayClass);
+		}
+	}	
 }
 
 void ACACommissionPoster::EndInteract(ACharacter* Initiator)
