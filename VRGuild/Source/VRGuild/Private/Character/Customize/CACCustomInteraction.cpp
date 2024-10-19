@@ -39,6 +39,8 @@ void UCACCustomInteraction::ShowWidget()
 {
 	if (character->IsLocallyControlled())
 	{
+		if (!CustomUIFactory)
+			return;
 		CustomUI = CreateWidget<UCWCharacterCustom>(GetWorld(), CustomUIFactory);
 		if (CustomUI)
 		{

@@ -31,7 +31,7 @@ public:
 	void CustomEnd();
 
 	// Cast 
-	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite) // , meta=(ExposeOnSpawn)
 	class UCACCharacterHead* CharacterHeadComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

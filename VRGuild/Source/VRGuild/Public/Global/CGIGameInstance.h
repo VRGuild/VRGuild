@@ -11,7 +11,7 @@
 
 class UCACCharacterPartBase;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FCharacterCustomData
 {
 	GENERATED_BODY()

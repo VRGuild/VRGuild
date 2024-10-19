@@ -10,7 +10,7 @@
 #include "CACCustomInteraction.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACCustomInteraction : public UActorComponent
 {
 	GENERATED_BODY()
@@ -28,18 +28,19 @@ public:
 
 	class AActor* Owner;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	class UUserWidget* CustomUI;
 
 	UPROPERTY(EditDefaultsOnly)
     TSubclassOf <class UUserWidget> CustomUIFactory;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly)
 	class ATP_ThirdPersonCharacter* character;
 
 	UFUNCTION()
 	void ShowWidget();
 	
+	UFUNCTION(BlueprintCallable)
 	void SaveCustomData(FCharacterCustomData data);
 
 	FCharacterCustomData CustomData;
