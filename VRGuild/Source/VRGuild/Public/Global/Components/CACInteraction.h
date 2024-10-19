@@ -30,7 +30,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void EnableTrace(bool bEnabled);
+	void Enable();
+	UFUNCTION(BlueprintCallable)
+	void Disable();
 	UFUNCTION(BlueprintCallable)
 	void BeginInteract();
 	UFUNCTION(BlueprintCallable)
@@ -43,7 +45,13 @@ protected:
 	float InteractRadius;
 
 private:
+	void BeginTrace();
+	void EndTrace();
 	void UpdateTrace(AActor*& ActorOnFocus);
 	TObjectPtr<ACharacter> Owner;
 	ICIInteractionInterface* InterfaceTest;
+
+	bool bCanInteract;
+	bool bIsTracing;
+	bool bEnabled;
 };

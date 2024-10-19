@@ -20,6 +20,7 @@ UCACInteraction::UCACInteraction()
 
 	InteractDistance = 600.f;
 	InteractRadius = 60.f;
+	bCanInteract = true;
 }
 
 
@@ -50,71 +51,82 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		{
 			if (ActorOnFocus->Implements<UCIInteractionInterface>())
 			{
-				if (!Cast<ICIInteractionInterface>(ActorOnFocus)->CanInteract())
-				{
-					if (InterfaceTest) {
-						InterfaceTest->EndTrace();
-						InterfaceTest = nullptr;
-					}
-					return;
-				};
-
 				if (!InterfaceTest)
 				{
 					InterfaceTest = Cast<ICIInteractionInterface>(ActorOnFocus);
-					InterfaceTest->BeginTrace();
+					BeginTrace();
 				}
 				else if (InterfaceTest != Cast<ICIInteractionInterface>(ActorOnFocus))
 				{
-					InterfaceTest->EndTrace();
+					EndTrace();
 
 					InterfaceTest = Cast<ICIInteractionInterface>(ActorOnFocus);
-
-					InterfaceTest->BeginTrace();
+					BeginTrace();
 				}
+				else BeginTrace();
 			}
 		}
 		else if (InterfaceTest) {
-			InterfaceTest->EndTrace();
+			EndTrace();
 			InterfaceTest = nullptr;
 		}
 	}
 }
 
-void UCACInteraction::EnableTrace(bool bEnabled)
+void UCACInteraction::Enable()
+{
+	//If Interactable actor is already in map, remove actor from map
+	//else add interactable actor to map
+
+	if (!bCanInteract) return;
+
+	if (Owner && Owner->IsLocallyControlled())
+	{
+		bEnabled = true;
+		SetComponentTickEnabled(true);
+	}
+}
+
+void UCACInteraction::Disable()
 {
 	if (Owner && Owner->IsLocallyControlled())
 	{
-		SetComponentTickEnabled(bEnabled);
-		if (!bEnabled && InterfaceTest)
-		{
-			InterfaceTest->EndTrace();
-			InterfaceTest = nullptr;
-		}
+		bEnabled = false;
+		SetComponentTickEnabled(false);
+		EndTrace();
 	}
 }
 
 void UCACInteraction::BeginInteract()
 {
-	if (InterfaceTest && InterfaceTest->CanInteract())
+	if (InterfaceTest && bCanInteract)
 	{
 		InterfaceTest->BeginInteract(Owner);
-		SetComponentTickEnabled(false);
-
+		EndTrace();
+		bCanInteract = false;
+		
+		if (bEnabled)
+			SetComponentTickEnabled(false);
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No begininteract"));
 }
 
 void UCACInteraction::EndInteract()
 {
-	if (InterfaceTest && !InterfaceTest->CanInteract())
+	if (InterfaceTest && !bCanInteract)
 	{
 		InterfaceTest->EndInteract(Owner);
-		SetComponentTickEnabled(true);
+		bCanInteract = true;
+
+		if (bEnabled)
+		{
+			SetComponentTickEnabled(true);
+		}
+		else InterfaceTest = nullptr;
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Endinteract"));
 }
-		
+
 void UCACInteraction::UpdateTrace(AActor*& ActorOnFocus)
 {
 	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
@@ -179,5 +191,23 @@ void UCACInteraction::UpdateTrace(AActor*& ActorOnFocus)
 				LargestDotValue = DotResult;
 			}
 		}
+	}
+}
+
+void UCACInteraction::BeginTrace()
+{
+	if (!bIsTracing && InterfaceTest)
+	{
+		InterfaceTest->BeginTrace();
+		bIsTracing = true;
+	}
+}
+
+void UCACInteraction::EndTrace()
+{
+	if (bIsTracing && InterfaceTest)
+	{
+		InterfaceTest->EndTrace();
+		bIsTracing = false;
 	}
 }
