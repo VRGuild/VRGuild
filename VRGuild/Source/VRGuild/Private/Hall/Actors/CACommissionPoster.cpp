@@ -14,11 +14,13 @@ ACACommissionPoster::ACACommissionPoster()
 
 void ACACommissionPoster::BeginTrace()
 {
+	Super::BeginTrace();
 	UE_LOG(LogTemp, Warning, TEXT("ACACommisionPoster BeginTrace"));
 }
 
 void ACACommissionPoster::EndTrace()
 {
+	Super::EndTrace();
 	UE_LOG(LogTemp, Warning, TEXT("ACACommisionPoster EndTrace"));
 }
 

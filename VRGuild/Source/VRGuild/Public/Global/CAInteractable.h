@@ -7,6 +7,8 @@
 #include "Global/Interfaces/CIInteractionInterface.h"
 #include "CAInteractable.generated.h"
 
+class UCGIGameInstance;
+
 UCLASS()
 class VRGUILD_API ACAInteractable : public AActor, public ICIInteractionInterface
 {
@@ -20,6 +22,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void SetTraceMessage(FString newMsg);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -32,4 +36,7 @@ public:
 
 private:
 	bool bCanInteract;
+	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess))
+	FString TraceMessage;
+	TObjectPtr<UCGIGameInstance> GameInstance;
 };
