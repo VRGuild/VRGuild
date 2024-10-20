@@ -35,7 +35,7 @@ void ACAInteractable::BeginTrace()
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayMessage(true, TraceMessage);
+		GameInstance->DisplayTraceMessage(true, TraceMessage);
 	}
 }
 
@@ -43,7 +43,7 @@ void ACAInteractable::EndTrace()
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayMessage(false, TraceMessage);
+		GameInstance->DisplayTraceMessage(false, TraceMessage);
 	}
 }
 
