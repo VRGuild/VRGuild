@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Global/CAInteractable.h"
+#include "Global/CACarryInteractable.h"
 #include "CACommissionPoster.generated.h"
 
 /**
@@ -13,25 +13,8 @@
 class UStaticMeshComponent;
 
 UCLASS()
-class VRGUILD_API ACACommissionPoster : public ACAInteractable
+class VRGUILD_API ACACommissionPoster : public ACACarryInteractable
 {
 	GENERATED_BODY()
-	
-public:
-	ACACommissionPoster();
 
-	virtual void BeginTrace() override;
-	virtual void EndTrace() override;
-	virtual void BeginInteract(ACharacter* Initiator) override;
-	virtual void EndInteract(ACharacter* Initiator) override;
-
-protected:
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
-	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
-
-protected:
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
-	TSubclassOf<UUserWidget> PosterWidgetToDisplayClass;
-	UPROPERTY(EditDefaultsOnly, Category = Settings)
-	TSubclassOf<AActor> SelfActor;
 };
