@@ -45,14 +45,16 @@ protected:
 	float InteractDistance;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	float InteractRadius;
+	const AActor* GetActorOnFocus() const;
 
 private:
 	void BeginTrace();
 	void EndTrace();
-	void UpdateTrace(AActor*& ActorOnFocus);
+	void UpdateTrace();
 	ICIInteractionInterface* GetInterface() const;
 	TObjectPtr<ACharacter> Owner;
-	AActor* ActorToInteract;
+	AActor* InteractingActor;
+	AActor* ActorOnFocus;
 
 	bool bCanInteract;
 	bool bIsTracing;
