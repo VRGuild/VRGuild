@@ -15,7 +15,8 @@ UENUM(Blueprintable)
 enum class ECarriedType : uint8
 {
 	COMMISSION UMETA(DisplayName = "Commission"),
-	REGISTRATION UMETA(DisplayName = "Registration")
+	REGISTRATION UMETA(DisplayName = "Registration"),
+	NONE UMETA(DisplayName = "None")
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -43,6 +44,9 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_ActorInHand)
 	TObjectPtr<AActor> ActorInHand;
 	
+	ECarriedType CarryType;
+	ECarriedType CarryTypeTemp;
+
 	UFUNCTION()
 	void OnRep_ActorInHand();
 	

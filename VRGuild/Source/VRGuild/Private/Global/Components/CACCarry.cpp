@@ -21,6 +21,8 @@ void UCACCarry::InitializeComponent()
 	Super::InitializeComponent();
 
 	Owner = GetOwner<ACharacter>();
+	CarryTypeTemp = ECarriedType::NONE;
+	CarryType = CarryTypeTemp;
 }
 
 void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -39,6 +41,7 @@ void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<AActor> ActorToHold, T
 		if (ScrollBaseWidget && ScrollBaseWidget->Init(WidgetToDisplay))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("2222"));
+			CarryTypeTemp = Type;
 			ServerHoldPoster(ActorToHold);
 		}
 	}
@@ -46,7 +49,22 @@ void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<AActor> ActorToHold, T
 
 FString UCACCarry::GetMessageForNPC()
 {
-	return FString();
+	switch (CarryType)
+	{
+	case ECarriedType::COMMISSION:
+	{
+		return TEXT("Submit Commission");
+	}
+	case ECarriedType::REGISTRATION:
+	{
+		return TEXT("Submit Registration");
+	}
+	case ECarriedType::NONE:
+	{
+		return TEXT("No carried objects");
+	}
+	}
+	return TEXT("Default string");
 }
 
 void UCACCarry::OnRep_ActorInHand()
@@ -55,19 +73,15 @@ void UCACCarry::OnRep_ActorInHand()
 	{
 		if (ActorInHand)
 		{
-			if (ScrollBaseWidget)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("4444"));
-				ScrollBaseWidget->AddToViewport();
-			}
+			UE_LOG(LogTemp, Warning, TEXT("4444"));
+			ScrollBaseWidget->AddToViewport();
+			CarryType = CarryTypeTemp;
 		}
 		else
 		{
-			if (!ScrollBaseWidget)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("5555"));
-				ScrollBaseWidget->RemoveFromParent();
-			}
+			UE_LOG(LogTemp, Warning, TEXT("5555"));
+			ScrollBaseWidget->RemoveFromParent();
+			CarryType = ECarriedType::NONE;
 		}
 	}
 }
@@ -80,8 +94,7 @@ void UCACCarry::ServerHoldPoster_Implementation(TSubclassOf<AActor> ActorToHold)
 		ActorInHand = GetWorld()->SpawnActor<AActor>(ActorToHold, Owner->GetActorTransform());
 		if (ActorInHand)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s Success %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"),
-				*GetNameSafe(ActorInHand));
+			UE_LOG(LogTemp, Warning, TEXT("%s Success %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"), *GetNameSafe(ActorInHand));
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("%s Failed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 	}

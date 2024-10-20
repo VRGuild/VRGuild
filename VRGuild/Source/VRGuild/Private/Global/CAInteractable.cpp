@@ -31,7 +31,7 @@ void ACAInteractable::Tick(float DeltaTime)
 
 }
 
-void ACAInteractable::BeginTrace()
+void ACAInteractable::BeginTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{
@@ -39,7 +39,7 @@ void ACAInteractable::BeginTrace()
 	}
 }
 
-void ACAInteractable::EndTrace()
+void ACAInteractable::EndTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{

@@ -198,7 +198,7 @@ void UCACInteraction::BeginTrace()
 {
 	if (!bIsTracing && InterfaceTest)
 	{
-		InterfaceTest->BeginTrace();
+		InterfaceTest->BeginTrace(Owner);
 		bIsTracing = true;
 	}
 }
@@ -207,7 +207,7 @@ void UCACInteraction::EndTrace()
 {
 	if (bIsTracing && InterfaceTest)
 	{
-		InterfaceTest->EndTrace();
+		InterfaceTest->EndTrace(Owner);
 		bIsTracing = false;
 	}
 }

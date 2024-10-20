@@ -18,15 +18,15 @@ ACACarryInteractable::ACACarryInteractable()
 	StaticMeshComp->SetCollisionProfileName("Interactable");
 }
 
-void ACACarryInteractable::BeginTrace()
+void ACACarryInteractable::BeginTrace(ACharacter* Initiator)
 {
-	Super::BeginTrace();
+	Super::BeginTrace(Initiator);
 	UE_LOG(LogTemp, Warning, TEXT("ACACarryInteractable BeginTrace"));
 }
 
-void ACACarryInteractable::EndTrace()
+void ACACarryInteractable::EndTrace(ACharacter* Initiator)
 {
-	Super::EndTrace();
+	Super::EndTrace(Initiator);
 	UE_LOG(LogTemp, Warning, TEXT("ACACarryInteractable EndTrace"));
 }
 

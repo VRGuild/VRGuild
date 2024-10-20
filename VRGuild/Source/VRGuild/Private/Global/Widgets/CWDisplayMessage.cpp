@@ -4,7 +4,7 @@
 #include "Global/Widgets/CWDisplayMessage.h"
 #include "Components/TextBlock.h"
 
-void UCWDisplayMessage::Init(FString msg)
+void UCWDisplayMessage::SetMessage(FString msg)
 {
 	TextBlock_Message->SetText(FText::FromString(msg));
 }

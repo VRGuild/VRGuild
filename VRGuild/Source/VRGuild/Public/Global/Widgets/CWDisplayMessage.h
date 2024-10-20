@@ -17,7 +17,7 @@ class VRGUILD_API UCWDisplayMessage : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void Init(FString msg);
+	void SetMessage(FString msg);
 
 protected:
 	UPROPERTY(meta=(BindWidget))

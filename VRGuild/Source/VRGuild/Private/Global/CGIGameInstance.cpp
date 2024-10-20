@@ -90,14 +90,17 @@ void UCGIGameInstance::DisplayTraceMessage(bool bDisplay, FString msg)
         
         if (!DisplayWidget) return;
 
-        DisplayWidget->Init(msg);
-
+        DisplayWidget->SetMessage(msg);
         DisplayWidget->AddToViewport();
     }
     
     if (bDisplay)
     {
+        DisplayWidget->SetMessage(msg);
         DisplayWidget->SetVisibility(ESlateVisibility::Visible);
     }
-    else DisplayWidget->SetVisibility(ESlateVisibility::Hidden);
+    else 
+    {
+        DisplayWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
 }
