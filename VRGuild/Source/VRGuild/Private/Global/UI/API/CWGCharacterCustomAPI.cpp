@@ -1,28 +1,10 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Global/API/CACCharacterCustomAPI.h"
+#include "Global/UI/API/CWGCharacterCustomAPI.h"
 #include "Global/CGIGameInstance.h"
-#include "Global/Server/CPCBasePlayerController.h"
 
-UCACCharacterCustomAPI::UCACCharacterCustomAPI()
-{
-	PrimaryComponentTick.bCanEverTick = false;
-	bWantsInitializeComponent = true;
-}
-
-void UCACCharacterCustomAPI::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void UCACCharacterCustomAPI::InitializeComponent()
-{
-	Super::InitializeComponent();
-
-}
-
-void UCACCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s \n"), *req->GetURL());
 	if (this->CheckCallBackAPI(req, "api/character"))
@@ -38,7 +20,7 @@ void UCACCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr 
 	}
 }
 
-void UCACCharacterCustomAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterCustomAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("OnFailAPI : %s \n"), *req->GetURL());
 	if (this->CheckCallBackAPI(req, "api/character"))
@@ -54,39 +36,44 @@ void UCACCharacterCustomAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res
 	}
 }
 
-void UCACCharacterCustomAPI::CharacterCustomGetCall()
+void UCWGCharacterCustomAPI::CharacterCustomGetCall()
 {
 	this->API = "api/character";
 
 	HttpGetCall();
 }
 
-void UCACCharacterCustomAPI::CharacterCustomUpdateCall(TArray<int32> CustomList)
+void UCWGCharacterCustomAPI::CharacterCustomUpdateCall(TArray<int32> CustomList)
 {
 	this->API = "api/character";
 
-	FCharacterCustomCreateAPI ApiSendData = FCharacterCustomCreateAPI(CustomList);
-	HttpPostCall<FCharacterCustomCreateAPI>(ApiSendData);
+	//UGameInstance* GI = GetWorld()->GetGameInstance();
+	//UCGIGameInstance* MyGI = Cast<UCGIGameInstance>(GI);
+	//FCharacterCustomCreate ApiSendData = FCharacterCustomCreate();
+
+	//ApiSendData.status = MyGI->CustomData.Selections;
+	FCharacterCustomCreate ApiSendData = FCharacterCustomCreate(CustomList);
+	HttpPostCall<FCharacterCustomCreate>(ApiSendData);
 }
 
-void UCACCharacterCustomAPI::CharacterCustomGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterCustomAPI::CharacterCustomGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("content type %s"), *res->GetContentType());
 	//if (res->GetContentType() == "application/json")
 	FString jsonString = res->GetContentAsString();
 
-	FCharacterCustomGetAPI ParseData;
-	ParseData = JsonPerse<FCharacterCustomGetAPI>(jsonString);
+	FCharacterCustomGet ParseData;
+	ParseData = JsonPerse<FCharacterCustomGet>(jsonString);
 
 	OnCharacterCustomGetCallBack(ParseData);
 }
 
-void UCACCharacterCustomAPI::CharacterCustomUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterCustomAPI::CharacterCustomUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	FString jsonString = res->GetContentAsString();
-	FCharacterCustomGetAPI ParseData;
-	ParseData = JsonPerse<FCharacterCustomGetAPI>(jsonString);
-	bool hasCustom = false;
+	FCharacterCustomGet ParseData;
+	ParseData = JsonPerse<FCharacterCustomGet>(jsonString);
+	bool hasCustom =false;
 	if (ParseData.characterId)
 	{
 		hasCustom = true;
@@ -94,3 +81,4 @@ void UCACCharacterCustomAPI::CharacterCustomUpdateCallBack(FHttpRequestPtr req, 
 	}
 	OnCharacterCustomUpdateCallBack(hasCustom);
 }
+

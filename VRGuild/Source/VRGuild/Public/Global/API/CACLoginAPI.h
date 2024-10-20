@@ -51,6 +51,9 @@ protected:
 
 	virtual void InitializeComponent() override;
 
+	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+
 	class ACPCBasePlayerController* OwnerPlayerController;
 
 	UFUNCTION(BlueprintCallable)
@@ -59,7 +62,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EpicLoginInfoGetCall();
 
-	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEpicLoginComple();
