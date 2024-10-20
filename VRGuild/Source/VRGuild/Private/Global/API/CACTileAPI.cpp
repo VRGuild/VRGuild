@@ -8,8 +8,6 @@ UCACTileAPI::UCACTileAPI()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	bWantsInitializeComponent = true;
-
-	this->URL = "http://localhost:3000/api/tile";
 }
 
 void UCACTileAPI::BeginPlay()
@@ -39,4 +37,8 @@ void UCACTileAPI::TilePostCall()
 void UCACTileAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	OnTileZoneDataUpdateComple();
+}
+
+void UCACTileAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+{
 }

@@ -33,7 +33,7 @@ void UCACLoginAPI::InitializeComponent()
 
 void UCACLoginAPI::EpicLoginPostCall()
 {
-	this->URL = "http://125.132.216.190:15530/api/auth/epicgames/callback";
+	this->API = "api/auth/epicgames/callback";
 
 	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
 	IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
@@ -45,30 +45,25 @@ void UCACLoginAPI::EpicLoginPostCall()
 
 void UCACLoginAPI::EpicLoginInfoGetCall()
 {
-	this->URL = "http://125.132.216.190:15530/api/auth/epicgames/user-info";
+	this->API = "api/auth/epicgames/user-info";
 
-	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
-	IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
-	this->OAuthToken = Identity->GetAuthToken(0);
-	FUniqueNetIdPtr a =  Identity->GetUniquePlayerId(0);
-
-	FJsonGetLoginInfo getinfo;
-	UE_LOG(LogTemp, Display, TEXT("%s \n netid :  %s\n "), *this->OAuthToken, *a->ToString());
-
-	HttpGetCall <FJsonGetLoginInfo> (getinfo);
+	HttpGetCall();
 }
 
 
 void UCACLoginAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("req->GetURL() : %s \n"), *req->GetURL());
-	UE_LOG(LogTemp, Display, TEXT("req->GetURL() : %s \n"), *this->HttpResult);
-	if (req->GetURL() == "http://125.132.216.190:15530/api/auth/epicgames/callback")
+	if (this->CheckCallBackAPI(req, "api/auth/epicgames/callback"))
 	{
 		OnEpicLoginComple();
 	}
-	else if (req->GetURL() == "http://125.132.216.190:15530/api/auth/epicgames/user-info")
+	else if (this->CheckCallBackAPI(req, "api/auth/epicgames/user-info"))
 	{
 		OnEpicGetLoginInfoComple();
 	}
+}
+
+void UCACLoginAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+{
 }

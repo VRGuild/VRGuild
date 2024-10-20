@@ -3,24 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Global/API/CACBaseAPI.h"
-#include "CACCharacterCustomAPI.generated.h"
-
+#include "Global/UI/API/CWGBaseAPI.h"
+#include "CWGCharacterCustomAPI.generated.h"
 
 USTRUCT(BlueprintType, Atomic)
-struct FCharacterCustomCreateAPI
-{
+struct FCharacterCustomCreate {
 	GENERATED_USTRUCT_BODY()
 public:
-	FCharacterCustomCreateAPI() {};
-	FCharacterCustomCreateAPI(TArray <int32> status) : Status(status) {};
+	FCharacterCustomCreate() {};
+	FCharacterCustomCreate(TArray <int32> status) : Status(status) {};
 
 	TArray <int32> Status;
 };
 
 USTRUCT(BlueprintType, Atomic)
-struct FCharacterCustomGetAPI
-{
+struct FCharacterCustomGet {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -31,23 +28,15 @@ public:
 	TArray <int32> Status;
 };
 
-
 /**
  * 
  */
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class VRGUILD_API UCACCharacterCustomAPI : public UCACBaseAPI
+class VRGUILD_API UCWGCharacterCustomAPI : public UCWGBaseAPI
 {
 	GENERATED_BODY()
-	
-public:
-	UCACCharacterCustomAPI();
 
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	virtual void InitializeComponent() override;
-
+protected:
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
@@ -62,7 +51,7 @@ public:
 	void CharacterCustomUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnCharacterCustomGetCallBack(FCharacterCustomGetAPI ParseData);
+	void OnCharacterCustomGetCallBack(FCharacterCustomGet ParseData);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCharacterCustomUpdateCallBack(bool hasData);

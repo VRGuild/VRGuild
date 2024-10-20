@@ -8,8 +8,6 @@ UCACEtherAPI::UCACEtherAPI()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	bWantsInitializeComponent = true;
-
-	this->URL = "http://125.132.216.190:15530/ether";
 }
 
 void UCACEtherAPI::BeginPlay()
@@ -39,4 +37,8 @@ void UCACEtherAPI::EtherPostCall()
 void UCACEtherAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	OnEtherComple();
+}
+
+void UCACEtherAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+{
 }
