@@ -30,6 +30,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
+	bool CanInteract() const;
+	UFUNCTION(BlueprintCallable)
 	void Enable();
 	UFUNCTION(BlueprintCallable)
 	void Disable();
@@ -48,8 +50,9 @@ private:
 	void BeginTrace();
 	void EndTrace();
 	void UpdateTrace(AActor*& ActorOnFocus);
+	ICIInteractionInterface* GetInterface() const;
 	TObjectPtr<ACharacter> Owner;
-	ICIInteractionInterface* InterfaceTest;
+	AActor* ActorToInteract;
 
 	bool bCanInteract;
 	bool bIsTracing;

@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
 #include "Global/Interfaces/CIInteractionInterface.h"
+#include "Hall/Actors/CAReceptionist.h"
 
 static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("su.InteractionDebugDraw"),
 	false, TEXT("Enable Debug Lines for Interact Component."), ECVF_Cheat);
@@ -51,24 +52,24 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		{
 			if (ActorOnFocus->Implements<UCIInteractionInterface>())
 			{
-				if (!InterfaceTest)
+				if (!ActorToInteract)
 				{
-					InterfaceTest = Cast<ICIInteractionInterface>(ActorOnFocus);
+					ActorToInteract = ActorOnFocus;
 					BeginTrace();
 				}
-				else if (InterfaceTest != Cast<ICIInteractionInterface>(ActorOnFocus))
+				else if (ActorToInteract != ActorOnFocus)
 				{
 					EndTrace();
 
-					InterfaceTest = Cast<ICIInteractionInterface>(ActorOnFocus);
+					ActorToInteract = ActorOnFocus;
 					BeginTrace();
 				}
 				else BeginTrace();
 			}
 		}
-		else if (InterfaceTest) {
+		else if (ActorToInteract) {
 			EndTrace();
-			InterfaceTest = nullptr;
+			ActorToInteract = nullptr;
 		}
 	}
 }
@@ -77,8 +78,6 @@ void UCACInteraction::Enable()
 {
 	//If Interactable actor is already in map, remove actor from map
 	//else add interactable actor to map
-
-	if (!bCanInteract) return;
 
 	if (Owner && Owner->IsLocallyControlled())
 	{
@@ -99,9 +98,9 @@ void UCACInteraction::Disable()
 
 void UCACInteraction::BeginInteract()
 {
-	if (InterfaceTest && bCanInteract)
+	if (ActorToInteract && bCanInteract)
 	{
-		InterfaceTest->BeginInteract(Owner);
+		GetInterface()->BeginInteract(Owner);
 		EndTrace();
 		bCanInteract = false;
 		
@@ -113,16 +112,16 @@ void UCACInteraction::BeginInteract()
 
 void UCACInteraction::EndInteract()
 {
-	if (InterfaceTest && !bCanInteract)
+	if (ActorToInteract && !bCanInteract)
 	{
-		InterfaceTest->EndInteract(Owner);
+		GetInterface()->EndInteract(Owner);
 		bCanInteract = true;
 
 		if (bEnabled)
 		{
 			SetComponentTickEnabled(true);
 		}
-		else InterfaceTest = nullptr;
+		else ActorToInteract = nullptr;
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Endinteract"));
 }
@@ -162,6 +161,7 @@ void UCACInteraction::UpdateTrace(AActor*& ActorOnFocus)
 	if (bDebugDraw)
 	{
 		DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 0.f);
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Actor* %s"), *GetNameSafe(ActorToInteract)));
 	}
 
 	QueryParams.AddIgnoredActor(Owner);
@@ -196,18 +196,28 @@ void UCACInteraction::UpdateTrace(AActor*& ActorOnFocus)
 
 void UCACInteraction::BeginTrace()
 {
-	if (!bIsTracing && InterfaceTest)
+	if (!bIsTracing && ActorToInteract)
 	{
-		InterfaceTest->BeginTrace(Owner);
+		GetInterface()->BeginTrace(Owner);
 		bIsTracing = true;
 	}
 }
 
 void UCACInteraction::EndTrace()
 {
-	if (bIsTracing && InterfaceTest)
+	if (bIsTracing && ActorToInteract)
 	{
-		InterfaceTest->EndTrace(Owner);
+		GetInterface()->EndTrace(Owner);
 		bIsTracing = false;
 	}
+}
+
+ICIInteractionInterface* UCACInteraction::GetInterface() const
+{
+	return Cast<ICIInteractionInterface>(ActorToInteract);
+}
+
+bool UCACInteraction::CanInteract() const
+{
+	return bCanInteract;
 }
