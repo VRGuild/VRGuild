@@ -21,7 +21,7 @@ UCACInteraction::UCACInteraction()
 
 	InteractDistance = 600.f;
 	InteractRadius = 60.f;
-	ActorOnFocus = nullptr;
+	ActorTraced = nullptr;
 	bCanInteract = true;
 }
 
@@ -51,25 +51,25 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		if (bDebugDraw)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("InteractingActor: %s"), *GetNameSafe(InteractingActor)));
-			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, FString::Printf(TEXT("ActorOnFocus: %s"), *GetNameSafe(ActorOnFocus)));
+			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, FString::Printf(TEXT("ActorTraced: %s"), *GetNameSafe(ActorTraced)));
 		}		
 
 		if(!bCanInteract) return;
 
-		if (ActorOnFocus)
+		if (ActorTraced)
 		{
-			if (ActorOnFocus->Implements<UCIInteractionInterface>())
+			if (ActorTraced->Implements<UCIInteractionInterface>())
 			{
-				if (!InteractingActor)
+				if (!ActorOnFocus)
 				{
-					InteractingActor = ActorOnFocus;
+					ActorOnFocus = ActorTraced;
 					BeginTrace();
 				}
-				else if (InteractingActor != ActorOnFocus)
+				else if (ActorOnFocus != ActorTraced)
 				{
 					EndTrace();
 
-					InteractingActor = ActorOnFocus;
+					ActorOnFocus = ActorTraced;
 					BeginTrace();
 				}
 				else
@@ -78,11 +78,25 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 				}
 			}
 		}
-		else if (InteractingActor) {
+		else if (ActorOnFocus) {
 			EndTrace();
-			InteractingActor = nullptr;
+			ActorOnFocus = nullptr;
 		}
 	}
+}
+
+bool UCACInteraction::IsHoldingItem() const
+{
+	return HoldingActor != nullptr;
+}
+
+void UCACInteraction::HoldItem()
+{
+}
+
+AActor* UCACInteraction::DropItem()
+{
+	return nullptr;
 }
 
 void UCACInteraction::Enable()
@@ -94,7 +108,7 @@ void UCACInteraction::Enable()
 	{
 		bEnabled = true;
 		SetComponentTickEnabled(true);
-		ActorOnFocus = nullptr;
+		ActorTraced = nullptr;
 	}
 }
 
@@ -105,17 +119,19 @@ void UCACInteraction::Disable()
 		bEnabled = false;
 		SetComponentTickEnabled(false);
 		EndTrace();
-		ActorOnFocus = nullptr;
+		ActorTraced = nullptr;
 	}
 }
 
 void UCACInteraction::BeginInteract()
 {
-	if (InteractingActor && bCanInteract)
+	if (ActorOnFocus && !InteractingActor && bCanInteract)
 	{
-		GetInterface()->BeginInteract(Owner);
-		EndTrace();
+		InteractingActor = ActorOnFocus;
+		GetInterface(InteractingActor)->BeginInteract(Owner);
 		bCanInteract = false;
+
+		EndTrace();
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No begininteract"));
 }
@@ -124,13 +140,13 @@ void UCACInteraction::EndInteract()
 {
 	if (InteractingActor && !bCanInteract)
 	{
-		GetInterface()->EndInteract(Owner);
+		GetInterface(InteractingActor)->EndInteract(Owner);
+		InteractingActor = nullptr;
 		bCanInteract = true;
-
-		if (!bEnabled)
+		/*if (!bEnabled)
 		{
-			InteractingActor = nullptr;
-		}
+
+		}*/
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Endinteract"));
 }
@@ -195,24 +211,24 @@ void UCACInteraction::UpdateTrace()
 			float DotResult = FVector::DotProduct(DistVector, WorldDirTemp);
 			if (DotResult > LargestDotValue)
 			{
-				ActorOnFocus = Hits[i].GetActor();
+				ActorTraced = Hits[i].GetActor();
 				LargestDotValue = DotResult;
 			}
 		}
 	}
-	else ActorOnFocus = nullptr;
+	else ActorTraced = nullptr;
 }
 
-const AActor* UCACInteraction::GetActorOnFocus() const
+const AActor* UCACInteraction::GetActorTraced() const
 {
-	return ActorOnFocus;
+	return ActorTraced;
 }
 
 void UCACInteraction::BeginTrace()
 {
-	if (!bIsTracing && InteractingActor)
+	if (!bIsTracing && ActorOnFocus)
 	{
-		GetInterface()->BeginTrace(Owner);
+		GetInterface(ActorOnFocus)->BeginTrace(Owner);
 		bIsTracing = true;
 	}
 }
@@ -221,17 +237,17 @@ void UCACInteraction::EndTrace()
 {
 	if (bIsTracing )
 	{
-		if (InteractingActor)
+		if (ActorOnFocus)
 		{
-			GetInterface()->EndTrace(Owner);
+			GetInterface(ActorOnFocus)->EndTrace(Owner);
 		}		
 		bIsTracing = false;
 	}
 }
 
-ICIInteractionInterface* UCACInteraction::GetInterface() const
+ICIInteractionInterface* UCACInteraction::GetInterface(AActor* actor) const
 {
-	return Cast<ICIInteractionInterface>(InteractingActor);
+	return Cast<ICIInteractionInterface>(actor);
 }
 
 bool UCACInteraction::CanInteract() const
