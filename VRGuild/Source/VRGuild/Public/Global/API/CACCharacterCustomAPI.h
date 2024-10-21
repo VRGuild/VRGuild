@@ -8,33 +8,34 @@
 
 
 USTRUCT(BlueprintType, Atomic)
-struct FCharacterCustomDataAPI
+struct FCharacterCustomCreateAPI
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	FCharacterCustomDataAPI() {};
-	UPROPERTY(BlueprintReadOnly)
-	TArray<int> status;
+	FCharacterCustomCreateAPI() {};
+	FCharacterCustomCreateAPI(TArray <int32> status) : Status(status) {};
+
+	TArray <int32> Status;
 };
 
 USTRUCT(BlueprintType, Atomic)
-struct FCharacterInfoGetDataAPI
+struct FCharacterCustomGetAPI
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	FCharacterInfoGetDataAPI() : UserID("none") {};
-
-	FCharacterInfoGetDataAPI(FString userId) : UserID(userId) {};
-
 	UPROPERTY(BlueprintReadOnly)
-	FString UserID;
+	int32 characterId;
+	UPROPERTY(BlueprintReadOnly)
+	FString accountId;
+	UPROPERTY(BlueprintReadOnly)
+	TArray <int32> Status;
 };
 
 
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VRGUILD_API UCACCharacterCustomAPI : public UCACBaseAPI
 {
 	GENERATED_BODY()
@@ -42,15 +43,27 @@ class VRGUILD_API UCACCharacterCustomAPI : public UCACBaseAPI
 public:
 	UCACCharacterCustomAPI();
 
+	// Called when the game starts
+	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void CharacterCustomStatusPostCall();
-	void CharacterCustomStatusGetCall();
+	virtual void InitializeComponent() override;
 
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
-	void OnGetCustomCharacterData(FHttpRequestPtr req, FHttpResponsePtr res);
-	
+	UFUNCTION(BlueprintCallable)
+	void CharacterCustomGetCall();
+
+	UFUNCTION(BlueprintCallable)
+	void CharacterCustomUpdateCall(TArray<int32> CustomList);
+
+	void CharacterCustomGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+
+	void CharacterCustomUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnGetCusomCFharacterDataCallBack();
+	void OnCharacterCustomGetCallBack(FCharacterCustomGetAPI ParseData);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCharacterCustomUpdateCallBack(bool hasData);
 };

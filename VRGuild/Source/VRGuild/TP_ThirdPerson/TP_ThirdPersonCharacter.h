@@ -9,11 +9,13 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
-class UCWScrollBase;
+
 class UCACInteraction;
+class UCACCarry;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -48,9 +50,6 @@ class ATP_ThirdPersonCharacter : public ACharacter
 
 public:
 	ATP_ThirdPersonCharacter();
-	
-	void HoldPoster(TSubclassOf<AActor> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay);
-
 
 protected:
 
@@ -62,7 +61,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Settings)
 	TObjectPtr<UCACInteraction> InteractionComponent;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Settings)
+	TObjectPtr<UCACCarry> CarryComponent;
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -70,26 +71,11 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-
-	
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-private:
-	UPROPERTY(EditDefaultsOnly, Category=Settings, meta=(AllowPrivateAccess))
-	TSubclassOf<UCWScrollBase> ScrollBaseWidgetClass;
-	TObjectPtr<UCWScrollBase> ScrollBaseWidget;
-	UPROPERTY(ReplicatedUsing = OnRep_ActorInHand)
-	TObjectPtr<AActor> ActorInHand;
-	UFUNCTION()
-	void OnRep_ActorInHand();
-
-	UFUNCTION(Server, Reliable)
-	void ServerHoldPoster(TSubclassOf<AActor> ActorToHold);
 };
 

@@ -30,7 +30,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void EnableTrace(bool bEnabled);
+	bool CanInteract() const;
+	UFUNCTION(BlueprintCallable)
+	void Enable();
+	UFUNCTION(BlueprintCallable)
+	void Disable();
 	UFUNCTION(BlueprintCallable)
 	void BeginInteract();
 	UFUNCTION(BlueprintCallable)
@@ -41,9 +45,18 @@ protected:
 	float InteractDistance;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	float InteractRadius;
+	const AActor* GetActorOnFocus() const;
 
 private:
-	void UpdateTrace(AActor*& ActorOnFocus);
+	void BeginTrace();
+	void EndTrace();
+	void UpdateTrace();
+	ICIInteractionInterface* GetInterface() const;
 	TObjectPtr<ACharacter> Owner;
-	ICIInteractionInterface* InterfaceTest;
+	AActor* InteractingActor;
+	AActor* ActorOnFocus;
+
+	bool bCanInteract;
+	bool bIsTracing;
+	bool bEnabled;
 };

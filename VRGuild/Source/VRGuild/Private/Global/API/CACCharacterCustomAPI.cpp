@@ -3,65 +3,94 @@
 
 #include "Global/API/CACCharacterCustomAPI.h"
 #include "Global/CGIGameInstance.h"
-#include "Global/API/CBPLJsonParse.h"
+#include "Global/Server/CPCBasePlayerController.h"
+
 UCACCharacterCustomAPI::UCACCharacterCustomAPI()
 {
+	PrimaryComponentTick.bCanEverTick = false;
+	bWantsInitializeComponent = true;
 }
 
-
-void UCACCharacterCustomAPI::CharacterCustomStatusPostCall()
+void UCACCharacterCustomAPI::BeginPlay()
 {
-	this->URL="http://125.132.216.190:15530/api/character/create";
-
-	UGameInstance* GI = GetWorld()->GetGameInstance();
-	UCGIGameInstance* MyGI = Cast<UCGIGameInstance>(GI);
-	FCharacterCustomDataAPI ApiSendData = FCharacterCustomDataAPI();
-
-	ApiSendData.status = MyGI->CustomData.Selections;
-
-	HttpPostCall<FCharacterCustomDataAPI>(ApiSendData);
+	Super::BeginPlay();
 }
 
-
-void UCACCharacterCustomAPI::CharacterCustomStatusGetCall()
+void UCACCharacterCustomAPI::InitializeComponent()
 {
-	this->URL = "http://125.132.216.190:15530/api/character/info";
+	Super::InitializeComponent();
 
-	FCharacterInfoGetDataAPI userSendInfo = FCharacterInfoGetDataAPI("userid1132151");
-	HttpGetCall<FCharacterInfoGetDataAPI>(userSendInfo);
 }
-
 
 void UCACCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	if (req->GetURL() == "http://125.132.216.190:15530/api/character/create")
+	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s \n"), *req->GetURL());
+	if (this->CheckCallBackAPI(req, "api/character"))
 	{
-		//OnEpicLoginComple();
+		if (req->GetVerb() == "GET")
+		{
+			CharacterCustomGetCallBack(req, res);
+		}
+		else if (req->GetVerb() == "POST")
+		{
+			CharacterCustomUpdateCallBack(req, res);
+		}
 	}
-	else if (req->GetURL() == "http://125.132.216.190:15530/api/character/info")
-	{
-		OnGetCustomCharacterData(req,res);
-		OnGetCusomCFharacterDataCallBack();
-	}
-
 }
 
-void UCACCharacterCustomAPI::OnGetCustomCharacterData(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCACCharacterCustomAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	FString resultJsonString = this->HttpResult;
-
-	FCharacterCustomDataAPI ParseData;
-
-	TSharedPtr<FJsonObject> JsonObject;
-	TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(resultJsonString);
-
-	FJsonSerializer::Deserialize(JsonReader, JsonObject);
-
-	FJsonObjectConverter::JsonObjectToUStruct<FCharacterCustomDataAPI>(JsonObject.ToSharedRef(), &ParseData);
-
-
-	UGameInstance* GI = GetWorld()->GetGameInstance();
-	UCGIGameInstance* MyGI = Cast<UCGIGameInstance>(GI);
-	MyGI->CustomData.Selections = ParseData.status;
+	UE_LOG(LogTemp, Display, TEXT("OnFailAPI : %s \n"), *req->GetURL());
+	if (this->CheckCallBackAPI(req, "api/character"))
+	{
+		if (req->GetVerb() == "GET")
+		{
+			CharacterCustomGetCallBack(req, res);
+		}
+		else if (req->GetVerb() == "POST")
+		{
+			CharacterCustomUpdateCallBack(req, res);
+		}
+	}
 }
 
+void UCACCharacterCustomAPI::CharacterCustomGetCall()
+{
+	this->API = "api/character";
+
+	HttpGetCall();
+}
+
+void UCACCharacterCustomAPI::CharacterCustomUpdateCall(TArray<int32> CustomList)
+{
+	this->API = "api/character";
+
+	FCharacterCustomCreateAPI ApiSendData = FCharacterCustomCreateAPI(CustomList);
+	HttpPostCall<FCharacterCustomCreateAPI>(ApiSendData);
+}
+
+void UCACCharacterCustomAPI::CharacterCustomGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+	UE_LOG(LogTemp, Display, TEXT("content type %s"), *res->GetContentType());
+	//if (res->GetContentType() == "application/json")
+	FString jsonString = res->GetContentAsString();
+
+	FCharacterCustomGetAPI ParseData;
+	ParseData = JsonPerse<FCharacterCustomGetAPI>(jsonString);
+
+	OnCharacterCustomGetCallBack(ParseData);
+}
+
+void UCACCharacterCustomAPI::CharacterCustomUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+	FString jsonString = res->GetContentAsString();
+	FCharacterCustomGetAPI ParseData;
+	ParseData = JsonPerse<FCharacterCustomGetAPI>(jsonString);
+	bool hasCustom = false;
+	if (ParseData.characterId)
+	{
+		hasCustom = true;
+		OnCharacterCustomUpdateCallBack(hasCustom);
+	}
+	OnCharacterCustomUpdateCallBack(hasCustom);
+}
