@@ -47,11 +47,7 @@ public:
 
 		TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
 
-		FString jsonStr = "";
-		TSharedPtr<FJsonObject> JsonObject = FJsonObjectConverter::UStructToJsonObject<T>(sendData);
-		TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&jsonStr);
-
-		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
+		FString jsonStr = JsonStringify<T>(sendData);
 
 		SetOAuthToken();
 
@@ -67,8 +63,8 @@ public:
 		req->ProcessRequest();
 	};
 
-	void HttpGetCall() {
-		UE_LOG(LogTemp, Display, TEXT("HttpGetCall"));
+	void HttpJsonContentTypeCall(FString Verb) {
+		UE_LOG(LogTemp, Display, TEXT("HttpJsonContentTypeCall"));
 		if (bHttpWaitResponse)
 			return;
 		bHttpWaitResponse = true;
@@ -80,7 +76,7 @@ public:
 		SetOAuthToken();
 
 		req->SetURL(this->URL + this->API);
-		req->SetVerb("GET");
+		req->SetVerb(Verb);
 		req->SetHeader("content-type", "application/json");
 		if (!OAuthToken.IsEmpty())
 			req->SetHeader("Authorization", "Bearer " + OAuthToken);;
@@ -88,6 +84,11 @@ public:
 		req->OnProcessRequestComplete().BindUObject(this, &UCWGBaseAPI::HttpCallBack);
 
 		req->ProcessRequest();
+	};
+
+	void HttpGetCall() {
+		UE_LOG(LogTemp, Display, TEXT("HttpGetCall"));
+		HttpJsonContentTypeCall("GET");
 	};
 
 	template<typename T>
@@ -100,6 +101,11 @@ public:
 	void HttpDeleteCall(T sendData) {
 		UE_LOG(LogTemp, Display, TEXT("HttpDeleteCall"));
 		HttpJsonContentTypeCall<T>(sendData, "DELETE");
+	};
+
+	void HttpDeleteCall() {
+		UE_LOG(LogTemp, Display, TEXT("HttpDeleteCall"));
+		HttpJsonContentTypeCall("DELETE");
 	};
 
 	template<typename T>
@@ -116,16 +122,18 @@ public:
 
 
 	template <typename T>
-	FString JsonStringfy(T someStruct)
+	FString JsonStringify(T& someStruct)
 	{
-		FString jsonStr = "";
-		TSharedPtr<FJsonObject> JsonObject = FJsonObjectConverter::UStructToJsonObject<T>(someStruct);
-		TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&jsonStr);
+		FString OutputString;
+		TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer =
+			TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
 
-		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
-
-		return jsonStr;
-	};
+		if (FJsonObjectConverter::UStructToJsonObjectString(someStruct, OutputString))
+		{
+			return OutputString;
+		}
+		return TEXT("Conversion Failed");
+	}
 
 	template <typename T>
 	T JsonPerse(FString someString) {
