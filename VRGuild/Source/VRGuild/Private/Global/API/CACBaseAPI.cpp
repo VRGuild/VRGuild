@@ -36,7 +36,8 @@ void UCACBaseAPI::InitializeComponent()
 bool UCACBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
 {
 	api = api.TrimChar('/');
-	if (req->GetURL() == (this->URL + api))
+
+	if (!(this->URL + api).Compare(req->GetURL()))
 		return true;
 	return false;
 }
