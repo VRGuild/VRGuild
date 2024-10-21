@@ -30,7 +30,7 @@ void ACAReceptionist::BeginInteract(ACharacter* Initiator)
 {
 	Super::BeginInteract(Initiator);
 
-	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginINteract"));	
+	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginINteract"));
 }
 
 void ACAReceptionist::EndInteract(ACharacter* Initiator)

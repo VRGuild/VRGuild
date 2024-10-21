@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "Global/Widgets/CWScrollBase.h"
+#include "Global/CACarryInteractable.h"
 
 UCACCarry::UCACCarry()
 {
@@ -32,7 +33,7 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(UCACCarry, ActorInHand);
 }
 
-void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<AActor> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay)
+void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay)
 {
 	if (WidgetToDisplay)
 	{
@@ -53,6 +54,15 @@ void UCACCarry::StartDrop()
 	{
 		ServerDrop();
 	}
+}
+
+FGameplayTagContainer UCACCarry::GetGameplayTagContainer() const
+{
+	if (ActorInHand)
+	{
+		return ActorInHand->GetGameplayTagContainer();
+	}
+	return FGameplayTagContainer();
 }
 
 FString UCACCarry::GetMessageForNPC()
@@ -95,12 +105,15 @@ void UCACCarry::OnRep_ActorInHand()
 	else UE_LOG(LogTemp, Warning, TEXT("Invalid somehow"));
 }
 
-void UCACCarry::ServerHold_Implementation(TSubclassOf<AActor> ActorToHold)
+void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> ActorToHold)
 {
 	UE_LOG(LogTemp, Warning, TEXT("3333"));
 	if (Owner && ActorToHold)
 	{
-		ActorInHand = GetWorld()->SpawnActor<AActor>(ActorToHold, Owner->GetActorTransform());
+		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
+		ActorInHand->Init(false);
+		ActorInHand->FinishSpawning(Owner->GetActorTransform());
+
 		if (ActorInHand)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s Success %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"), *GetNameSafe(ActorInHand));
@@ -115,7 +128,7 @@ void UCACCarry::ServerDrop_Implementation()
 	{
 		ActorInHand->Destroy();
 		ActorInHand = nullptr;
-		UE_LOG(LogTemp, Warning, TEXT("%s ActorInHand destroyed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
+		UE_LOG(LogTemp, Warning, TEXT("%s ActorInHand destroyed "), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 		
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("%s Missing ActorInHand"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));

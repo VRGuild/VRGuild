@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 #include "CACCarry.generated.h"
 
 class ACharacter;
 class AActor;
+class ACACarryInteractable;
 
 class UCWScrollBase;
 
@@ -31,8 +33,10 @@ protected:
 	virtual void InitializeComponent() override;
 
 public:	
-	void StartCarry(ECarriedType Type, TSubclassOf<AActor> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay);
+	void StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay);
 	void StartDrop();
+
+	FGameplayTagContainer GetGameplayTagContainer() const;
 
 	FString GetMessageForNPC();
 private:
@@ -43,7 +47,7 @@ private:
 	TSubclassOf<UCWScrollBase> ScrollBaseWidgetClass;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_ActorInHand)
-	TObjectPtr<AActor> ActorInHand;
+	TObjectPtr<ACACarryInteractable> ActorInHand;
 	
 	ECarriedType CarryType;
 	ECarriedType CarryTypeTemp;
@@ -52,7 +56,7 @@ private:
 	void OnRep_ActorInHand();
 	
 	UFUNCTION(Server, Reliable)
-	void ServerHold(TSubclassOf<AActor> ActorToHold);
+	void ServerHold(TSubclassOf<ACACarryInteractable> ActorToHold);
 	UFUNCTION(Server, Reliable)
 	void ServerDrop();
 };

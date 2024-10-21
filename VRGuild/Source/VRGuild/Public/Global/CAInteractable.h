@@ -19,6 +19,8 @@ public:
 	// Sets default values for this actor's properties
 	ACAInteractable();
 
+	FGameplayTagContainer GetGameplayTagContainer() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,6 +31,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual bool IsActive() const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;

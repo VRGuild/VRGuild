@@ -47,13 +47,7 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	if (Owner && Owner->IsLocallyControlled())
 	{
 		UpdateTrace();
-
-		if (bDebugDraw)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("InteractingActor: %s"), *GetNameSafe(InteractingActor)));
-			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Magenta, FString::Printf(TEXT("ActorTraced: %s"), *GetNameSafe(ActorTraced)));
-		}		
-
+		
 		if (ActorTraced)
 		{
 			if (ActorTraced->Implements<UCIInteractionInterface>())
@@ -80,6 +74,12 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 			EndTrace();
 			ActorOnFocus = nullptr;
 		}
+	}
+
+	if (bDebugDraw)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("InteractingActor: %s"), *GetNameSafe(InteractingActor)));
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Magenta, FString::Printf(TEXT("ActorTraced: %s"), *GetNameSafe(ActorTraced)));
 	}
 }
 
@@ -175,7 +175,7 @@ void UCACInteraction::UpdateTrace()
 			End = Start + WorldDir * InteractDistance;
 		}
 	}
-
+	
 	TArray<FHitResult> Hits;
 	FCollisionObjectQueryParams ObjectQueryparams;
 	//ObjectQueryparams.AddObjectTypesToQuery(ECC_WorldStatic);
@@ -195,6 +195,13 @@ void UCACInteraction::UpdateTrace()
 		float LargestDotValue = -100.f;
 		for (int i = Hits.Num() - 1; i >= 0; --i)
 		{
+			if (auto temp = Cast<ICIInteractionInterface>(Hits[i].GetActor()))
+			{
+				if (!temp->IsActive()) continue;
+			}
+			else continue;
+
+
 			if (bDebugDraw)
 			{
 				DrawDebugSphere(GetWorld(), Hits[i].ImpactPoint, InteractRadius, 32, FColor::Blue, false, 0.0f);
