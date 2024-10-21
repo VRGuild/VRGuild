@@ -49,14 +49,19 @@ void UCWCharacterCustom::CustomLower(int32 index)
 	}
 }
 
+TArray<int32> UCWCharacterCustom::CustomSave()
+{
+	Data.Selections.Add(CharacterHeadComponent->ValueSelected);
+	Data.Selections.Add(CharacterBodyComponent->ValueSelected);
+	Data.Selections.Add(CharacterLowerComponent->ValueSelected);
+	return (Data.Selections);
+}
+
+
 void UCWCharacterCustom::CustomEnd()
 {
 	if (nullptr != CharacterCustomComponent)
 	{
-		FCharacterCustomData Data; 
-		Data.Selections.Add(CharacterHeadComponent->ValueSelected);
-		Data.Selections.Add(CharacterBodyComponent->ValueSelected);
-		Data.Selections.Add(CharacterLowerComponent->ValueSelected);
 		CharacterCustomComponent->SaveCustomData(Data);
 		this->RemoveFromParent();
 	}	

@@ -2,21 +2,33 @@
 
 
 #include "Hall/Actors/CAReceptionist.h"
+#include "Global/Components/CACCarry.h"
+#include "GameFramework/Character.h"
 
-void ACAReceptionist::BeginTrace()
-{
+void ACAReceptionist::BeginTrace(ACharacter* Initiator)
+{	
+	if(!Initiator) return;
+
 	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginTrace"));
+
+	if(auto CarryComponent = Initiator->GetComponentByClass<UCACCarry>())
+	{
+		SetTraceMessage(CarryComponent->GetMessageForNPC());
+	}
+
+	Super::BeginTrace(Initiator);
 }
 
-void ACAReceptionist::EndTrace()
+void ACAReceptionist::EndTrace(ACharacter* Initiator)
 {
+	Super::EndTrace(Initiator);
 	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist EndTrace"));
 }
 
 void ACAReceptionist::BeginInteract(ACharacter* Initiator)
 {
 	Super::BeginInteract(Initiator);
-	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginINteract"));
+	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginINteract"));	
 }
 
 void ACAReceptionist::EndInteract(ACharacter* Initiator)

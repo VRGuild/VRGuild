@@ -10,13 +10,15 @@
 
 
 class UCACCharacterPartBase;
+class UCWDisplayMessage;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FCharacterCustomData
 {
 	GENERATED_BODY()
 public:
-	TArray<int> Selections;
+	UPROPERTY(BlueprintReadOnly)
+	TArray<int32> Selections;
 	/* index 0: Head
 	* index 1: Body
 	* index 2: Lower
@@ -36,8 +38,6 @@ protected:
 	FDelegateHandle DestroySessionDelegateHandle;
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
-	
-
 public:
 	// 토큰을 저장하기 위한 변수 입니다.
 	FString TokenID;
@@ -49,4 +49,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
 	TArray<TSubclassOf<UActorComponent>> CharacterPartComponents;
+
+	UFUNCTION(BlueprintCallable)
+	void DisplayTraceMessage(bool bDisplay, FString msg);
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = Settings, meta=(AllowPrivateAccess))
+	TSubclassOf<UCWDisplayMessage> DisplayMsgWidgetClass;
+	TObjectPtr<UCWDisplayMessage> DisplayWidget;
 };

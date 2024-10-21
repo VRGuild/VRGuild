@@ -33,6 +33,14 @@ void UCACBaseAPI::InitializeComponent()
 	this->Owner = GetOwner();
 }
 
+bool UCACBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
+{
+	api = api.TrimChar('/');
+	if (req->GetURL() == (this->URL + api))
+		return true;
+	return false;
+}
+
 // Called every frame
 void UCACBaseAPI::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -54,22 +62,24 @@ void UCACBaseAPI::SetOAuthToken()
 void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("HttpCallBack"));
-	if (bConnectedSuccessfully)
+	if (bConnectedSuccessfully && res->GetResponseCode() == 200)
 	{
-		FString jsonString = res->GetContentAsString();
-		this->HttpResult = jsonString;
-		this->HttpStatus = res->GetResponseCode();
-
-		if (res->GetResponseCode() == 200)
-		{
-			//성공 했을때 동작 추가
-			OnSuccessAPI(req, res);
-		}
+		OnSuccessAPI(req, res);
+	}
+	else
+	{
+		// 실패 했을때
+		OnFailAPI(req, res);
 	}
 	bHttpWaitResponse = false;
 };
 
 void UCACBaseAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI %s"), *this->HttpResult);
+	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI %s"), *req->GetURL());
+}
+
+void UCACBaseAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+	UE_LOG(LogTemp, Display, TEXT("OnFailAPI %s"), *req->GetURL());
 }
