@@ -7,6 +7,7 @@
 void UCWGCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s \n"), *req->GetURL());
+	UE_LOG(LogTemp, Display, TEXT("Token : %s \n"), *this->OAuthToken);
 	if (this->CheckCallBackAPI(req, "api/character"))
 	{
 		if (req->GetVerb() == "GET")
@@ -23,15 +24,16 @@ void UCWGCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr 
 void UCWGCharacterCustomAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("OnFailAPI : %s \n"), *req->GetURL());
+	UE_LOG(LogTemp, Display, TEXT("Token : %s \n"), *this->OAuthToken);
 	if (this->CheckCallBackAPI(req, "api/character"))
 	{
 		if (req->GetVerb() == "GET")
 		{
-			CharacterCustomGetCallBack(req, res);
+			OnFailCharacterCustomGetCallBack();
 		}
 		else if (req->GetVerb() == "POST")
 		{
-			CharacterCustomUpdateCallBack(req, res);
+			OnFailCharacterCustomUpdateCallBack();
 		}
 	}
 }
@@ -47,11 +49,6 @@ void UCWGCharacterCustomAPI::CharacterCustomUpdateCall(TArray<int32> CustomList)
 {
 	this->API = "api/character";
 
-	//UGameInstance* GI = GetWorld()->GetGameInstance();
-	//UCGIGameInstance* MyGI = Cast<UCGIGameInstance>(GI);
-	//FCharacterCustomCreate ApiSendData = FCharacterCustomCreate();
-
-	//ApiSendData.status = MyGI->CustomData.Selections;
 	FCharacterCustomCreate ApiSendData = FCharacterCustomCreate(CustomList);
 	HttpPostCall<FCharacterCustomCreate>(ApiSendData);
 }

@@ -42,17 +42,18 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void CharacterCustomGetCall();
+	void CharacterCustomGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCharacterCustomGetCallBack(FCharacterCustomGet ParseData);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailCharacterCustomGetCallBack();
+
 
 	UFUNCTION(BlueprintCallable)
 	void CharacterCustomUpdateCall(TArray<int32> CustomList);
-
-	void CharacterCustomGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-
 	void CharacterCustomUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnCharacterCustomGetCallBack(FCharacterCustomGet ParseData);
-
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCharacterCustomUpdateCallBack(bool hasData);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailCharacterCustomUpdateCallBack();
 };
