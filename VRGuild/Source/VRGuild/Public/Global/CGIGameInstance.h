@@ -17,7 +17,7 @@ struct FCharacterCustomData
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> Selections;
 	/* index 0: Head
 	* index 1: Body

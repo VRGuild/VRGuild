@@ -18,7 +18,7 @@ void UCWGBaseAPI::SetOAuthToken()
 bool UCWGBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
 {
 	api = api.TrimChar('/');
-	if (req->GetURL() == (this->URL + api))
+	if (!(this->URL + api).Compare(req->GetURL()))
 		return true;
 	return false;
 }
@@ -26,7 +26,7 @@ bool UCWGBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
 void UCWGBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("HttpCallBack"));
-	if (bConnectedSuccessfully && res->GetResponseCode() == 200)
+	if (bConnectedSuccessfully && 200 <= res->GetResponseCode() && res->GetResponseCode() < 300)
 	{
 		OnSuccessAPI(req, res);
 	}

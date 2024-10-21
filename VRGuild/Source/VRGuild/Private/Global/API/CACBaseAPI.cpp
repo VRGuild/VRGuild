@@ -33,22 +33,6 @@ void UCACBaseAPI::InitializeComponent()
 	this->Owner = GetOwner();
 }
 
-bool UCACBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
-{
-	api = api.TrimChar('/');
-	if (req->GetURL() == (this->URL + api))
-		return true;
-	return false;
-}
-
-// Called every frame
-void UCACBaseAPI::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UCACBaseAPI::SetOAuthToken()
 {
 	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
@@ -59,10 +43,18 @@ void UCACBaseAPI::SetOAuthToken()
 	}
 }
 
+bool UCACBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
+{
+	api = api.TrimChar('/');
+	if (!(this->URL + api).Compare(req->GetURL()))
+		return true;
+	return false;
+}
+
 void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("HttpCallBack"));
-	if (bConnectedSuccessfully && res->GetResponseCode() == 200)
+	if (bConnectedSuccessfully && 200 <= res->GetResponseCode() && res->GetResponseCode() < 300)
 	{
 		OnSuccessAPI(req, res);
 	}
@@ -72,7 +64,7 @@ void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool b
 		OnFailAPI(req, res);
 	}
 	bHttpWaitResponse = false;
-};
+}
 
 void UCACBaseAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
