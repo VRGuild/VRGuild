@@ -32,6 +32,7 @@ protected:
 
 public:	
 	void StartCarry(ECarriedType Type, TSubclassOf<AActor> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay);
+	void StartDrop();
 
 	FString GetMessageForNPC();
 private:
@@ -51,5 +52,7 @@ private:
 	void OnRep_ActorInHand();
 	
 	UFUNCTION(Server, Reliable)
-	void ServerHoldPoster(TSubclassOf<AActor> ActorToHold);
+	void ServerHold(TSubclassOf<AActor> ActorToHold);
+	UFUNCTION(Server, Reliable)
+	void ServerDrop();
 };

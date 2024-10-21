@@ -23,12 +23,12 @@ public:
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
+	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
+	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TSubclassOf<UUserWidget> PosterWidgetToDisplayClass;
-	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	TSubclassOf<AActor> SelfActor;
 };

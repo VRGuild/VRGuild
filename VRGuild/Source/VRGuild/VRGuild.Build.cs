@@ -11,7 +11,8 @@ public class VRGuild : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG",
         "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemEOS",
 		"HTTP", "Json", "JsonUtilities",
-        "VoiceChat"
+        "VoiceChat",
+		"GameplayTags"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

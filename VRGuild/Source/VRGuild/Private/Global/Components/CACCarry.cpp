@@ -42,8 +42,16 @@ void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<AActor> ActorToHold, T
 		{
 			UE_LOG(LogTemp, Warning, TEXT("2222"));
 			CarryTypeTemp = Type;
-			ServerHoldPoster(ActorToHold);
+			ServerHold(ActorToHold);
 		}
+	}
+}
+
+void UCACCarry::StartDrop()
+{
+	if (ScrollBaseWidget && ActorInHand)
+	{
+		ServerDrop();
 	}
 }
 
@@ -84,9 +92,10 @@ void UCACCarry::OnRep_ActorInHand()
 			CarryType = ECarriedType::NONE;
 		}
 	}
+	else UE_LOG(LogTemp, Warning, TEXT("Invalid somehow"));
 }
 
-void UCACCarry::ServerHoldPoster_Implementation(TSubclassOf<AActor> ActorToHold)
+void UCACCarry::ServerHold_Implementation(TSubclassOf<AActor> ActorToHold)
 {
 	UE_LOG(LogTemp, Warning, TEXT("3333"));
 	if (Owner && ActorToHold)
@@ -98,4 +107,16 @@ void UCACCarry::ServerHoldPoster_Implementation(TSubclassOf<AActor> ActorToHold)
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("%s Failed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 	}
+}
+
+void UCACCarry::ServerDrop_Implementation()
+{
+	if (Owner && ActorInHand)
+	{
+		ActorInHand->Destroy();
+		ActorInHand = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("%s ActorInHand destroyed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
+		
+	}
+	else UE_LOG(LogTemp, Warning, TEXT("%s Missing ActorInHand"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 }

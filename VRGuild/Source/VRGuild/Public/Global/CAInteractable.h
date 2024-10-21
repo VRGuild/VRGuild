@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Global/Interfaces/CIInteractionInterface.h"
+#include "GameplayTagContainer.h"
 #include "CAInteractable.generated.h"
 
 class UCGIGameInstance;
@@ -33,8 +34,12 @@ public:
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "Settings | Tags")
+	FGameplayTagContainer InteractionTag;
+
 private:
-	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	FString TraceMessage;
 	TObjectPtr<UCGIGameInstance> GameInstance;
 };

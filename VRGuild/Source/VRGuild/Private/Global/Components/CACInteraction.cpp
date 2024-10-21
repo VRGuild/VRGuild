@@ -51,10 +51,8 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		if (bDebugDraw)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("InteractingActor: %s"), *GetNameSafe(InteractingActor)));
-			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, FString::Printf(TEXT("ActorTraced: %s"), *GetNameSafe(ActorTraced)));
+			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Magenta, FString::Printf(TEXT("ActorTraced: %s"), *GetNameSafe(ActorTraced)));
 		}		
-
-		if(!bCanInteract) return;
 
 		if (ActorTraced)
 		{
@@ -83,20 +81,6 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 			ActorOnFocus = nullptr;
 		}
 	}
-}
-
-bool UCACInteraction::IsHoldingItem() const
-{
-	return HoldingActor != nullptr;
-}
-
-void UCACInteraction::HoldItem()
-{
-}
-
-AActor* UCACInteraction::DropItem()
-{
-	return nullptr;
 }
 
 void UCACInteraction::Enable()
@@ -143,12 +127,29 @@ void UCACInteraction::EndInteract()
 		GetInterface(InteractingActor)->EndInteract(Owner);
 		InteractingActor = nullptr;
 		bCanInteract = true;
-		/*if (!bEnabled)
-		{
-
-		}*/
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Endinteract"));
+}
+
+void UCACInteraction::BeginTrace()
+{
+	if (!bIsTracing && ActorOnFocus)
+	{
+		GetInterface(ActorOnFocus)->BeginTrace(Owner);
+		bIsTracing = true;
+	}
+}
+
+void UCACInteraction::EndTrace()
+{
+	if (bIsTracing)
+	{
+		if (ActorOnFocus)
+		{
+			GetInterface(ActorOnFocus)->EndTrace(Owner);
+		}
+		bIsTracing = false;
+	}
 }
 
 void UCACInteraction::UpdateTrace()
@@ -219,38 +220,13 @@ void UCACInteraction::UpdateTrace()
 	else ActorTraced = nullptr;
 }
 
-const AActor* UCACInteraction::GetActorTraced() const
-{
-	return ActorTraced;
-}
-
-void UCACInteraction::BeginTrace()
-{
-	if (!bIsTracing && ActorOnFocus)
-	{
-		GetInterface(ActorOnFocus)->BeginTrace(Owner);
-		bIsTracing = true;
-	}
-}
-
-void UCACInteraction::EndTrace()
-{
-	if (bIsTracing )
-	{
-		if (ActorOnFocus)
-		{
-			GetInterface(ActorOnFocus)->EndTrace(Owner);
-		}		
-		bIsTracing = false;
-	}
-}
-
 ICIInteractionInterface* UCACInteraction::GetInterface(AActor* actor) const
 {
 	return Cast<ICIInteractionInterface>(actor);
 }
 
-bool UCACInteraction::CanInteract() const
+bool UCACInteraction::IsInteracting() const
 {
-	return bCanInteract;
+
+	return !bCanInteract;
 }

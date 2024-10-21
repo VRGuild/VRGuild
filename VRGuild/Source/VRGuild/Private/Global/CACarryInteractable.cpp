@@ -48,5 +48,13 @@ void ACACarryInteractable::BeginInteract(ACharacter* Initiator)
 void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 {
 	Super::EndInteract(Initiator);
+	if (Initiator)
+	{
+		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("1111"));
+			carryComponent->StartDrop();
+		}
+	}
 	UE_LOG(LogTemp, Warning, TEXT("ACACarryInteractable EndInteract"));
 }
