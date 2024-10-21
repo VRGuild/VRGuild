@@ -11,6 +11,8 @@
 #include "Global/Server/CGSSBaseGameSession.h"
 #include <VRGuild/TP_ThirdPerson/TP_ThirdPersonCharacter.h>
 #include "Blueprint/UserWidget.h"
+#include "Global/Widgets/CWDisplayMessage.h"
+
 
 void UCGIGameInstance::Init()
 {
@@ -78,22 +80,27 @@ void UCGIGameInstance::AttachCustomSelections(ACharacter* NewCharacter)
     }
 }
 
-void UCGIGameInstance::DisplayMessage(bool bDisplay, FString msg)
+void UCGIGameInstance::DisplayTraceMessage(bool bDisplay, FString msg)
 {
     if (!DisplayWidget)
     {
         if (!ensure(DisplayMsgWidgetClass)) return;
 
-        DisplayWidget = CreateWidget(GetWorld(), DisplayMsgWidgetClass);
+        DisplayWidget = CreateWidget<UCWDisplayMessage>(GetWorld(), DisplayMsgWidgetClass);
         
         if (!DisplayWidget) return;
 
+        DisplayWidget->SetMessage(msg);
         DisplayWidget->AddToViewport();
     }
     
     if (bDisplay)
     {
+        DisplayWidget->SetMessage(msg);
         DisplayWidget->SetVisibility(ESlateVisibility::Visible);
     }
-    else DisplayWidget->SetVisibility(ESlateVisibility::Hidden);
+    else 
+    {
+        DisplayWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
 }

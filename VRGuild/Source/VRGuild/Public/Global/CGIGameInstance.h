@@ -10,6 +10,7 @@
 
 
 class UCACCharacterPartBase;
+class UCWDisplayMessage;
 
 USTRUCT(BlueprintType)
 struct FCharacterCustomData
@@ -50,10 +51,10 @@ public:
 	TArray<TSubclassOf<UActorComponent>> CharacterPartComponents;
 
 	UFUNCTION(BlueprintCallable)
-	void DisplayMessage(bool bDisplay, FString msg);
+	void DisplayTraceMessage(bool bDisplay, FString msg);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta=(AllowPrivateAccess))
-	TSubclassOf<UUserWidget> DisplayMsgWidgetClass;
-	TObjectPtr<UUserWidget> DisplayWidget;
+	TSubclassOf<UCWDisplayMessage> DisplayMsgWidgetClass;
+	TObjectPtr<UCWDisplayMessage> DisplayWidget;
 };

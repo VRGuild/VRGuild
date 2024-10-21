@@ -28,8 +28,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void BeginTrace() override;
-	virtual void EndTrace() override;
+	virtual void BeginTrace(ACharacter* Initiator) override;
+	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 

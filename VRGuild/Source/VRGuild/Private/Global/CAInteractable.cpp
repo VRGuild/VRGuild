@@ -31,19 +31,19 @@ void ACAInteractable::Tick(float DeltaTime)
 
 }
 
-void ACAInteractable::BeginTrace()
+void ACAInteractable::BeginTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayMessage(true, TraceMessage);
+		GameInstance->DisplayTraceMessage(true, TraceMessage);
 	}
 }
 
-void ACAInteractable::EndTrace()
+void ACAInteractable::EndTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayMessage(false, TraceMessage);
+		GameInstance->DisplayTraceMessage(false, TraceMessage);
 	}
 }
 

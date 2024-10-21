@@ -3,12 +3,12 @@
 
 #include "Hall/Actors/CAPortal.h"
 
-void ACAPortal::BeginTrace()
+void ACAPortal::BeginTrace(ACharacter* Initiator)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ACAPortal BeginTrace"));
 }
 
-void ACAPortal::EndTrace()
+void ACAPortal::EndTrace(ACharacter* Initiator)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ACAPortal EndTrace"));
 }
