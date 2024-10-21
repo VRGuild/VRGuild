@@ -46,8 +46,13 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 	if (Owner && Owner->IsLocallyControlled())
 	{
-		//AActor* ActorOnFocus = nullptr;
 		UpdateTrace();
+
+		if (bDebugDraw)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("InteractingActor: %s"), *GetNameSafe(InteractingActor)));
+			GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, FString::Printf(TEXT("ActorOnFocus: %s"), *GetNameSafe(ActorOnFocus)));
+		}		
 
 		if(!bCanInteract) return;
 
@@ -67,7 +72,10 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 					InteractingActor = ActorOnFocus;
 					BeginTrace();
 				}
-				else BeginTrace();
+				else
+				{
+					BeginTrace();
+				}
 			}
 		}
 		else if (InteractingActor) {
@@ -108,9 +116,6 @@ void UCACInteraction::BeginInteract()
 		GetInterface()->BeginInteract(Owner);
 		EndTrace();
 		bCanInteract = false;
-		
-		/*if (bEnabled)
-			SetComponentTickEnabled(false);*/
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No begininteract"));
 }
@@ -125,9 +130,7 @@ void UCACInteraction::EndInteract()
 		if (!bEnabled)
 		{
 			InteractingActor = nullptr;
-			//SetComponentTickEnabled(true);
 		}
-		//else InteractingActor = nullptr;
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Endinteract"));
 }
@@ -167,7 +170,6 @@ void UCACInteraction::UpdateTrace()
 	if (bDebugDraw)
 	{
 		DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 0.f);
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Actor* %s"), *GetNameSafe(InteractingActor)));
 	}
 
 	QueryParams.AddIgnoredActor(Owner);
@@ -198,6 +200,7 @@ void UCACInteraction::UpdateTrace()
 			}
 		}
 	}
+	else ActorOnFocus = nullptr;
 }
 
 const AActor* UCACInteraction::GetActorOnFocus() const
@@ -216,9 +219,12 @@ void UCACInteraction::BeginTrace()
 
 void UCACInteraction::EndTrace()
 {
-	if (bIsTracing && InteractingActor)
+	if (bIsTracing )
 	{
-		GetInterface()->EndTrace(Owner);
+		if (InteractingActor)
+		{
+			GetInterface()->EndTrace(Owner);
+		}		
 		bIsTracing = false;
 	}
 }
