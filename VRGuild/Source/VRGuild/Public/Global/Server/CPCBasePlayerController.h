@@ -102,10 +102,7 @@ protected:
 	virtual void OnRep_PlayerState() override;
 	UFUNCTION(Server, Reliable)
 	void ServerStartCustomCharacter(FCharacterCustomData customData);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void AttachCustomSKMComponents(FCharacterCustomData customData);
-
+	virtual void OnPossess(APawn* aPawn) override;
 private:
 	//=============EOS Voice Chat===============
 	void StartVoiceChat();

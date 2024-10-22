@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Global/CGIGameInstance.h"
 #include "TP_ThirdPersonCharacter.generated.h"
 
 class USpringArmComponent;
@@ -70,8 +71,19 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
+	UPROPERTY(ReplicatedUsing = OnRep_CustomValues)
+	FCharacterCustomData CustomValues;
+	UFUNCTION()
+	void OnRep_CustomValues();
+	UFUNCTION(BlueprintImplementableEvent)
+	void AttachCustomSKMComponents(FCharacterCustomData customData);
 
 public:
+
+	void SetCustomValue(FCharacterCustomData data);
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/

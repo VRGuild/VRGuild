@@ -11,8 +11,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "Global/Components/CACCarry.h"
 #include "Global/Components/CACInteraction.h"
+
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,12 +61,40 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 
 	InteractionComponent = CreateDefaultSubobject<UCACInteraction>("InteractionComponent");
 	CarryComponent = CreateDefaultSubobject<UCACCarry>("CarryComponent");
+
+	SetReplicates(true);
 }
 
 void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void ATP_ThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATP_ThirdPersonCharacter, CustomValues);
+}
+
+void ATP_ThirdPersonCharacter::SetCustomValue(FCharacterCustomData data)
+{
+	FCharacterCustomData stuff; 
+	stuff.Selections.Empty();
+	stuff.Selections.Add(1);
+	stuff.Selections.Add(1);
+	stuff.Selections.Add(1);
+	
+	CustomValues = stuff;
+	if(GetController() && GetController()->IsLocalPlayerController()) 
+		OnRep_CustomValues();
+}
+
+void ATP_ThirdPersonCharacter::OnRep_CustomValues()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnRep_CustomValues"));
+	AttachCustomSKMComponents(CustomValues);
 }
 
 //////////////////////////////////////////////////////////////////////////

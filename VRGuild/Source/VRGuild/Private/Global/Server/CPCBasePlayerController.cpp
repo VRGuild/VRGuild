@@ -214,11 +214,28 @@ void ACPCBasePlayerController::OnRep_PlayerState()
 	else UE_LOG(LogTemp, Warning, TEXT("At L_CustomMap"));
 }
 
+void ACPCBasePlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	if (IsLocalPlayerController())
+	{
+		if (auto character = Cast<ATP_ThirdPersonCharacter>(GetCharacter()))
+		{
+			if (auto GI = GetWorld()->GetGameInstance<UCGIGameInstance>())
+			{
+				character->SetCustomValue(GI->CustomData);
+			}
+		}
+	}	
+}
+
 void ACPCBasePlayerController::ServerStartCustomCharacter_Implementation(FCharacterCustomData customData)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Inside ServerStartCustomC"));
-	
-	AttachCustomSKMComponents(customData);
+	UE_LOG(LogTemp, Warning, TEXT("Inside ServerStartCustomCharacter_Implementation"));
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(GetCharacter()))
+	{
+		character->SetCustomValue(customData);
+	}
 }
 
 void ACPCBasePlayerController::StartVoiceChat()

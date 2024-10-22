@@ -51,4 +51,7 @@ protected:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSwitchSKM(int value);
+
+private:
+	void BeginCustomSetup(int value);
 };
