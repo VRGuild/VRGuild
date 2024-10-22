@@ -14,6 +14,7 @@
  */
 class FOnlineSessionSearch;
 class FOnlineSessionSearchResult;
+class USkeletalMesh;
 
 struct FEVIKChannelCredentials : public FJsonSerializable
 {
@@ -99,6 +100,11 @@ private:
 
 protected:
 	virtual void OnRep_PlayerState() override;
+	UFUNCTION(Server, Reliable)
+	void ServerStartCustomCharacter(FCharacterCustomData customData);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void AttachCustomSKMComponents(FCharacterCustomData customData);
 
 private:
 	//=============EOS Voice Chat===============

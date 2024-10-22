@@ -36,12 +36,9 @@ protected:
 	AActor* Owner;
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	UPROPERTY(BlueprintReadOnly)
 	FString OAuthToken;
-	
+
 	void SetOAuthToken();// { OAuthToken = "Bearer " + token; };
 
 	bool CheckCallBackAPI(FHttpRequestPtr req, FString api);
@@ -57,11 +54,7 @@ public:
 
 		TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
 
-		FString jsonStr = "";
-		TSharedPtr<FJsonObject> JsonObject = FJsonObjectConverter::UStructToJsonObject<T>(sendData);
-		TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&jsonStr);
-
-		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
+		FString jsonStr = JsonStringfy<T>(sendData);
 
 		SetOAuthToken();
 
@@ -77,8 +70,8 @@ public:
 		req->ProcessRequest();
 	};
 
-	void HttpGetCall() {
-		UE_LOG(LogTemp, Display, TEXT("HttpGetCall"));
+	void HttpJsonContentTypeCall(FString Verb) {
+		UE_LOG(LogTemp, Display, TEXT("HttpJsonContentTypeCall"));
 		if (bHttpWaitResponse)
 			return;
 		bHttpWaitResponse = true;
@@ -90,7 +83,7 @@ public:
 		SetOAuthToken();
 
 		req->SetURL(this->URL + this->API);
-		req->SetVerb("GET");
+		req->SetVerb(Verb);
 		req->SetHeader("content-type", "application/json");
 		if (!OAuthToken.IsEmpty())
 			req->SetHeader("Authorization", "Bearer " + OAuthToken);;
@@ -98,6 +91,11 @@ public:
 		req->OnProcessRequestComplete().BindUObject(this, &UCACBaseAPI::HttpCallBack);
 
 		req->ProcessRequest();
+	};
+
+	void HttpGetCall() {
+		UE_LOG(LogTemp, Display, TEXT("HttpGetCall"));
+		HttpJsonContentTypeCall("GET");
 	};
 
 	template<typename T>
@@ -112,19 +110,21 @@ public:
 		HttpJsonContentTypeCall<T>(sendData, "DELETE");
 	};
 
+	void HttpDeleteCall() {
+		UE_LOG(LogTemp, Display, TEXT("HttpDeleteCall"));
+		HttpJsonContentTypeCall("DELETE");
+	};
+
 	template<typename T>
 	void HttpPatchCall(T sendData) {
 		UE_LOG(LogTemp, Display, TEXT("HttpPatchCall"));
 		HttpJsonContentTypeCall<T>(sendData, "PATCH");
 	};
-	
+
 	void HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res);
 	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res);
-
-
-
 
 	template <typename T>
 	FString JsonStringfy(T someStruct)

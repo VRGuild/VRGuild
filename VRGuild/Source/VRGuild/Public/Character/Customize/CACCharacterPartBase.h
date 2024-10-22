@@ -21,7 +21,7 @@ public:
 };
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACCharacterPartBase : public UActorComponent
 {
 	GENERATED_BODY()

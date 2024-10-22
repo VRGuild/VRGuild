@@ -12,6 +12,10 @@
 #include "Global/Server/CGMBaseServer.h"
 #include "Global/CGIGameInstance.h"
 #include "GameFramework/PlayerState.h"
+#include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "Character/Customize/CACCharacterBody.h"
+#include "Character/Customize/CACCharacterHead.h"
+#include "Character/Customize/CACCharacterLower.h"
 
 ACPCBasePlayerController::ACPCBasePlayerController()
 {
@@ -196,7 +200,25 @@ void ACPCBasePlayerController::TravelToNextServer()
 void ACPCBasePlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	StartVoiceChat();
+	
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) != TEXT("L_CustomMap"))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Not L_CustomMap"));
+		//StartVoiceChat();
+		if (auto GI = GetWorld()->GetGameInstance<UCGIGameInstance>())
+		{
+			ServerStartCustomCharacter(GI->CustomData);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("No GameInstance"));
+	}
+	else UE_LOG(LogTemp, Warning, TEXT("At L_CustomMap"));
+}
+
+void ACPCBasePlayerController::ServerStartCustomCharacter_Implementation(FCharacterCustomData customData)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Inside ServerStartCustomC"));
+	
+	AttachCustomSKMComponents(customData);
 }
 
 void ACPCBasePlayerController::StartVoiceChat()

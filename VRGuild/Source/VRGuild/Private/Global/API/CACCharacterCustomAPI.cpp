@@ -2,8 +2,7 @@
 
 
 #include "Global/API/CACCharacterCustomAPI.h"
-#include "Global/CGIGameInstance.h"
-#include "Global/Server/CPCBasePlayerController.h"
+#include "Global/API/BPL/CBPLCharacterCustom.h"
 
 UCACCharacterCustomAPI::UCACCharacterCustomAPI()
 {
@@ -25,15 +24,25 @@ void UCACCharacterCustomAPI::InitializeComponent()
 void UCACCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s \n"), *req->GetURL());
+	UE_LOG(LogTemp, Display, TEXT("Token : %s \n"), *this->OAuthToken);
 	if (this->CheckCallBackAPI(req, "api/character"))
 	{
-		if (req->GetVerb() == "GET")
+		FString Verb = req->GetVerb();
+		if (Verb == "GET")
 		{
 			CharacterCustomGetCallBack(req, res);
 		}
-		else if (req->GetVerb() == "POST")
+		else if (Verb == "POST")
+		{
+			CharacterCustomCreateCallBack(req, res);
+		}
+		else if (Verb == "FETCH")
 		{
 			CharacterCustomUpdateCallBack(req, res);
+		}
+		else if (Verb == "DELETE")
+		{
+			CharacterCustomDeleteCallBack(req, res);
 		}
 	}
 }
@@ -41,56 +50,96 @@ void UCACCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr 
 void UCACCharacterCustomAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	UE_LOG(LogTemp, Display, TEXT("OnFailAPI : %s \n"), *req->GetURL());
+	UE_LOG(LogTemp, Display, TEXT("Token : %s \n"), *this->OAuthToken);
 	if (this->CheckCallBackAPI(req, "api/character"))
 	{
-		if (req->GetVerb() == "GET")
+		FString Verb = req->GetVerb();
+		if (Verb == "GET")
 		{
-			CharacterCustomGetCallBack(req, res);
+			OnFailCharacterCustomGetCallBack();
 		}
-		else if (req->GetVerb() == "POST")
+		else if (Verb == "POST")
 		{
-			CharacterCustomUpdateCallBack(req, res);
+			OnFailCharacterCustomCreateCallBack();
+		}
+		else if (Verb == "FETCH")
+		{
+			OnFailCharacterCustomUpdateCallBack();
+		}
+		else if (Verb == "DELETE")
+		{
+			OnFailCharacterCustomDeleteCallBack();
 		}
 	}
 }
 
 void UCACCharacterCustomAPI::CharacterCustomGetCall()
 {
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomGetCall"));
 	this->API = "api/character";
 
 	HttpGetCall();
 }
 
-void UCACCharacterCustomAPI::CharacterCustomUpdateCall(TArray<int32> CustomList)
-{
-	this->API = "api/character";
-
-	FCharacterCustomCreateAPI ApiSendData = FCharacterCustomCreateAPI(CustomList);
-	HttpPostCall<FCharacterCustomCreateAPI>(ApiSendData);
-}
-
 void UCACCharacterCustomAPI::CharacterCustomGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	UE_LOG(LogTemp, Display, TEXT("content type %s"), *res->GetContentType());
-	//if (res->GetContentType() == "application/json")
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomGetCallBack"));
 	FString jsonString = res->GetContentAsString();
 
-	FCharacterCustomGetAPI ParseData;
-	ParseData = JsonPerse<FCharacterCustomGetAPI>(jsonString);
+	FCharacterCustomInfo ParseData;
+	ParseData = JsonPerse<FCharacterCustomInfo>(jsonString);
 
 	OnCharacterCustomGetCallBack(ParseData);
 }
 
+void UCACCharacterCustomAPI::CharacterCustomCreateCall(TArray<int32> CustomList)
+{
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomCreateCall"));
+	this->API = "api/character";
+
+	FCharacterCustomCreate ApiSendData = FCharacterCustomCreate(CustomList);
+	HttpPostCall<FCharacterCustomCreate>(ApiSendData);
+}
+
+void UCACCharacterCustomAPI::CharacterCustomCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomCreateCallBack"));
+	FString jsonString = res->GetContentAsString();
+	FCharacterCustomInfo ParseData;
+	ParseData = JsonPerse<FCharacterCustomInfo>(jsonString);
+	OnCharacterCustomCreateCallBack(ParseData);
+}
+
+void UCACCharacterCustomAPI::CharacterCustomUpdateCall(TArray<int32> CustomList)
+{
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomUpdateCall"));
+	this->API = "api/character";
+
+	FCharacterCustomCreate ApiSendData = FCharacterCustomCreate(CustomList);
+	HttpPatchCall<FCharacterCustomCreate>(ApiSendData);
+}
+
 void UCACCharacterCustomAPI::CharacterCustomUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomUpdateCallBack"));
 	FString jsonString = res->GetContentAsString();
-	FCharacterCustomGetAPI ParseData;
-	ParseData = JsonPerse<FCharacterCustomGetAPI>(jsonString);
-	bool hasCustom = false;
-	if (ParseData.characterId)
-	{
-		hasCustom = true;
-		OnCharacterCustomUpdateCallBack(hasCustom);
-	}
-	OnCharacterCustomUpdateCallBack(hasCustom);
+	FCharacterCustomInfo ParseData;
+	ParseData = JsonPerse<FCharacterCustomInfo>(jsonString);
+
+	OnCharacterCustomUpdateCallBack(ParseData);
+}
+
+void UCACCharacterCustomAPI::CharacterCustomDeleteCall(TArray<int32> CustomList)
+{
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomDeleteCall"));
+	this->API = "api/character";
+
+	FCharacterCustomCreate ApiSendData = FCharacterCustomCreate(CustomList);
+	HttpDeleteCall();
+}
+
+void UCACCharacterCustomAPI::CharacterCustomDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+	UE_LOG(LogTemp, Display, TEXT("CharacterCustomDeleteCallBack"));
+	OnCharacterCustomDeleteCallBack();
 }
