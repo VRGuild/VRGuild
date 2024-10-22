@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Global/Project/CBPLProject.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CAProjectNotice.generated.h"
@@ -19,7 +20,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:	
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FProjectNotice NoticeData;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FVector2D WidgetDrawSize = { 400,440 };
 
