@@ -27,8 +27,6 @@ void ACANoticeBoard::BeginPlay()
 {
 	Super::BeginPlay();
 	FProjectNotice test = FProjectNotice();
-	PostProjectNotice(FVector(1,0,0), test);
-	PostProjectNotice(FVector(0,500,0), test);
 }
 
 void ACANoticeBoard::PostProjectNotice(FVector position, FProjectNotice projectNotice)
