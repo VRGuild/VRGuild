@@ -22,6 +22,8 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable)
+	void Init(bool bHasCharacter);
 
 public:	
 	virtual void InitializeComponent() override;

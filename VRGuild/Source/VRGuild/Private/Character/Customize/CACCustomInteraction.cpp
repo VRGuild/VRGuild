@@ -20,8 +20,15 @@ UCACCustomInteraction::UCACCustomInteraction()
 void UCACCustomInteraction::BeginPlay()
 {
 	Super::BeginPlay();
-	ShowWidget();
 	// ...
+}
+
+void UCACCustomInteraction::Init(bool bHasCharacter)
+{
+	if (!bHasCharacter)
+	{
+		ShowWidget();
+	}
 }
 
 void UCACCustomInteraction::InitializeComponent()

@@ -26,12 +26,24 @@ void UCACCharacterPartBase::InitializeComponent()
 		CharacterSKM->AttachToComponent(character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 		CharacterSKM->SetLeaderPoseComponent(character->GetMesh());
 	}
-
 }
 
 void UCACCharacterPartBase::SwitchSKM(int value)
 {
-	ServerSwitchSKM(value);
+	BeginCustomSetup(value);
+
+	//ServerSwitchSKM(value);
+}
+
+void UCACCharacterPartBase::BeginCustomSetup(int value)
+{
+	if (nullptr != CharacterSKM && SkeletalMeshBox.Find(value) != nullptr)
+	{
+		ValueSelected = value;
+		CharacterSKM->SetSkeletalMesh(SkeletalMeshBox[ValueSelected].CustomSkeletalMesh);
+		UE_LOG(LogTemp, Warning, TEXT("Success Hapy"));
+	}
+	else UE_LOG(LogTemp, Warning, TEXT("Failed Hapy"));
 }
 
 void UCACCharacterPartBase::ServerSwitchSKM_Implementation(int value)
@@ -41,9 +53,5 @@ void UCACCharacterPartBase::ServerSwitchSKM_Implementation(int value)
 
 void UCACCharacterPartBase::MulticastSwitchSKM_Implementation(int value)
 {
-	if (nullptr != CharacterSKM && SkeletalMeshBox.Find(value) != nullptr)
-	{
-		ValueSelected = value;
-		CharacterSKM->SetSkeletalMesh(SkeletalMeshBox[ValueSelected].CustomSkeletalMesh);
-	}
+
 }

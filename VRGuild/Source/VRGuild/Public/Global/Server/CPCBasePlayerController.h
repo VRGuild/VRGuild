@@ -14,6 +14,7 @@
  */
 class FOnlineSessionSearch;
 class FOnlineSessionSearchResult;
+class USkeletalMesh;
 
 struct FEVIKChannelCredentials : public FJsonSerializable
 {
@@ -99,7 +100,9 @@ private:
 
 protected:
 	virtual void OnRep_PlayerState() override;
-
+	UFUNCTION(Server, Reliable)
+	void ServerStartCustomCharacter(FCharacterCustomData customData);
+	virtual void OnPossess(APawn* aPawn) override;
 private:
 	//=============EOS Voice Chat===============
 	void StartVoiceChat();
