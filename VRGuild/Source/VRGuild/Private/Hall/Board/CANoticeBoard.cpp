@@ -6,6 +6,7 @@
 #include "Hall/Board/Notice/CAProjectNotice.h"
 #include "Components/WidgetComponent.h"
 #include "Hall/Board/Notice/UI/CWGProjectNotice.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ACANoticeBoard::ACANoticeBoard()
@@ -29,14 +30,23 @@ void ACANoticeBoard::BeginPlay()
 	FProjectNotice test = FProjectNotice();
 }
 
+void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACAProjectNotice, NoticeData);
+}
+
+
 void ACANoticeBoard::PostProjectNotice(FVector position, FProjectNotice projectNotice)
 {
 
 	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActor<ACAProjectNotice>(this->ProjectNoticeClass);
 
+	newProjectNotice->NoticeData = projectNotice;
+
 	newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	newProjectNotice->SetActorRelativeLocation(position);
-	UCWGProjectNotice* FrontSideWidget = Cast<UCWGProjectNotice>(newProjectNotice->FrontSideComp->GetWidget());
-	FrontSideWidget->SetProjectInfo(projectNotice);
+	if (UCWGProjectNotice* FrontSideWidget = Cast<UCWGProjectNotice>(newProjectNotice->FrontSideComp->GetWidget()))
+		FrontSideWidget->SetProjectInfo(projectNotice);
 }
 
