@@ -27,7 +27,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMesh* BoardMesh;
-
+	
+	UFUNCTION(BlueprintCallable)
 	void PostProjectNotice(FVector position, FProjectNotice projectNotice);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

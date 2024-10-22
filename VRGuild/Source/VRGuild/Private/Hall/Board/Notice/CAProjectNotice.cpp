@@ -15,6 +15,7 @@ ACAProjectNotice::ACAProjectNotice()
 	this->FrontSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("FrontSide"));
 	this->FrontSideComp->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	this->FrontSideComp->SetDrawSize(this->WidgetDrawSize);
+	this->FrontSideComp->SetRelativeScale3D(FVector(0.2));
 	ConstructorHelpers::FClassFinder<UUserWidget> tempFrontSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeFrontSide.WBP_ProjectNoticeFrontSide_C'"));
 
 	if (tempFrontSide.Succeeded())
@@ -28,6 +29,7 @@ ACAProjectNotice::ACAProjectNotice()
 	this->BackSideComp->SetRelativeRotation(FRotator(0, 180,0));
 	this->BackSideComp->SetDrawSize(this->WidgetDrawSize);
 	this->BackSideComp->SetTwoSided(true);
+	this->BackSideComp->SetRelativeScale3D(FVector(0.2));
 	ConstructorHelpers::FClassFinder<UUserWidget> tempBackSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeBackSide.WBP_ProjectNoticeBackSide_C'"));
 	if (tempBackSide.Succeeded())
 	{

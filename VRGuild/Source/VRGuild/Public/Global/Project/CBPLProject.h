@@ -14,14 +14,28 @@ struct FProjectInitator
 public:
 	FProjectInitator() {};
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	int32 InitiatorId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> ProjectNoticeId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	UTexture2D* CompanyImage;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FString CompanyName;
+};
+
+USTRUCT(BlueprintType, Atomic)
+struct FProjectEmplyee
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FProjectEmplyee() {};
+
+	UPROPERTY(BlueprintReadWrite)
+	FString EmployeeName;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 Number;
 };
 
 USTRUCT(BlueprintType, Atomic)
@@ -31,25 +45,27 @@ struct FProjectNotice
 public:
 	FProjectNotice() {};
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	int32 ProjectNoticeId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	int32 ProjectDetailId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FProjectInitator InitiatorId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FVector Postision;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FString ProjectTitle;
-	UPROPERTY(BlueprintReadOnly)
-	FString ProjectEmployee;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FProjectEmplyee> ProjectEmployees;
+	UPROPERTY(BlueprintReadWrite)
 	int32 ProjectPrice;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FDateTime ProjectCreateDate;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FDateTime ProjectEndDate;
 };
+
+
 
 USTRUCT(BlueprintType, Atomic)
 struct FProjectDetail
@@ -58,13 +74,13 @@ struct FProjectDetail
 public:
 	FProjectDetail() {};
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	int32 ProjectDetailId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> TeamId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> CommentID;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FString ProjectDetailNote;
 };
 
@@ -75,15 +91,15 @@ struct FProjectComment
 public:
 	FProjectComment() {};
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	int32 CommentID;
-	UPROPERTY(BlueprintReadOnly)
-	int32 UserID;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
+	FString UserID;
+	UPROPERTY(BlueprintReadWrite)
 	FString Comment;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FDateTime CreateDate;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FDateTime UpdateDate;
 };
 
@@ -94,15 +110,15 @@ struct FProjectTeam
 public:
 	FProjectTeam() {};
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	int32 TeamId;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	int32 CaptainID;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> CrewID;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FDateTime CreateDate;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FDateTime UpdateDate;
 };
 
