@@ -67,6 +67,8 @@ FGameplayTagContainer UCACCarry::GetGameplayTagContainer() const
 
 FString UCACCarry::GetMessageForNPC()
 {
+	UE_LOG(LogTemp, Warning, TEXT("CarryType %s"), *UEnum::GetValueAsString(CarryType));
+
 	switch (CarryType)
 	{
 	case ECarriedType::COMMISSION:
@@ -91,14 +93,16 @@ void UCACCarry::OnRep_ActorInHand()
 	{
 		if (ActorInHand)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("4444"));
-			ScrollBaseWidget->AddToViewport();
+			UE_LOG(LogTemp, Warning, TEXT("4444 --- Finished"));
+			if(ScrollBaseWidget)
+				ScrollBaseWidget->AddToViewport();
 			CarryType = CarryTypeTemp;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("5555"));
-			ScrollBaseWidget->RemoveFromParent();
+			UE_LOG(LogTemp, Warning, TEXT("5555 --- Finished"));
+			if (ScrollBaseWidget)
+				ScrollBaseWidget->RemoveFromParent();
 			CarryType = ECarriedType::NONE;
 		}
 	}
@@ -112,13 +116,15 @@ void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> Acto
 	{
 		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
 		ActorInHand->Init(false);
-		ActorInHand->FinishSpawning(Owner->GetActorTransform());
+		ActorInHand->FinishSpawning(Owner->GetActorTransform());			
 
 		if (ActorInHand)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s Success %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"), *GetNameSafe(ActorInHand));
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("%s Failed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
+		
+		OnRep_ActorInHand();
 	}
 }
 
@@ -130,6 +136,7 @@ void UCACCarry::ServerDrop_Implementation()
 		ActorInHand = nullptr;
 		UE_LOG(LogTemp, Warning, TEXT("%s ActorInHand destroyed "), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 		
+		OnRep_ActorInHand();
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("%s Missing ActorInHand"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 }

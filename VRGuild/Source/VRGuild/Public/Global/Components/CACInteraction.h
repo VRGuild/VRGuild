@@ -49,7 +49,7 @@ private:
 	void BeginTrace();
 	void EndTrace();
 
-	void UpdateTrace();
+	void UpdateTrace(AActor*& actorTraced);
 	
 	bool CanInteract(AActor* actor) const;
 
@@ -59,8 +59,6 @@ private:
 	AActor* InteractingActor;
 	
 	AActor* ActorOnFocus;
-
-	AActor* ActorTraced;
 
 	bool bCanInteract;
 	bool bIsTracing;
