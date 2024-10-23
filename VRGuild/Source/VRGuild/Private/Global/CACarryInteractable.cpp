@@ -8,7 +8,7 @@
 #include "Global/Components/CACCarry.h"
 
 #include "Net/UnrealNetwork.h"
-
+#include "GameFramework/Character.h"
 
 ACACarryInteractable::ACACarryInteractable()
 {
@@ -17,6 +17,19 @@ ACACarryInteractable::ACACarryInteractable()
 	bReplicates = true;
 	bEnabled = true;
 	StaticMeshComp->SetCollisionProfileName("Interactable");
+
+	HeldScale = FVector(.5f);
+	HoldSocketName = "RightSocketHold";
+}
+
+void ACACarryInteractable::BeginPlay()
+{
+	Super::BeginPlay();
+	if (!bEnabled)
+	{
+		SetActorScale3D(HeldScale);
+		StaticMeshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	}
 }
 
 void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -26,9 +39,11 @@ void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ACACarryInteractable, bEnabled);
 }
 
-void ACACarryInteractable::Init(bool bEnabled_In)
+void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner)
 {
-	bEnabled = bEnabled_In;
+	bEnabled = bIsEnabled;
+	AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
+	SetOwner(owner);
 }
 
 bool ACACarryInteractable::IsActive() const
@@ -75,4 +90,9 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("ACACarryInteractable EndInteract"));
+}
+
+FVector ACACarryInteractable::GetHeldScale() const
+{
+	return HeldScale;
 }

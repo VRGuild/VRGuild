@@ -114,7 +114,6 @@ void UCACInteraction::BeginInteract()
 	if (ActorOnFocus && !InteractingActor && bCanInteract)
 	{
 		InteractingActor = ActorOnFocus;
-		GetInterface(InteractingActor)->EndTrace(Owner);
 		GetInterface(InteractingActor)->BeginInteract(Owner);
 		bCanInteract = false;
 

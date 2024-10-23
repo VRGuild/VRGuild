@@ -38,9 +38,9 @@ public:
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Settings | Tags")
+	UPROPERTY(EditAnywhere, Category = "Settings|Tags")
 	FGameplayTagContainer InteractionTag;
-
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	FString TraceMessage;
