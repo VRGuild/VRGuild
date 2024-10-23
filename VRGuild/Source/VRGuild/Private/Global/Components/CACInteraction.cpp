@@ -33,7 +33,7 @@ void UCACInteraction::BeginPlay()
 
 	Owner = GetOwner<ACharacter>();
 	//Only Clients can Interact
-	if (Owner && Owner->HasAuthority() || !Owner->IsLocallyControlled())
+	if (Owner && !Owner->IsLocallyControlled())
 		Owner = nullptr;
 }
 
@@ -109,9 +109,13 @@ void UCACInteraction::Disable()
 
 void UCACInteraction::BeginInteract()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ActorOnFocus %s, InteractingActor %s, bCanInteract %d"),
+		*GetNameSafe(ActorOnFocus), *GetNameSafe(InteractingActor), bCanInteract
+		);
 	if (ActorOnFocus && !InteractingActor && bCanInteract)
 	{
 		InteractingActor = ActorOnFocus;
+		GetInterface(InteractingActor)->EndTrace(Owner);
 		GetInterface(InteractingActor)->BeginInteract(Owner);
 		bCanInteract = false;
 
@@ -198,6 +202,8 @@ void UCACInteraction::UpdateTrace()
 			if (auto temp = Cast<ICIInteractionInterface>(Hits[i].GetActor()))
 			{
 				if (!temp->IsActive()) continue;
+
+				if (!CanInteract(Hits[i].GetActor())) continue;
 			}
 			else continue;
 
@@ -232,8 +238,8 @@ ICIInteractionInterface* UCACInteraction::GetInterface(AActor* actor) const
 	return Cast<ICIInteractionInterface>(actor);
 }
 
-bool UCACInteraction::IsInteracting() const
+bool UCACInteraction::CanInteract(AActor* actor) const
 {
-
-	return !bCanInteract;
+	if (InteractingActor == actor)
+		return false;
 }
