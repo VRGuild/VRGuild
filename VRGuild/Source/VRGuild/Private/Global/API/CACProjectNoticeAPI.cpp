@@ -27,9 +27,9 @@ void UCACProjectNoticeAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr re
     FRegexPattern PatchProjectPattern(TEXT(R"(PATCH\s+/api/project)"));
     FRegexPattern GetProjectByIdPattern(TEXT(R"(GET\s+/api/project/(\d+))"));
     FRegexPattern DeleteProjectPattern(TEXT(R"(DELETE\s+/api/project/(\d+))"));
+
     // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" ") + req->GetURL();
-
 
     if (FRegexMatcher(PostProjectPattern, UrlToMatch).FindNext())
     {
