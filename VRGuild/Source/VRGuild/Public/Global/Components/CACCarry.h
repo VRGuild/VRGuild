@@ -39,6 +39,9 @@ public:
 	FGameplayTagContainer GetGameplayTagContainer() const;
 
 	FString GetMessageForNPC();
+
+	ECarriedType GetCarryType() const;
+
 private:
 	TObjectPtr<ACharacter> Owner;
 	TObjectPtr<UCWScrollBase> ScrollBaseWidget;

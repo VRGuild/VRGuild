@@ -88,6 +88,11 @@ FString UCACCarry::GetMessageForNPC()
 	return TEXT("Default string");
 }
 
+ECarriedType UCACCarry::GetCarryType() const
+{
+	return CarryType;
+}
+
 void UCACCarry::OnRep_ActorInHand()
 {
 	if (Owner && Owner->IsLocallyControlled())

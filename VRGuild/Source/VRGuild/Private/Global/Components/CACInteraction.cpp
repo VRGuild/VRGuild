@@ -111,7 +111,7 @@ void UCACInteraction::BeginInteract()
 	UE_LOG(LogTemp, Warning, TEXT("ActorOnFocus %s, InteractingActor %s, bCanInteract %d"),
 		*GetNameSafe(ActorOnFocus), *GetNameSafe(InteractingActor), bCanInteract
 		);
-	if (ActorOnFocus && !InteractingActor && bCanInteract)
+	if (ActorOnFocus /*&& !InteractingActor*/ && CanInteract(ActorOnFocus))
 	{
 		InteractingActor = ActorOnFocus;
 		GetInterface(InteractingActor)->BeginInteract(Owner);
@@ -124,7 +124,7 @@ void UCACInteraction::BeginInteract()
 
 void UCACInteraction::EndInteract()
 {
-	if (InteractingActor && !bCanInteract)
+	if (InteractingActor && !CanInteract(ActorOnFocus))
 	{
 		GetInterface(InteractingActor)->EndInteract(Owner);
 		InteractingActor = nullptr;
