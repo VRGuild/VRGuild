@@ -3,9 +3,11 @@
 #pragma once
 
 #include "Global/Project/CBPLProject.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CAProjectNotice.generated.h"
+
 
 UCLASS()
 class VRGUILD_API ACAProjectNotice : public AActor

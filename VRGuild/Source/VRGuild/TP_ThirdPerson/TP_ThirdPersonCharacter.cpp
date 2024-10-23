@@ -80,13 +80,17 @@ void ATP_ThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 void ATP_ThirdPersonCharacter::SetCustomValue(FCharacterCustomData data)
 {
-	FCharacterCustomData stuff; 
+	/*FCharacterCustomData stuff; 
 	stuff.Selections.Empty();
 	stuff.Selections.Add(1);
 	stuff.Selections.Add(1);
 	stuff.Selections.Add(1);
 	
-	CustomValues = stuff;
+	CustomValues = stuff;*/
+	for(int i = 0; i < data.Selections.Num(); ++i)
+		UE_LOG(LogTemp, Warning, TEXT("[%d]SetCustomValue %d"),i, data.Selections[i]);
+
+	CustomValues = data;
 	if(GetController() && GetController()->IsLocalPlayerController()) 
 		OnRep_CustomValues();
 }

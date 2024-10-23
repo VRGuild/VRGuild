@@ -86,10 +86,10 @@ void UCACCharacterCustomAPI::CharacterCustomGetCallBack(FHttpRequestPtr req, FHt
 	UE_LOG(LogTemp, Display, TEXT("CharacterCustomGetCallBack"));
 	FString jsonString = res->GetContentAsString();
 
-	FCharacterCustomInfo ParseData;
-	ParseData = JsonPerse<FCharacterCustomInfo>(jsonString);
+	FCharacterCustomInfoData ParseData;
+	ParseData = JsonPerse<FCharacterCustomInfoData>(jsonString);
 
-	OnCharacterCustomGetCallBack(ParseData);
+	OnCharacterCustomGetCallBack(ParseData.data);
 }
 
 void UCACCharacterCustomAPI::CharacterCustomCreateCall(TArray<int32> CustomList)
