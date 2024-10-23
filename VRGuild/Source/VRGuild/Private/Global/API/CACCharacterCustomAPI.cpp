@@ -88,8 +88,11 @@ void UCACCharacterCustomAPI::CharacterCustomGetCallBack(FHttpRequestPtr req, FHt
 
 	FCharacterCustomInfoData ParseData;
 	ParseData = JsonPerse<FCharacterCustomInfoData>(jsonString);
+	if (ParseData.data.characterId)
+		OnCharacterCustomGetCallBack(ParseData.data);
+	else
+		OnFailCharacterCustomGetCallBack();
 
-	OnCharacterCustomGetCallBack(ParseData.data);
 }
 
 void UCACCharacterCustomAPI::CharacterCustomCreateCall(TArray<int32> CustomList)
