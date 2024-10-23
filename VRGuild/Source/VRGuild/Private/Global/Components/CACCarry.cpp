@@ -43,6 +43,7 @@ void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> 
 		{
 			UE_LOG(LogTemp, Warning, TEXT("2222"));
 			CarryTypeTemp = Type;
+			CarryType = CarryTypeTemp;
 			ServerHold(ActorToHold);
 		}
 	}
@@ -115,8 +116,8 @@ void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> Acto
 	if (Owner && ActorToHold)
 	{
 		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
-		ActorInHand->Init(false);
-		ActorInHand->FinishSpawning(Owner->GetActorTransform());			
+		ActorInHand->Init(false, Owner);
+		ActorInHand->FinishSpawning(Owner->GetActorTransform());
 
 		if (ActorInHand)
 		{

@@ -10,6 +10,8 @@
  * 
  */
 
+class ACharacter;
+
 UCLASS()
 class VRGUILD_API ACACarryInteractable : public ACAInteractable
 {
@@ -18,7 +20,7 @@ class VRGUILD_API ACACarryInteractable : public ACAInteractable
 public:
 	ACACarryInteractable();
 
-	void Init(bool bEnabled_In);
+	void Init(bool bIsEnabled, ACharacter* owner);
 
 	virtual bool IsActive() const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
@@ -26,17 +28,27 @@ public:
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
+	FVector GetHeldScale() const;
+
 protected:
+	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
-
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TSubclassOf<UUserWidget> PosterWidgetToDisplayClass;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	TSubclassOf<ACACarryInteractable> SelfActor;
+	
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	FVector HeldScale;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	FName HoldSocketName;
 
 private:
 	UPROPERTY(Replicated)
