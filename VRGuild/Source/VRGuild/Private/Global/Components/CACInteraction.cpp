@@ -131,7 +131,7 @@ void UCACInteraction::EndInteract()
 		InteractingActor = nullptr;
 		bCanInteract = true;
 
-		BeginTrace();
+		EndTrace();
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Endinteract"));
 }
@@ -147,12 +147,9 @@ void UCACInteraction::BeginTrace()
 
 void UCACInteraction::EndTrace()
 {
-	if (bIsTracing)
+	if (bIsTracing && ActorOnFocus)
 	{
-		if (ActorOnFocus)
-		{
-			GetInterface(ActorOnFocus)->EndTrace(Owner);
-		}
+		GetInterface(ActorOnFocus)->EndTrace(Owner);
 		bIsTracing = false;
 	}
 }
