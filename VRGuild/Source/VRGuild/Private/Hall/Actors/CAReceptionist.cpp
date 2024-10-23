@@ -4,6 +4,7 @@
 #include "Hall/Actors/CAReceptionist.h"
 #include "Global/Components/CACCarry.h"
 #include "GameFramework/Character.h"
+#include "Global/Components/CACInteraction.h"
 
 void ACAReceptionist::BeginTrace(ACharacter* Initiator)
 {	
@@ -28,11 +29,13 @@ void ACAReceptionist::EndTrace(ACharacter* Initiator)
 void ACAReceptionist::BeginInteract(ACharacter* Initiator)
 {
 	Super::BeginInteract(Initiator);
-	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginINteract"));	
+
+	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginINteract"));
 }
 
 void ACAReceptionist::EndInteract(ACharacter* Initiator)
 {
 	Super::EndInteract(Initiator);
+
 	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist EndINteract"));
 }

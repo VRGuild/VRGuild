@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Global/Interfaces/CIInteractionInterface.h"
+#include "GameplayTagContainer.h"
 #include "CAInteractable.generated.h"
 
 class UCGIGameInstance;
@@ -18,6 +19,8 @@ public:
 	// Sets default values for this actor's properties
 	ACAInteractable();
 
+	FGameplayTagContainer GetGameplayTagContainer() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,13 +31,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual bool IsActive() const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "Settings | Tags")
+	FGameplayTagContainer InteractionTag;
+
 private:
-	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	FString TraceMessage;
 	TObjectPtr<UCGIGameInstance> GameInstance;
 };

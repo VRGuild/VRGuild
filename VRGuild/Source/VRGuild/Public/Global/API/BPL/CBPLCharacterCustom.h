@@ -27,6 +27,13 @@ public:
 };
 
 
+USTRUCT(BlueprintType, Atomic)
+struct FCharacterCustomInfoData {
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FCharacterCustomInfo data;
+};
 /**
  * 
  */

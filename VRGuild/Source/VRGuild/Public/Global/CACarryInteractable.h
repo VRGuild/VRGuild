@@ -9,6 +9,7 @@
 /**
  * 
  */
+
 UCLASS()
 class VRGUILD_API ACACarryInteractable : public ACAInteractable
 {
@@ -17,18 +18,27 @@ class VRGUILD_API ACACarryInteractable : public ACAInteractable
 public:
 	ACACarryInteractable();
 
+	void Init(bool bEnabled_In);
+
+	virtual bool IsActive() const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
+	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TSubclassOf<UUserWidget> PosterWidgetToDisplayClass;
-	UPROPERTY(EditDefaultsOnly, Category = Settings)
-	TSubclassOf<AActor> SelfActor;
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
+	TSubclassOf<ACACarryInteractable> SelfActor;
+
+private:
+	UPROPERTY(Replicated)
+	bool bEnabled;
 };

@@ -3,6 +3,8 @@
 
 #include "Hall/Board/Notice/CAProjectNotice.h"
 #include "Components/WidgetComponent.h"
+#include "Hall/Board/Notice/UI/CWGProjectNotice.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ACAProjectNotice::ACAProjectNotice()
@@ -11,6 +13,8 @@ ACAProjectNotice::ACAProjectNotice()
 	PrimaryActorTick.bCanEverTick = false;
 	this->RootSceneComp = CreateDefaultSubobject<USceneComponent>(FName("RootSceneComp"));
 	this->SetRootComponent(this->RootSceneComp);
+
+	SetReplicates(true);
 
 	this->FrontSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("FrontSide"));
 	this->FrontSideComp->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
@@ -41,10 +45,13 @@ ACAProjectNotice::ACAProjectNotice()
 void ACAProjectNotice::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (this->WidgetFrontSide)
 	{
 		this->FrontSideComp->SetWidgetClass(this->WidgetFrontSide);
+		UCWGProjectNotice* tempFrontSideComp = Cast<UCWGProjectNotice>(FrontSideComp->GetWidget());
+		if (tempFrontSideComp)
+			tempFrontSideComp->SetProjectInfo(this->NoticeData);
 	}
 	if (this->WidgetBackSide)
 	{
@@ -52,3 +59,9 @@ void ACAProjectNotice::BeginPlay()
 	}
 }
 
+void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACAProjectNotice, NoticeData);
+}

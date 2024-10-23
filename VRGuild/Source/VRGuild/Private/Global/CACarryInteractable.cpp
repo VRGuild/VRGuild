@@ -7,6 +7,7 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Global/Components/CACCarry.h"
 
+#include "Net/UnrealNetwork.h"
 
 
 ACACarryInteractable::ACACarryInteractable()
@@ -14,8 +15,25 @@ ACACarryInteractable::ACACarryInteractable()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
 	StaticMeshComp->SetupAttachment(RootComponent);
 	bReplicates = true;
-
+	bEnabled = true;
 	StaticMeshComp->SetCollisionProfileName("Interactable");
+}
+
+void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACACarryInteractable, bEnabled);
+}
+
+void ACACarryInteractable::Init(bool bEnabled_In)
+{
+	bEnabled = bEnabled_In;
+}
+
+bool ACACarryInteractable::IsActive() const
+{
+	return bEnabled;
 }
 
 void ACACarryInteractable::BeginTrace(ACharacter* Initiator)
@@ -48,5 +66,13 @@ void ACACarryInteractable::BeginInteract(ACharacter* Initiator)
 void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 {
 	Super::EndInteract(Initiator);
+	if (Initiator)
+	{
+		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("1111"));
+			carryComponent->StartDrop();
+		}
+	}
 	UE_LOG(LogTemp, Warning, TEXT("ACACarryInteractable EndInteract"));
 }

@@ -12,6 +12,11 @@ ACAInteractable::ACAInteractable()
 	TraceMessage = TEXT("Default Msg");
 }
 
+FGameplayTagContainer ACAInteractable::GetGameplayTagContainer() const
+{
+	return InteractionTag;
+}
+
 // Called when the game starts or when spawned
 void ACAInteractable::BeginPlay()
 {
@@ -29,6 +34,11 @@ void ACAInteractable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool ACAInteractable::IsActive() const
+{
+	return true;
 }
 
 void ACAInteractable::BeginTrace(ACharacter* Initiator)
