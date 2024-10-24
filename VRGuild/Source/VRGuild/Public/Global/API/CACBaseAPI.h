@@ -14,13 +14,12 @@ UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACBaseAPI : public UActorComponent
 {
 	GENERATED_BODY()
-
 private:
 	FString URL = "http://125.132.216.190:15530/"; // Base URL
-
 public:	
 	// Sets default values for this component's properties
 	UCACBaseAPI();
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "API")
 	FString API = "";
@@ -42,7 +41,7 @@ public:
 	void SetOAuthToken();// { OAuthToken = "Bearer " + token; };
 
 	bool CheckCallBackAPI(FHttpRequestPtr req, FString api);
-
+	FString GetAPIPath(const FString& FullURL);
 	template<typename T>
 	void HttpJsonContentTypeCall(T sendData, FString Verb) {
 		UE_LOG(LogTemp, Display, TEXT("HttpJsonContentTypeCall"));

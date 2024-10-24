@@ -36,6 +36,8 @@ public:
 
 	bool CheckCallBackAPI(FHttpRequestPtr req, FString api);
 
+	FString GetAPIPath(const FString& FullURL);
+
 	template<typename T>
 	void HttpJsonContentTypeCall(T sendData, FString Verb) {
 		UE_LOG(LogTemp, Display, TEXT("HttpJsonContentTypeCall"));

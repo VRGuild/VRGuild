@@ -50,6 +50,11 @@ bool UCACBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
 		return true;
 	return false;
 }
+FString UCACBaseAPI::GetAPIPath(const FString& FullURL)
+{
+	// Remove base URL to get just the API path
+	return FullURL.RightChop(this->URL.Len());
+}
 
 void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
