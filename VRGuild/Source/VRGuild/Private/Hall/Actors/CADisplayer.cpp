@@ -16,31 +16,48 @@ ACADisplayer::ACADisplayer()
 	bNetUseOwnerRelevancy = true;
 	ErrorMessage = TEXT("Cannot Interact: You don't have a commission in hand");
 	DisplayMessage = TEXT("Place Commission");
+	PickupMessage = TEXT("Pick up displayed actor");
 
 	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>("WidgetComponent");
 	WidgetComponent->SetupAttachment(RootComponent);
 }
 
-bool ACADisplayer::CanInteract(ACharacter* Initiator) const
+bool ACADisplayer::CanTrace(ACharacter* Initiator) const
 {
 	if (ActorDisplayed)
 	{
 		return (Owner == Initiator && Initiator->IsLocallyControlled());
 	}
 
+	return Super::CanTrace(Initiator);
+}
+
+bool ACADisplayer::CanInteract(ACharacter* Initiator) const
+{
 	return Super::CanInteract(Initiator);
+}
+
+bool ACADisplayer::IsInteracting(ACharacter* Initiator) const
+{
+	return Super::IsInteracting(Initiator);
 }
 
 void ACADisplayer::BeginTrace(ACharacter* Initiator)
 {
-	bool bCanInteract;
+	bool bCan = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("BeginTrace"));
 
 	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 	{
-		bCanInteract = carryComp->GetCarryType() == ECarriedType::COMMISSION;
+		bCan = carryComp->GetCarryType() == ECarriedType::COMMISSION;
 	}
 
-	FString Message = bCanInteract ? DisplayMessage : ErrorMessage;
+	FString Message = bCan ? DisplayMessage : ErrorMessage;
+
+	if (ActorDisplayed && Owner == Initiator && Initiator->IsLocallyControlled())
+		Message = PickupMessage;
+
 	SetTraceMessage(Message);
 
 	Super::BeginTrace(Initiator);
@@ -64,7 +81,6 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 			AActor* actorCarried = carryComp->GetCarriedActor();
 			if (ensure(actorCarried) && !ActorDisplayed)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("1111"));
 				ATP_ThirdPersonCharacter::SetOwnerFor(this, Initiator);
 
 			}
@@ -120,7 +136,6 @@ void ACADisplayer::OnRep_Owner()
 			auto actorCarried = carryComp->GetCarriedActor();
 			if (ensure(actorCarried))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("3333"));
 				UE_LOG(LogTemp, Warning, TEXT("ActorDisplayed: %s"), *GetNameSafe(ActorDisplayed));
 				ServerDisplayCommission(actorCarried);
 			}
@@ -134,7 +149,6 @@ void ACADisplayer::OnRep_ActorDisplayed()
 {
 	if (ActorDisplayed)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("5555 -- add widget"));
 		UE_LOG(LogTemp, Warning, TEXT("Success in displaying Actor Displayed"));
 				
 		WidgetComponent->SetWidgetClass(ActorDisplayed->GetPosterDisplayWidgetClass());
@@ -142,7 +156,6 @@ void ACADisplayer::OnRep_ActorDisplayed()
 	else
 	{
 		WidgetComponent->SetWidgetClass(nullptr);
-		UE_LOG(LogTemp, Warning, TEXT("5555 -- remove widget"));
 	}
 	
 }
@@ -163,7 +176,6 @@ void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPass
 		{
 			if (ActorDisplayed)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("4444"));
 				carryComp->StartDrop();
 			}
 			//else Spawn ActorDisplayed in players hand. carryComp->StartCarry(ECarriedType::NONE,  );

@@ -53,7 +53,7 @@ void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttach
 	}	
 }
 
-bool ACACarryInteractable::CanInteract(ACharacter* Initiator) const
+bool ACACarryInteractable::CanTrace(ACharacter* Initiator) const
 {
 	return bEnabled;
 }
@@ -79,7 +79,6 @@ void ACACarryInteractable::BeginInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111"));
 			carryComponent->StartCarry(ECarriedType::COMMISSION, SelfActor, PosterWidgetToDisplayClass);
 		}
 	}	
@@ -92,7 +91,6 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111"));
 			carryComponent->StartDrop();
 		}
 	}

@@ -67,13 +67,10 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 
 void ATP_ThirdPersonCharacter::SetOwnerFor(AActor* target, ACharacter* newOwner)
 {
-	UE_LOG(LogTemp, Warning, TEXT("1.1"));
 	if (auto character = Cast<ATP_ThirdPersonCharacter>(newOwner))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("1.2"));
 		if (target)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1.3"));
 			character->ServerSetOwnerFor(target);
 		}
 	}
@@ -81,7 +78,7 @@ void ATP_ThirdPersonCharacter::SetOwnerFor(AActor* target, ACharacter* newOwner)
 
 void ATP_ThirdPersonCharacter::ServerSetOwnerFor_Implementation(AActor* target)
 {
-	target->SetOwner(this);UE_LOG(LogTemp, Warning, TEXT("22222"));
+	target->SetOwner(this);
 }
 
 void ATP_ThirdPersonCharacter::BeginPlay()

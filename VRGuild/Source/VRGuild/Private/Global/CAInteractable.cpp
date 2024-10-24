@@ -10,6 +10,7 @@ ACAInteractable::ACAInteractable()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	TraceMessage = TEXT("Default Msg");
+	bIsInteracting = false;
 }
 
 FGameplayTagContainer ACAInteractable::GetGameplayTagContainer() const
@@ -41,9 +42,19 @@ void ACAInteractable::Tick(float DeltaTime)
 
 }
 
+bool ACAInteractable::CanTrace(ACharacter* Initiator) const
+{
+	return true;
+}
+
 bool ACAInteractable::CanInteract(ACharacter* Initiator) const
 {
 	return true;
+}
+
+bool ACAInteractable::IsInteracting(ACharacter* Initiator) const
+{
+	return bIsInteracting;
 }
 
 void ACAInteractable::BeginTrace(ACharacter* Initiator)
@@ -64,12 +75,12 @@ void ACAInteractable::EndTrace(ACharacter* Initiator)
 
 void ACAInteractable::BeginInteract(ACharacter* Initiator)
 {
-	//
+	bIsInteracting = true;
 }
 
 void ACAInteractable::EndInteract(ACharacter* Initiator)
 {
-	//
+	bIsInteracting = false;
 }
 
 void ACAInteractable::OnRep_Owner()

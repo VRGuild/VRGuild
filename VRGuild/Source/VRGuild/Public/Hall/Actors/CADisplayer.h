@@ -20,7 +20,10 @@ class VRGUILD_API ACADisplayer : public ACAInteractable
 public:
 	ACADisplayer();
 
+	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual bool CanInteract(ACharacter* Initiator) const override;
+	virtual bool IsInteracting(ACharacter* Initiator) const override;
+
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
@@ -35,11 +38,16 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerDisplayCommission(AActor* commissionPassed);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
 	FString ErrorMessage;
+	
 	UPROPERTY(EditDefaultsOnly, Category = Settings)
 	FString DisplayMessage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	FString PickupMessage;
 
 	UPROPERTY(ReplicatedUsing = OnRep_ActorDisplayed)
 	TObjectPtr<ACACarryInteractable> ActorDisplayed;
