@@ -13,13 +13,7 @@ class ACACarryInteractable;
 
 class UCWScrollBase;
 
-UENUM(Blueprintable)
-enum class ECarriedType : uint8
-{
-	COMMISSION UMETA(DisplayName = "Commission"),
-	REGISTRATION UMETA(DisplayName = "Registration"),
-	NONE UMETA(DisplayName = "None")
-};
+enum class ECarriedType : uint8;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACCarry : public UActorComponent
@@ -33,7 +27,7 @@ protected:
 	virtual void InitializeComponent() override;
 
 public:	
-	void StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay);
+	void StartCarry(ACACarryInteractable* ActorToHold);
 	void StartDrop();
 
 	FGameplayTagContainer GetGameplayTagContainer() const;
@@ -52,9 +46,6 @@ private:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_ActorInHand)
 	TObjectPtr<ACACarryInteractable> ActorInHand;
-	
-	ECarriedType CarryType;
-	ECarriedType CarryTypeTemp;
 
 	UFUNCTION()
 	void OnRep_ActorInHand();

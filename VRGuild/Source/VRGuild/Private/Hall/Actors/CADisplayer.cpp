@@ -72,6 +72,8 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 {
 	Super::BeginInteract(Initiator);
 
+	if (!Initiator) return;
+
 	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 	{
 		switch (carryComp->GetCarryType())
@@ -98,20 +100,26 @@ void ACADisplayer::EndInteract(ACharacter* Initiator)
 {
 	Super::EndInteract(Initiator);
 
+	if (!Initiator) return;
+
 	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 	{
 		switch (carryComp->GetCarryType())
 		{
 		case ECarriedType::COMMISSION:
 		{
-			if (ActorDisplayed)
-			{
-				ATP_ThirdPersonCharacter::SetOwnerFor(this, nullptr);
-			}
+
 			break;
 		}
 		case ECarriedType::NONE:
 		{
+			if (ActorDisplayed && ensureAlways(Owner == Initiator))
+			{
+				if (ActorDisplayed)
+				{
+					ServerPickupCommission(Initiator);
+				}
+			}
 			break;
 		}
 		}
@@ -142,7 +150,6 @@ void ACADisplayer::OnRep_Owner()
 			else UE_LOG(LogTemp, Warning, TEXT("ACADisplayer, OnRep_Owner, no carried actor in UCACCarryComponent"));
 		}
 	}
-	else ServerDisplayCommission(nullptr);
 }
 
 void ACADisplayer::OnRep_ActorDisplayed()
@@ -181,4 +188,21 @@ void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPass
 			//else Spawn ActorDisplayed in players hand. carryComp->StartCarry(ECarriedType::NONE,  );
 		}
 	}	
+}
+
+void ACADisplayer::ServerPickupCommission_Implementation(ACharacter* player)
+{
+	if (!player || !Owner) return;
+	
+	if (Owner == player)
+	{
+		if (auto carryComp = player->GetComponentByClass<UCACCarry>())
+		{	
+			//carryComp->StartCarry(ActorDisplayed);
+		}
+	}
+	else
+	{
+
+	}
 }

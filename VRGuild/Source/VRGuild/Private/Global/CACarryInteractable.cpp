@@ -20,6 +20,7 @@ ACACarryInteractable::ACACarryInteractable()
 
 	HeldScale = FVector(.5f);
 	HoldSocketName = "RightSocketHold";
+	CarryType = ECarriedType::NONE;
 }
 
 void ACACarryInteractable::BeginPlay()
@@ -79,7 +80,7 @@ void ACACarryInteractable::BeginInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			carryComponent->StartCarry(ECarriedType::COMMISSION, SelfActor, PosterWidgetToDisplayClass);
+			carryComponent->StartCarry(this);
 		}
 	}	
 }
@@ -100,6 +101,11 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 FVector ACACarryInteractable::GetHeldScale() const
 {
 	return HeldScale;
+}
+
+ECarriedType ACACarryInteractable::GetCarriedType() const
+{
+	return CarryType;
 }
 
 TSubclassOf<UUserWidget> ACACarryInteractable::GetPosterDisplayWidgetClass() const

@@ -38,6 +38,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerDisplayCommission(AActor* commissionPassed);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerPickupCommission(ACharacter* player);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
