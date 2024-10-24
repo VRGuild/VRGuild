@@ -22,8 +22,6 @@ void UCACCarry::InitializeComponent()
 	Super::InitializeComponent();
 
 	Owner = GetOwner<ACharacter>();
-	CarryTypeTemp = ECarriedType::NONE;
-	CarryType = CarryTypeTemp;
 }
 
 void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -33,18 +31,19 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(UCACCarry, ActorInHand);
 }
 
-void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay)
+void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
 {
-	if (WidgetToDisplay)
-	{
-		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
-
-		if (ScrollBaseWidget && ScrollBaseWidget->Init(WidgetToDisplay))
+	if (auto widgetClass = ActorToHold->GetPosterDisplayWidgetClass())
+	{		
+		if (ScrollBaseWidget)
 		{
-			CarryTypeTemp = Type;
-			CarryType = CarryTypeTemp;
-			ServerHold(ActorToHold);
+			ScrollBaseWidget->RemoveFromParent();
 		}
+
+		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
+		ScrollBaseWidget->Init(widgetClass);
+
+		ServerHold(ActorToHold->GetClass());
 	}
 }
 
@@ -67,9 +66,9 @@ FGameplayTagContainer UCACCarry::GetGameplayTagContainer() const
 
 FString UCACCarry::GetMessageForNPC()
 {
-	UE_LOG(LogTemp, Warning, TEXT("CarryType %s"), *UEnum::GetValueAsString(CarryType));
+	if (!ActorInHand) return TEXT("Default String");
 
-	switch (CarryType)
+	switch (ActorInHand->GetCarriedType())
 	{
 	case ECarriedType::COMMISSION:
 	{
@@ -89,7 +88,9 @@ FString UCACCarry::GetMessageForNPC()
 
 ECarriedType UCACCarry::GetCarryType() const
 {
-	return CarryType;
+	if (ActorInHand) return ActorInHand->GetCarriedType();
+	
+	return ECarriedType::NONE;
 }
 
 AActor* UCACCarry::GetCarriedActor() const
@@ -105,13 +106,11 @@ void UCACCarry::OnRep_ActorInHand()
 		{
 			if(ScrollBaseWidget)
 				ScrollBaseWidget->AddToViewport();
-			CarryType = CarryTypeTemp;
 		}
 		else
 		{
 			if (ScrollBaseWidget)
 				ScrollBaseWidget->RemoveFromParent();
-			CarryType = ECarriedType::NONE;
 		}
 	}
 }

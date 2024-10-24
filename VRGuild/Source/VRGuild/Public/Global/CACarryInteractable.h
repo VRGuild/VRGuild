@@ -10,6 +10,14 @@
  * 
  */
 
+UENUM(Blueprintable)
+enum class ECarriedType : uint8
+{
+	COMMISSION UMETA(DisplayName = "Commission"),
+	REGISTRATION UMETA(DisplayName = "Registration"),
+	NONE UMETA(DisplayName = "None")
+};
+
 class ACharacter;
 
 UCLASS()
@@ -29,6 +37,8 @@ public:
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 	FVector GetHeldScale() const;
+
+	ECarriedType GetCarriedType() const;
 
 	TSubclassOf<UUserWidget> GetPosterDisplayWidgetClass() const;
 
@@ -51,6 +61,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FName HoldSocketName;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	ECarriedType CarryType;
 
 private:
 	UPROPERTY(Replicated)
