@@ -5,25 +5,18 @@
 #include "Global/Project/CBPLProject.h"
 
 #include "CoreMinimal.h"
-#include "Global/API/CACBaseAPI.h"
-#include "CACProjectNoticeAPI.generated.h"
+#include "Global/UI/API/CWGBaseAPI.h"
+#include "CWGProjectAPI.generated.h"
 
 /**
  * 
  */
-UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class VRGUILD_API UCACProjectNoticeAPI : public UCACBaseAPI
+UCLASS()
+class VRGUILD_API UCWGProjectAPI : public UCWGBaseAPI
 {
 	GENERATED_BODY()
 
-public:
-	UCACProjectNoticeAPI();
-
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	virtual void InitializeComponent() override;
-
+protected:
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
@@ -69,13 +62,5 @@ public:
 	void OnProjectAllGetCallBack(FProjectAllDataAPI allProject);
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFailProjectAllGetCallBack();
-
-
-	//UFUNCTION(BlueprintCallable)
-	//void ProjectListOfUserGetCall(TArray<int32> CustomList);
-	//void ProjectListOfUserGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	//UFUNCTION(BlueprintImplementableEvent)
-	//void OnProjectListOfUserGetCallBack(FCharacterCustomGetAPI ParseData);
-
 
 };

@@ -23,6 +23,12 @@ bool UCWGBaseAPI::CheckCallBackAPI(FHttpRequestPtr req, FString api)
 	return false;
 }
 
+FString UCWGBaseAPI::GetAPIPath(const FString& FullURL)
+{
+	// Remove base URL to get just the API path
+	return FullURL.RightChop(this->URL.Len());
+}
+
 void UCWGBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("HttpCallBack"));
