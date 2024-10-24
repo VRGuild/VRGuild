@@ -29,6 +29,11 @@ void ACAInteractable::SetTraceMessage(FString newMsg)
 	TraceMessage = newMsg;
 }
 
+FString ACAInteractable::GetTraceMessage() const
+{
+	return TraceMessage;
+}
+
 // Called every frame
 void ACAInteractable::Tick(float DeltaTime)
 {
@@ -37,6 +42,11 @@ void ACAInteractable::Tick(float DeltaTime)
 }
 
 bool ACAInteractable::IsActive() const
+{
+	return true;
+}
+
+bool ACAInteractable::CanInteract(ACharacter* Initiator) const
 {
 	return true;
 }
@@ -65,5 +75,10 @@ void ACAInteractable::BeginInteract(ACharacter* Initiator)
 void ACAInteractable::EndInteract(ACharacter* Initiator)
 {
 	//
+}
+
+void ACAInteractable::OnRep_Owner()
+{
+	Super::OnRep_Owner();
 }
 

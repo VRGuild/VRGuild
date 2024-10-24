@@ -39,11 +39,18 @@ void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ACACarryInteractable, bEnabled);
 }
 
-void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner)
+void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttach)
 {
 	bEnabled = bIsEnabled;
-	AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
-	SetOwner(owner);
+	if (owner)
+	{
+		SetOwner(owner);
+	}
+
+	if (bAttach)
+	{
+		AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
+	}	
 }
 
 bool ACACarryInteractable::IsActive() const

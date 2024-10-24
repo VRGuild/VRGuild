@@ -42,6 +42,7 @@ public:
 
 	ECarriedType GetCarryType() const;
 
+	AActor* GetCarriedActor() const;
 private:
 	TObjectPtr<ACharacter> Owner;
 	TObjectPtr<UCWScrollBase> ScrollBaseWidget;

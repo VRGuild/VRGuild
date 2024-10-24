@@ -113,6 +113,8 @@ void UCACInteraction::BeginInteract()
 		);
 	if (ActorOnFocus /*&& !InteractingActor*/ && CanInteract(ActorOnFocus))
 	{
+		if(!GetInterface(ActorOnFocus)->CanInteract(Owner)) return;
+
 		InteractingActor = ActorOnFocus;
 		GetInterface(InteractingActor)->BeginInteract(Owner);
 		bCanInteract = false;
@@ -198,7 +200,7 @@ void UCACInteraction::UpdateTrace(AActor*& actorTraced)
 		{
 			if (auto temp = Cast<ICIInteractionInterface>(Hits[i].GetActor()))
 			{
-				if (!temp->IsActive()) continue;
+				if (!temp->IsActive()) continue; //Change to CanInteract in interactInterface
 				
 				if(!CanInteract(Hits[i].GetActor())) continue;
 			}

@@ -51,8 +51,9 @@ void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> 
 
 void UCACCarry::StartDrop()
 {
-	if (ScrollBaseWidget && ActorInHand)
+	if (/*ScrollBaseWidget && */ActorInHand)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("4.1"));
 		ServerDrop();
 	}
 }
@@ -93,6 +94,11 @@ ECarriedType UCACCarry::GetCarryType() const
 	return CarryType;
 }
 
+AActor* UCACCarry::GetCarriedActor() const
+{
+	return ActorInHand;
+}
+
 void UCACCarry::OnRep_ActorInHand()
 {
 	if (Owner && Owner->IsLocallyControlled())
@@ -106,6 +112,7 @@ void UCACCarry::OnRep_ActorInHand()
 		}
 		else
 		{
+			UE_LOG(LogTemp, Warning, TEXT("4.3"));
 			UE_LOG(LogTemp, Warning, TEXT("5555 --- Finished"));
 			if (ScrollBaseWidget)
 				ScrollBaseWidget->RemoveFromParent();
@@ -121,7 +128,7 @@ void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> Acto
 	if (Owner && ActorToHold)
 	{
 		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
-		ActorInHand->Init(false, Owner);
+		ActorInHand->Init(false, Owner, true);
 		ActorInHand->FinishSpawning(Owner->GetActorTransform());
 
 		if (ActorInHand)
@@ -136,8 +143,10 @@ void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> Acto
 
 void UCACCarry::ServerDrop_Implementation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("4.2"));
 	if (Owner && ActorInHand)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("4.3"));
 		ActorInHand->Destroy();
 		ActorInHand = nullptr;
 		UE_LOG(LogTemp, Warning, TEXT("%s ActorInHand destroyed "), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
