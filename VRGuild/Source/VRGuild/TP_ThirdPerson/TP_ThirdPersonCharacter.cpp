@@ -65,6 +65,22 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	SetReplicates(true);
 }
 
+void ATP_ThirdPersonCharacter::SetOwnerFor(AActor* target, ACharacter* newOwner)
+{
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(newOwner))
+	{
+		if (target)
+		{
+			character->ServerSetOwnerFor(target);
+		}
+	}
+}
+
+void ATP_ThirdPersonCharacter::ServerSetOwnerFor_Implementation(AActor* target)
+{
+	target->SetOwner(this);
+}
+
 void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  

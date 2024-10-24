@@ -39,14 +39,21 @@ void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ACACarryInteractable, bEnabled);
 }
 
-void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner)
+void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
 {
 	bEnabled = bIsEnabled;
-	AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
-	SetOwner(owner);
+	if (owner)
+	{
+		SetOwner(owner);
+	}
+
+	if (bAttachToOwner)
+	{
+		AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
+	}	
 }
 
-bool ACACarryInteractable::IsActive() const
+bool ACACarryInteractable::CanTrace(ACharacter* Initiator) const
 {
 	return bEnabled;
 }
@@ -72,7 +79,6 @@ void ACACarryInteractable::BeginInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111"));
 			carryComponent->StartCarry(ECarriedType::COMMISSION, SelfActor, PosterWidgetToDisplayClass);
 		}
 	}	
@@ -85,7 +91,6 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111"));
 			carryComponent->StartDrop();
 		}
 	}
@@ -95,4 +100,9 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 FVector ACACarryInteractable::GetHeldScale() const
 {
 	return HeldScale;
+}
+
+TSubclassOf<UUserWidget> ACACarryInteractable::GetPosterDisplayWidgetClass() const
+{
+	return PosterWidgetToDisplayClass;
 }

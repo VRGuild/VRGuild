@@ -21,7 +21,6 @@ UCACInteraction::UCACInteraction()
 
 	InteractDistance = 600.f;
 	InteractRadius = 60.f;
-	bCanInteract = true;
 }
 
 
@@ -29,9 +28,8 @@ UCACInteraction::UCACInteraction()
 void UCACInteraction::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Owner = GetOwner<ACharacter>();
 	
+	Owner = GetOwner<ACharacter>();
 	if (Owner && !Owner->IsLocallyControlled())
 		Owner = nullptr;
 }
@@ -79,7 +77,6 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 	if (bDebugDraw)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("InteractingActor: %s"), *GetNameSafe(InteractingActor)));
 		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Magenta, FString::Printf(TEXT("ActorTraced: %s"), *GetNameSafe(actorTraced)));
 	}
 }
@@ -106,16 +103,36 @@ void UCACInteraction::Disable()
 	}
 }
 
+void UCACInteraction::Interact()
+{
+	if (!ActorOnFocus) return;
+
+	if (auto inter = GetInterface(ActorOnFocus))
+	{
+		if (!inter->CanInteract(Owner))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cant Interact"));
+			return;
+		}
+
+		if (inter->IsInteracting(Owner))
+		{
+			EndInteract();
+		}
+		else BeginInteract();
+	}
+}
+
 void UCACInteraction::BeginInteract()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ActorOnFocus %s, InteractingActor %s, bCanInteract %d"),
-		*GetNameSafe(ActorOnFocus), *GetNameSafe(InteractingActor), bCanInteract
+	UE_LOG(LogTemp, Warning, TEXT("ActorOnFocus %s"),
+		*GetNameSafe(ActorOnFocus)
 		);
-	if (ActorOnFocus /*&& !InteractingActor*/ && CanInteract(ActorOnFocus))
+	if (ActorOnFocus /*&& !InteractingActor && CanInteract(ActorOnFocus)*/)
 	{
-		InteractingActor = ActorOnFocus;
-		GetInterface(InteractingActor)->BeginInteract(Owner);
-		bCanInteract = false;
+		//if(!GetInterface(ActorOnFocus)->CanInteract(Owner)) return;
+
+		GetInterface(ActorOnFocus)->BeginInteract(Owner);
 
 		EndTrace();
 	}
@@ -124,11 +141,9 @@ void UCACInteraction::BeginInteract()
 
 void UCACInteraction::EndInteract()
 {
-	if (InteractingActor && !CanInteract(ActorOnFocus))
+	if (ActorOnFocus)
 	{
-		GetInterface(InteractingActor)->EndInteract(Owner);
-		InteractingActor = nullptr;
-		bCanInteract = true;
+		GetInterface(ActorOnFocus)->EndInteract(Owner);
 
 		EndTrace();
 	}
@@ -139,6 +154,7 @@ void UCACInteraction::BeginTrace()
 {
 	if (!bIsTracing && ActorOnFocus)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("2 - 11111"));
 		GetInterface(ActorOnFocus)->BeginTrace(Owner);
 		bIsTracing = true;
 	}
@@ -198,9 +214,7 @@ void UCACInteraction::UpdateTrace(AActor*& actorTraced)
 		{
 			if (auto temp = Cast<ICIInteractionInterface>(Hits[i].GetActor()))
 			{
-				if (!temp->IsActive()) continue;
-				
-				if(!CanInteract(Hits[i].GetActor())) continue;
+				if (!temp->CanTrace(Owner)) continue;
 			}
 			else continue;
 
@@ -232,11 +246,4 @@ void UCACInteraction::UpdateTrace(AActor*& actorTraced)
 ICIInteractionInterface* UCACInteraction::GetInterface(AActor* actor) const
 {
 	return Cast<ICIInteractionInterface>(actor);
-}
-
-bool UCACInteraction::CanInteract(AActor* actor) const
-{
-	if (InteractingActor == actor)
-		return false;
-	return true;
 }

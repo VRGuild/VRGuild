@@ -41,7 +41,6 @@ void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> 
 
 		if (ScrollBaseWidget && ScrollBaseWidget->Init(WidgetToDisplay))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("2222"));
 			CarryTypeTemp = Type;
 			CarryType = CarryTypeTemp;
 			ServerHold(ActorToHold);
@@ -51,7 +50,7 @@ void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> 
 
 void UCACCarry::StartDrop()
 {
-	if (ScrollBaseWidget && ActorInHand)
+	if (/*ScrollBaseWidget && */ActorInHand)
 	{
 		ServerDrop();
 	}
@@ -93,35 +92,36 @@ ECarriedType UCACCarry::GetCarryType() const
 	return CarryType;
 }
 
+AActor* UCACCarry::GetCarriedActor() const
+{
+	return ActorInHand;
+}
+
 void UCACCarry::OnRep_ActorInHand()
 {
 	if (Owner && Owner->IsLocallyControlled())
 	{
 		if (ActorInHand)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("4444 --- Finished"));
 			if(ScrollBaseWidget)
 				ScrollBaseWidget->AddToViewport();
 			CarryType = CarryTypeTemp;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("5555 --- Finished"));
 			if (ScrollBaseWidget)
 				ScrollBaseWidget->RemoveFromParent();
 			CarryType = ECarriedType::NONE;
 		}
 	}
-	else UE_LOG(LogTemp, Warning, TEXT("Invalid somehow"));
 }
 
 void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> ActorToHold)
 {
-	UE_LOG(LogTemp, Warning, TEXT("3333"));
 	if (Owner && ActorToHold)
 	{
 		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
-		ActorInHand->Init(false, Owner);
+		ActorInHand->Init(false, Owner, true);
 		ActorInHand->FinishSpawning(Owner->GetActorTransform());
 
 		if (ActorInHand)
