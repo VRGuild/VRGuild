@@ -150,10 +150,19 @@ void ACADisplayer::OnRep_Owner()
 			else UE_LOG(LogTemp, Warning, TEXT("ACADisplayer, OnRep_Owner, no carried actor in UCACCarryComponent"));
 		}
 	}
+	else
+	{
+		if (WidgetComponent)
+		{
+			WidgetComponent->SetWidgetClass(nullptr);
+		}
+	}
 }
 
 void ACADisplayer::OnRep_ActorDisplayed()
 {
+	if (!WidgetComponent) return;
+
 	if (ActorDisplayed)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Success in displaying Actor Displayed"));
@@ -198,7 +207,11 @@ void ACADisplayer::ServerPickupCommission_Implementation(ACharacter* player)
 	{
 		if (auto carryComp = player->GetComponentByClass<UCACCarry>())
 		{	
-			//carryComp->StartCarry(ActorDisplayed);
+			carryComp->StartCarry(ActorDisplayed);
+			SetOwner(nullptr);
+			ActorDisplayed->SetActorHiddenInGame(true);
+			ActorDisplayed->SetLifeSpan(10.f);
+			ActorDisplayed = nullptr;
 		}
 	}
 	else
