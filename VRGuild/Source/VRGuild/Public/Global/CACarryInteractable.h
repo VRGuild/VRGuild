@@ -20,15 +20,17 @@ class VRGUILD_API ACACarryInteractable : public ACAInteractable
 public:
 	ACACarryInteractable();
 
-	void Init(bool bIsEnabled, ACharacter* owner);
+	void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner);
 
-	virtual bool IsActive() const override;
+	virtual bool CanInteract(ACharacter* Initiator) const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 	FVector GetHeldScale() const;
+
+	TSubclassOf<UUserWidget> GetPosterDisplayWidgetClass() const;
 
 protected:
 	virtual void BeginPlay() override;

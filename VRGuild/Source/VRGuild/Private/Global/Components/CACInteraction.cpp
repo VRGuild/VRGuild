@@ -111,8 +111,10 @@ void UCACInteraction::BeginInteract()
 	UE_LOG(LogTemp, Warning, TEXT("ActorOnFocus %s, InteractingActor %s, bCanInteract %d"),
 		*GetNameSafe(ActorOnFocus), *GetNameSafe(InteractingActor), bCanInteract
 		);
-	if (ActorOnFocus /*&& !InteractingActor*/ && CanInteract(ActorOnFocus))
+	if (ActorOnFocus /*&& !InteractingActor && CanInteract(ActorOnFocus)*/)
 	{
+		if(!GetInterface(ActorOnFocus)->CanInteract(Owner)) return;
+
 		InteractingActor = ActorOnFocus;
 		GetInterface(InteractingActor)->BeginInteract(Owner);
 		bCanInteract = false;
@@ -198,9 +200,9 @@ void UCACInteraction::UpdateTrace(AActor*& actorTraced)
 		{
 			if (auto temp = Cast<ICIInteractionInterface>(Hits[i].GetActor()))
 			{
-				if (!temp->IsActive()) continue;
+				if (!temp->CanInteract(Owner)) continue;
 				
-				if(!CanInteract(Hits[i].GetActor())) continue;
+				if (!CanInteract(Hits[i].GetActor())) continue;
 			}
 			else continue;
 

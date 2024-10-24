@@ -39,14 +39,21 @@ void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ACACarryInteractable, bEnabled);
 }
 
-void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner)
+void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
 {
 	bEnabled = bIsEnabled;
-	AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
-	SetOwner(owner);
+	if (owner)
+	{
+		SetOwner(owner);
+	}
+
+	if (bAttachToOwner)
+	{
+		AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
+	}	
 }
 
-bool ACACarryInteractable::IsActive() const
+bool ACACarryInteractable::CanInteract(ACharacter* Initiator) const
 {
 	return bEnabled;
 }
@@ -95,4 +102,9 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 FVector ACACarryInteractable::GetHeldScale() const
 {
 	return HeldScale;
+}
+
+TSubclassOf<UUserWidget> ACACarryInteractable::GetPosterDisplayWidgetClass() const
+{
+	return PosterWidgetToDisplayClass;
 }
