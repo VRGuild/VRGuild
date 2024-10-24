@@ -6,6 +6,7 @@
 #include "Global/Components/CACCarry.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/WidgetComponent.h"
 
 #include "Global/CACarryInteractable.h"
 
@@ -15,6 +16,9 @@ ACADisplayer::ACADisplayer()
 	bNetUseOwnerRelevancy = true;
 	ErrorMessage = TEXT("Cannot Interact: You don't have a commission in hand");
 	DisplayMessage = TEXT("Place Commission");
+
+	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>("WidgetComponent");
+	WidgetComponent->SetupAttachment(RootComponent);
 }
 
 bool ACADisplayer::CanInteract(ACharacter* Initiator) const
@@ -123,10 +127,17 @@ void ACADisplayer::OnRep_ActorDisplayed()
 {
 	if (ActorDisplayed)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("5555"));
+		UE_LOG(LogTemp, Warning, TEXT("5555 -- add widget"));
 		UE_LOG(LogTemp, Warning, TEXT("Success in displaying Actor Displayed"));
+				
+		WidgetComponent->SetWidgetClass(ActorDisplayed->GetPosterDisplayWidgetClass());
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Nice"));
+	else
+	{
+		WidgetComponent->SetWidgetClass(nullptr);
+		UE_LOG(LogTemp, Warning, TEXT("5555 -- remove widget"));
+	}
+	
 }
 
 void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPassed)
@@ -137,7 +148,7 @@ void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPass
 		ActorDisplayed = actorSpawned;
 		
 		ActorDisplayed->Init(false, Cast<ACharacter>(Owner), false);
-		
+				
 		ActorDisplayed->FinishSpawning(GetActorTransform());
 		
 		UE_LOG(LogTemp, Warning, TEXT("ActorDisplayed: %s, commissionPassed: %s"), *GetNameSafe(ActorDisplayed), *GetNameSafe(commissionPassed));

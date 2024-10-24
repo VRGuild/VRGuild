@@ -20,7 +20,7 @@ class VRGUILD_API ACACarryInteractable : public ACAInteractable
 public:
 	ACACarryInteractable();
 
-	void Init(bool bIsEnabled, ACharacter* owner, bool bAttach);
+	void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner);
 
 	virtual bool IsActive() const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
@@ -29,6 +29,8 @@ public:
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 	FVector GetHeldScale() const;
+
+	TSubclassOf<UUserWidget> GetPosterDisplayWidgetClass() const;
 
 protected:
 	virtual void BeginPlay() override;

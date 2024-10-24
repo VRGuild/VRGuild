@@ -11,6 +11,7 @@
  */
 
 class ACACarryInteractable;
+class UWidgetComponent;
 
 UCLASS()
 class VRGUILD_API ACADisplayer : public ACAInteractable
@@ -27,10 +28,13 @@ public:
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnRep_Owner() override;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Settings)
+	TObjectPtr<UWidgetComponent> WidgetComponent;
+
 	UFUNCTION(Server, Reliable)
 	void ServerDisplayCommission(AActor* commissionPassed);
-	virtual void OnRep_Owner() override;
 private:
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
 	FString ErrorMessage;
