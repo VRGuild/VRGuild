@@ -23,17 +23,24 @@ ACADisplayer::ACADisplayer()
 
 bool ACADisplayer::CanInteract(ACharacter* Initiator) const
 {
-	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	if (ActorDisplayed)
 	{
-		return carryComp->GetCarryType() == ECarriedType::COMMISSION;
+		return (Owner == Initiator && Initiator->IsLocallyControlled());
 	}
 
-	return false;
+	return Super::CanInteract(Initiator);
 }
 
 void ACADisplayer::BeginTrace(ACharacter* Initiator)
 {
-	FString Message = !CanInteract(Initiator) ? ErrorMessage : DisplayMessage;
+	bool bCanInteract;
+
+	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	{
+		bCanInteract = carryComp->GetCarryType() == ECarriedType::COMMISSION;
+	}
+
+	FString Message = bCanInteract ? DisplayMessage : ErrorMessage;
 	SetTraceMessage(Message);
 
 	Super::BeginTrace(Initiator);

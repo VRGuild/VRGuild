@@ -28,7 +28,6 @@ protected:
 public:
 	FGameplayTagContainer GetGameplayTagContainer() const;
 
-	virtual bool IsActive() const override;
 	virtual bool CanInteract(ACharacter* Initiator) const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;

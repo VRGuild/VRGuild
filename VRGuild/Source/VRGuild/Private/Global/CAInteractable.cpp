@@ -41,11 +41,6 @@ void ACAInteractable::Tick(float DeltaTime)
 
 }
 
-bool ACAInteractable::IsActive() const
-{
-	return true;
-}
-
 bool ACAInteractable::CanInteract(ACharacter* Initiator) const
 {
 	return true;

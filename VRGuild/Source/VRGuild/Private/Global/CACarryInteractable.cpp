@@ -53,7 +53,7 @@ void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttach
 	}	
 }
 
-bool ACACarryInteractable::IsActive() const
+bool ACACarryInteractable::CanInteract(ACharacter* Initiator) const
 {
 	return bEnabled;
 }
