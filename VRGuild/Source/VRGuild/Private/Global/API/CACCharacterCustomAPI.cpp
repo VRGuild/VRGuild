@@ -18,7 +18,6 @@ void UCACCharacterCustomAPI::BeginPlay()
 void UCACCharacterCustomAPI::InitializeComponent()
 {
 	Super::InitializeComponent();
-
 }
 
 void UCACCharacterCustomAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)

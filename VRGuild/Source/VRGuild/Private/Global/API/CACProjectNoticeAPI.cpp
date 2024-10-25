@@ -25,13 +25,18 @@ void UCACProjectNoticeAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr re
 
     FRegexPattern PostProjectPattern(TEXT(R"(POST\s+/api/project)"));
     FRegexPattern PatchProjectPattern(TEXT(R"(PATCH\s+/api/project)"));
-    FRegexPattern GetProjectByIdPattern(TEXT(R"(GET\s+/api/project/(\d+)/detail)"));
+    FRegexPattern GetProjectByIdPattern(TEXT(R"(GET\s+/api/project/(\d+))"));
     FRegexPattern DeleteProjectPattern(TEXT(R"(DELETE\s+/api/project/(\d+))"));
     FRegexPattern GetProjectAllPattern(TEXT(R"(GET\s+/api/project/summary)"));
-    
+
+    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support)"));
+    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support/(\d+))"));
+    FRegexPattern GetProjectSupportPorjectPattern(TEXT(R"(GET\s+/api/support/project/(\d+))"));
+    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+))"));
+
     // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
-
+    UE_LOG(LogTemp, Display, TEXT("%s"), *UrlToMatch);
     if (FRegexMatcher(PostProjectPattern, UrlToMatch).FindNext())
     {
         UE_LOG(LogTemp, Display, TEXT("POST new project"));
@@ -62,6 +67,22 @@ void UCACProjectNoticeAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr re
     {
         ProjectAllGetCallBack(req, res);
     }
+    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportPostCallBack(req, res);
+    }
+    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportDeleteCallBack(req, res);
+    }
+    else if (FRegexMatcher(GetProjectSupportPorjectPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportGetCallBack(req, res);
+    }
+    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportTeamGetCallBack(req, res);
+    }
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("No matching endpoint found for URL: %s"), *UrlToMatch);
@@ -71,7 +92,72 @@ void UCACProjectNoticeAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr re
 
 void UCACProjectNoticeAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	UE_LOG(LogTemp, Display, TEXT("OnFailAPI : %s \n"), *req->GetURL());
+    UE_LOG(LogTemp, Display, TEXT("OnFailAPI : %s \n"), *req->GetURL());
+    FRegexPattern PostProjectPattern(TEXT(R"(POST\s+/api/project)"));
+    FRegexPattern PatchProjectPattern(TEXT(R"(PATCH\s+/api/project)"));
+    FRegexPattern GetProjectByIdPattern(TEXT(R"(GET\s+/api/project/(\d+))"));
+    FRegexPattern DeleteProjectPattern(TEXT(R"(DELETE\s+/api/project/(\d+))"));
+    FRegexPattern GetProjectAllPattern(TEXT(R"(GET\s+/api/project/summary)"));
+
+    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support)"));
+    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support/(\d+))"));
+    FRegexPattern GetProjectSupportPorjectPattern(TEXT(R"(GET\s+/api/support/project/(\d+))"));
+    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+))"));
+
+    // Implementation of routing logic
+    FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
+    UE_LOG(LogTemp, Display, TEXT("%s"), *UrlToMatch);
+    if (FRegexMatcher(PostProjectPattern, UrlToMatch).FindNext())
+    {
+        UE_LOG(LogTemp, Display, TEXT("POST new project"));
+        OnFailProjectNewProjectPostCallBack();
+    }
+    else if (FRegexMatcher(PatchProjectPattern, UrlToMatch).FindNext())
+    {
+        UE_LOG(LogTemp, Display, TEXT("PATCH update project"));
+        OnFailProjectPatchCallBack();
+    }
+    else if (FRegexMatcher(GetProjectByIdPattern, UrlToMatch).FindNext())
+    {
+        FRegexMatcher Matcher(GetProjectByIdPattern, UrlToMatch);
+        Matcher.FindNext();
+        FString ProjectId = Matcher.GetCaptureGroup(1);
+        UE_LOG(LogTemp, Display, TEXT("GET Project ID: %s"), *ProjectId);
+        OnFailProjectDetailGetCallBack();
+    }
+    else if (FRegexMatcher(DeleteProjectPattern, UrlToMatch).FindNext())
+    {
+        FRegexMatcher Matcher(DeleteProjectPattern, UrlToMatch);
+        Matcher.FindNext();
+        FString ProjectId = Matcher.GetCaptureGroup(1);
+        UE_LOG(LogTemp, Display, TEXT("DELETE Project ID: %s"), *ProjectId);
+        OnFailProjectDetailDeleteCallBack();
+    }
+    else if (FRegexMatcher(GetProjectAllPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectAllGetCallBack();
+    }
+    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportPostCallBack();
+    }
+    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportDeleteCallBack();
+    }
+    else if (FRegexMatcher(GetProjectSupportPorjectPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportGetCallBack();
+    }
+    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportTeamGetCallBack();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No matching endpoint found for URL: %s"), *UrlToMatch);
+        // Handle 404 case
+    }
 }
 
 void UCACProjectNoticeAPI::ProjectNewProjectPostCall(FProjectAPI projectInfo)
@@ -145,4 +231,62 @@ void UCACProjectNoticeAPI::ProjectAllGetCallBack(FHttpRequestPtr req, FHttpRespo
     FProjectAllDataAPI ParseData;
     ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
     OnProjectAllGetCallBack(ParseData);
+}
+
+void UCACProjectNoticeAPI::ProjectSupportPostCall(FProjectSupportAPI supportInfo)
+{
+    this->API = "api/support";
+
+    HttpPostCall<FProjectSupportAPI>(supportInfo);
+}
+
+void UCACProjectNoticeAPI::ProjectSupportPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportPostCallBack(ParseData);
+}
+void UCACProjectNoticeAPI::ProjectSupportDeleteCall(int32 supportId)
+{
+    this->API = "api/support" + FString::FromInt(supportId);
+
+    HttpDeleteCall();
+}
+
+void UCACProjectNoticeAPI::ProjectSupportDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportDeleteCallBack(ParseData);
+}
+
+void UCACProjectNoticeAPI::ProjectSupportGetCall(int32 supportId)
+{
+    this->API = "api/support/project/" + FString::FromInt(supportId);
+
+    HttpGetCall();
+}
+
+void UCACProjectNoticeAPI::ProjectSupportGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportGetCallBack(ParseData);
+}
+void UCACProjectNoticeAPI::ProjectSupportTeamGetCall(int32 teamId)
+{
+    this->API = "api/support/team/" + FString::FromInt(teamId);
+
+    HttpGetCall();
+}
+
+void UCACProjectNoticeAPI::ProjectSupportTeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportTeamGetCallBack(ParseData);
 }
