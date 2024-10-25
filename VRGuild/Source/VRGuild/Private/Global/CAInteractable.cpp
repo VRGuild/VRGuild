@@ -3,6 +3,9 @@
 
 #include "Global/CAInteractable.h"
 #include "Global/CGIGameInstance.h"
+#include "Components/BoxComponent.h"
+#include "../../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "Global/Components/CACInteraction.h"
 
 // Sets default values
 ACAInteractable::ACAInteractable()
@@ -11,6 +14,9 @@ ACAInteractable::ACAInteractable()
 	PrimaryActorTick.bCanEverTick = true;
 	TraceMessage = TEXT("Default Msg");
 	bIsInteracting = false;
+
+	BoxOverlap = CreateDefaultSubobject<UBoxComponent>("PlayerBoxOverlap");
+	BoxOverlap->SetupAttachment(RootComponent);
 }
 
 FGameplayTagContainer ACAInteractable::GetGameplayTagContainer() const
@@ -23,6 +29,12 @@ void ACAInteractable::BeginPlay()
 {
 	Super::BeginPlay();
 	GameInstance = GetWorld()->GetGameInstance<UCGIGameInstance>();
+
+	if (BoxOverlap)
+	{
+		BoxOverlap->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnPlayerOverlapBegin);
+		BoxOverlap->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnPlayerOverlapEnd);
+	}
 }
 
 void ACAInteractable::SetTraceMessage(FString newMsg)
@@ -88,3 +100,39 @@ void ACAInteractable::OnRep_Owner()
 	Super::OnRep_Owner();
 }
 
+void ACAInteractable::OnPlayerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->HasAuthority()) return;
+
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(OtherActor))
+	{
+		if (auto interactionComp = character->GetComponentByClass<UCACInteraction>())
+		{
+			if (!interactionComp->IsEnabled())
+			{
+				
+			}	
+			//UE_LOG(LogTemp, Warning, TEXT("Overlap begin with %s"), *GetNameSafe(OtherActor));
+			interactionComp->Enable(this);
+		}
+	}
+
+}
+
+void ACAInteractable::OnPlayerOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->HasAuthority()) return;
+
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(OtherActor))
+	{
+		if (auto interactionComp = character->GetComponentByClass<UCACInteraction>())
+		{
+			if (interactionComp->IsEnabled())
+			{
+				
+			}
+			//UE_LOG(LogTemp, Warning, TEXT("Overlap end with %s"), *GetNameSafe(OtherActor));
+			interactionComp->Disable(this);
+		}
+	}
+}

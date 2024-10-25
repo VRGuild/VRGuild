@@ -30,9 +30,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void Enable();
+	void Enable(AActor* actorOverlapped);
 	UFUNCTION(BlueprintCallable)
-	void Disable();
+	void Disable(AActor* actorOverlapped);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsEnabled();
 
 	UFUNCTION(BlueprintCallable)
 	void Interact();
@@ -61,4 +64,6 @@ private:
 
 	bool bIsTracing;
 	bool bEnabled;
+	UPROPERTY()
+	TSet<AActor*> ActorsOverlapped;
 };

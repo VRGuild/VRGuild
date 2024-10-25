@@ -81,10 +81,14 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	}
 }
 
-void UCACInteraction::Enable()
+void UCACInteraction::Enable(AActor* actorOverlapped)
 {
-	//If Interactable actor is already in map, remove actor from map
-	//else add interactable actor to map
+	ActorsOverlapped.Add(actorOverlapped);
+	
+	if (ActorsOverlapped.Num() > 1) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Interaction Enabled: Actor after begin: %d"), ActorsOverlapped.Num());
+	UE_LOG(LogTemp, Warning, TEXT("================================"));
 
 	if (Owner && Owner->IsLocallyControlled())
 	{
@@ -93,14 +97,27 @@ void UCACInteraction::Enable()
 	}
 }
 
-void UCACInteraction::Disable()
+void UCACInteraction::Disable(AActor* actorOverlapped)
 {
+	ActorsOverlapped.Remove(actorOverlapped);
+
+	if (ActorsOverlapped.Num() > 0) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Interaction Disabled: Actor after disable: %d"), ActorsOverlapped.Num());
+	UE_LOG(LogTemp, Warning, TEXT("================================"));
+
 	if (Owner && Owner->IsLocallyControlled())
 	{
 		bEnabled = false;
 		SetComponentTickEnabled(false);
 		EndTrace();
+		ActorOnFocus = nullptr;
 	}
+}
+
+bool UCACInteraction::IsEnabled()
+{
+	return ActorsOverlapped.Num() > 0;
 }
 
 void UCACInteraction::Interact()
