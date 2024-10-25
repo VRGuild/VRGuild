@@ -7,6 +7,7 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
+#include "Components/BoxComponent.h"
 
 #include "Global/CACarryInteractable.h"
 
@@ -20,6 +21,15 @@ ACADisplayer::ACADisplayer()
 
 	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>("WidgetComponent");
 	WidgetComponent->SetupAttachment(RootComponent);
+	WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	BoxOverlap->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
+	StaticMeshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+}
+
+void ACADisplayer::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 bool ACADisplayer::CanTrace(ACharacter* Initiator) const
@@ -168,10 +178,12 @@ void ACADisplayer::OnRep_ActorDisplayed()
 		UE_LOG(LogTemp, Warning, TEXT("Success in displaying Actor Displayed"));
 				
 		WidgetComponent->SetWidget(ActorDisplayed->GetPosterDisplayWidget());
+		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
 	}
 	else
 	{
 		WidgetComponent->SetWidget(nullptr);
+		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	}
 	
 }

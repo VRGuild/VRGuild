@@ -20,6 +20,8 @@ class VRGUILD_API ACADisplayer : public ACAInteractable
 public:
 	ACADisplayer();
 
+	virtual void BeginPlay() override;
+
 	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual bool CanInteract(ACharacter* Initiator) const override;
 	virtual bool IsInteracting(ACharacter* Initiator) const override;

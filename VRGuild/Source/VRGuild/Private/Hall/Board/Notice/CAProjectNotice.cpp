@@ -14,13 +14,13 @@ ACAProjectNotice::ACAProjectNotice()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	this->RootSceneComp = CreateDefaultSubobject<USceneComponent>(FName("RootSceneComp"));
-	this->SetRootComponent(this->RootSceneComp);
+	/*this->RootSceneComp = CreateDefaultSubobject<USceneComponent>(FName("RootSceneComp"));
+	this->SetRootComponent(this->RootSceneComp);*/
 
 	SetReplicates(true);
 
 	this->FrontSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("FrontSide"));
-	this->FrontSideComp->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	this->FrontSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	this->FrontSideComp->SetDrawSize(this->WidgetDrawSize);
 	this->FrontSideComp->SetRelativeScale3D(FVector(0.2));
 	ConstructorHelpers::FClassFinder<UUserWidget> tempFrontSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeFrontSide.WBP_ProjectNoticeFrontSide_C'"));
@@ -30,8 +30,10 @@ ACAProjectNotice::ACAProjectNotice()
 		this->FrontSideComp->SetWidgetClass(tempFrontSide.Class);
 	}
 
+	FrontSideComp->SetCollisionProfileName("Interactable");
+
 	this->BackSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("BackSide"));
-	this->BackSideComp->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	this->BackSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	this->BackSideComp->SetRelativeLocation(FVector(-0.1,0,0));
 	this->BackSideComp->SetRelativeRotation(FRotator(0, 180,0));
 	this->BackSideComp->SetDrawSize(this->WidgetDrawSize);
@@ -42,6 +44,10 @@ ACAProjectNotice::ACAProjectNotice()
 	{
 		this->BackSideComp->SetWidgetClass(tempBackSide.Class);
 	}
+
+	BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	SetHideMesh(true);
 }
 
 void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
@@ -91,12 +97,15 @@ void ACAProjectNotice::OnRep_bEnabled()
 {
 	Super::OnRep_bEnabled();
 	auto owner = GetOwner<ACharacter>();
+
+	if (IsEnabled())
+	{
+		FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+	}
+	else FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
 	if (owner && owner->IsLocallyControlled())
 	{
-		if (IsEnabled())
-		{
-			FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
-		}
-		else FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		
 	}
 }

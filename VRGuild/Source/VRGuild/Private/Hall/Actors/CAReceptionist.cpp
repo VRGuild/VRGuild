@@ -5,6 +5,7 @@
 #include "Global/Components/CACCarry.h"
 #include "GameFramework/Character.h"
 #include "Global/Components/CACInteraction.h"
+#include "Global/CACarryInteractable.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -42,7 +43,8 @@ void ACAReceptionist::BeginInteract(ACharacter* Initiator)
 	{
 		if (auto interactComp = Initiator->GetComponentByClass<UCACInteraction>())
 		{
-			interactComp->Disable();
+			UE_LOG(LogTemp, Warning, TEXT("BeginInteract==================="));
+			interactComp->Disable(this);
 		}
 
 		auto EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Initiator->GetController<APlayerController>()->GetLocalPlayer());
@@ -95,7 +97,8 @@ void ACAReceptionist::EndInteract(ACharacter* Initiator)
 	{
 		if (auto InteractComp = Initiator->GetComponentByClass<UCACInteraction>())
 		{
-			InteractComp->Enable();
+			UE_LOG(LogTemp, Warning, TEXT("EndInteract==================="));
+			InteractComp->Enable(this);
 		}
 
 		auto EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Initiator->GetController<APlayerController>()->GetLocalPlayer());
@@ -125,7 +128,7 @@ void ACAReceptionist::EndInteract(ACharacter* Initiator)
 				}
 				case ECarriedType::NONE:
 				{
-					DisplayDefaultPopup(true);
+					DisplayDefaultPopup(false);
 					break;
 				}
 				}

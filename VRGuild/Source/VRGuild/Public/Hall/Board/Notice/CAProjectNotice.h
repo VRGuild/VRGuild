@@ -37,8 +37,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FVector2D WidgetDrawSize = { 400,440 };
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	USceneComponent* RootSceneComp;
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	USceneComponent* RootSceneComp;*/
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UWidgetComponent* FrontSideComp;

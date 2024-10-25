@@ -47,9 +47,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	UPROPERTY(EditDefaultsOnly, Category="Settings")
-	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Settings")

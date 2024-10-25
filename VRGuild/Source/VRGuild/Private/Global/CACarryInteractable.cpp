@@ -14,11 +14,8 @@
 
 ACACarryInteractable::ACACarryInteractable()
 {
-	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
-	StaticMeshComp->SetupAttachment(RootComponent);
 	bReplicates = true;
 	bEnabled = true;
-	StaticMeshComp->SetCollisionProfileName("Interactable");
 
 	HeldScale = FVector(.5f);
 	HoldSocketName = "RightSocketHold";
@@ -31,7 +28,6 @@ void ACACarryInteractable::BeginPlay()
 	if (!bEnabled)
 	{
 		SetActorScale3D(HeldScale);
-		StaticMeshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	}
 }
 

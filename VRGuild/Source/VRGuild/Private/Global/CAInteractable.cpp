@@ -3,6 +3,11 @@
 
 #include "Global/CAInteractable.h"
 #include "Global/CGIGameInstance.h"
+#include "Components/BoxComponent.h"
+#include "../../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "Global/Components/CACInteraction.h"
+#include "Components/StaticMeshComponent.h"
+
 
 // Sets default values
 ACAInteractable::ACAInteractable()
@@ -11,6 +16,19 @@ ACAInteractable::ACAInteractable()
 	PrimaryActorTick.bCanEverTick = true;
 	TraceMessage = TEXT("Default Msg");
 	bIsInteracting = false;
+	
+	RootComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
+	RootComponent = RootComp;
+	
+	BoxOverlap = CreateDefaultSubobject<UBoxComponent>("PlayerBoxOverlap");
+	BoxOverlap->SetupAttachment(RootComp);
+	BoxOverlap->SetBoxExtent(FVector(200.f));
+
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
+	StaticMeshComp->SetupAttachment(RootComp);
+	StaticMeshComp->SetCollisionProfileName("Interactable");
+
+	SetHideMesh(false);
 }
 
 FGameplayTagContainer ACAInteractable::GetGameplayTagContainer() const
@@ -22,7 +40,16 @@ FGameplayTagContainer ACAInteractable::GetGameplayTagContainer() const
 void ACAInteractable::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StaticMeshComp->SetHiddenInGame(bHideMesh);
+
 	GameInstance = GetWorld()->GetGameInstance<UCGIGameInstance>();
+
+	if (BoxOverlap)
+	{
+		BoxOverlap->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnPlayerOverlapBegin);
+		BoxOverlap->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnPlayerOverlapEnd);
+	}
 }
 
 void ACAInteractable::SetTraceMessage(FString newMsg)
@@ -88,3 +115,44 @@ void ACAInteractable::OnRep_Owner()
 	Super::OnRep_Owner();
 }
 
+void ACAInteractable::OnPlayerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->HasAuthority()) return;
+
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(OtherActor))
+	{
+		if (auto interactionComp = character->GetComponentByClass<UCACInteraction>())
+		{
+			if (!interactionComp->IsEnabled())
+			{
+				
+			}	
+			//UE_LOG(LogTemp, Warning, TEXT("Overlap begin with %s"), *GetNameSafe(OtherActor));
+			interactionComp->Enable(this);
+		}
+	}
+
+}
+
+void ACAInteractable::OnPlayerOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->HasAuthority()) return;
+
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(OtherActor))
+	{
+		if (auto interactionComp = character->GetComponentByClass<UCACInteraction>())
+		{
+			if (interactionComp->IsEnabled())
+			{
+				
+			}
+			//UE_LOG(LogTemp, Warning, TEXT("Overlap end with %s"), *GetNameSafe(OtherActor));
+			interactionComp->Disable(this);
+		}
+	}
+}
+
+void ACAInteractable::SetHideMesh(bool bHide)
+{
+	bHideMesh = bHide;
+}
