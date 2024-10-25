@@ -52,6 +52,8 @@ class ATP_ThirdPersonCharacter : public ACharacter
 public:
 	ATP_ThirdPersonCharacter();
 
+	static void SetOwnerFor(AActor* target, ACharacter* newOwner);
+
 protected:
 
 	/** Called for movement input */
@@ -89,5 +91,8 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerSetOwnerFor(AActor* actorToSet);
 };
 

@@ -16,33 +16,35 @@ class VRGUILD_API ACAInteractable : public AActor, public ICIInteractionInterfac
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ACAInteractable();
-
-	FGameplayTagContainer GetGameplayTagContainer() const;
-
+	
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	void SetTraceMessage(FString newMsg);
-
-public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual bool IsActive() const override;
+	void SetTraceMessage(FString newMsg);
+	FString GetTraceMessage() const;
+
+public:
+	FGameplayTagContainer GetGameplayTagContainer() const;
+
+	virtual bool CanTrace(ACharacter* Initiator) const override;
+	virtual bool CanInteract(ACharacter* Initiator) const override;
+	virtual bool IsInteracting(ACharacter* Initiator) const override;
+
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
+	virtual void OnRep_Owner() override;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Settings|Tags")
 	FGameplayTagContainer InteractionTag;
-	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	FString TraceMessage;
 	TObjectPtr<UCGIGameInstance> GameInstance;
+	bool bIsInteracting;
 };

@@ -22,8 +22,6 @@ void UCACCarry::InitializeComponent()
 	Super::InitializeComponent();
 
 	Owner = GetOwner<ACharacter>();
-	CarryTypeTemp = ECarriedType::NONE;
-	CarryType = CarryTypeTemp;
 }
 
 void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -33,25 +31,27 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(UCACCarry, ActorInHand);
 }
 
-void UCACCarry::StartCarry(ECarriedType Type, TSubclassOf<ACACarryInteractable> ActorToHold, TSubclassOf<UUserWidget> WidgetToDisplay)
+void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
 {
-	if (WidgetToDisplay)
+	auto widgetClass = ActorToHold->GetPosterDisplayWidget();
+	if (ensure(widgetClass))
 	{
-		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
-
-		if (ScrollBaseWidget && ScrollBaseWidget->Init(WidgetToDisplay))
+		if (ScrollBaseWidget)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("2222"));
-			CarryTypeTemp = Type;
-			CarryType = CarryTypeTemp;
-			ServerHold(ActorToHold);
+			ScrollBaseWidget->RemoveFromParent();
 		}
+
+		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
+		//ScrollBaseWidget->Init(widgetClass);
+
+		ServerHold(ActorToHold->GetClass());
 	}
+	else UE_LOG(LogTemp, Warning, TEXT("no widgetclass in StartCarry()"));
 }
 
 void UCACCarry::StartDrop()
 {
-	if (ScrollBaseWidget && ActorInHand)
+	if (/*ScrollBaseWidget && */ActorInHand)
 	{
 		ServerDrop();
 	}
@@ -68,9 +68,9 @@ FGameplayTagContainer UCACCarry::GetGameplayTagContainer() const
 
 FString UCACCarry::GetMessageForNPC()
 {
-	UE_LOG(LogTemp, Warning, TEXT("CarryType %s"), *UEnum::GetValueAsString(CarryType));
+	if (!ActorInHand) return TEXT("Default String");
 
-	switch (CarryType)
+	switch (ActorInHand->GetCarriedType())
 	{
 	case ECarriedType::COMMISSION:
 	{
@@ -90,7 +90,14 @@ FString UCACCarry::GetMessageForNPC()
 
 ECarriedType UCACCarry::GetCarryType() const
 {
-	return CarryType;
+	if (ActorInHand) return ActorInHand->GetCarriedType();
+	
+	return ECarriedType::NONE;
+}
+
+AActor* UCACCarry::GetCarriedActor() const
+{
+	return ActorInHand;
 }
 
 void UCACCarry::OnRep_ActorInHand()
@@ -99,29 +106,23 @@ void UCACCarry::OnRep_ActorInHand()
 	{
 		if (ActorInHand)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("4444 --- Finished"));
 			if(ScrollBaseWidget)
 				ScrollBaseWidget->AddToViewport();
-			CarryType = CarryTypeTemp;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("5555 --- Finished"));
 			if (ScrollBaseWidget)
 				ScrollBaseWidget->RemoveFromParent();
-			CarryType = ECarriedType::NONE;
 		}
 	}
-	else UE_LOG(LogTemp, Warning, TEXT("Invalid somehow"));
 }
 
 void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> ActorToHold)
 {
-	UE_LOG(LogTemp, Warning, TEXT("3333"));
 	if (Owner && ActorToHold)
 	{
 		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
-		ActorInHand->Init(false, Owner);
+		ActorInHand->Init(false, Owner, true);
 		ActorInHand->FinishSpawning(Owner->GetActorTransform());
 
 		if (ActorInHand)

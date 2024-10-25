@@ -33,11 +33,9 @@ public:
 	void Enable();
 	UFUNCTION(BlueprintCallable)
 	void Disable();
-		
+
 	UFUNCTION(BlueprintCallable)
-	void BeginInteract();
-	UFUNCTION(BlueprintCallable)
-	void EndInteract();
+	void Interact();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
@@ -45,22 +43,22 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	float InteractRadius;
 	
+	UFUNCTION(BlueprintCallable)
+	void BeginInteract();
+	UFUNCTION(BlueprintCallable)
+	void EndInteract();
+
 private:
 	void BeginTrace();
 	void EndTrace();
 
 	void UpdateTrace(AActor*& actorTraced);
-	
-	bool CanInteract(AActor* actor) const;
 
 	ICIInteractionInterface* GetInterface(AActor* actor) const;
 	TObjectPtr<ACharacter> Owner;
 	
-	AActor* InteractingActor;
-	
 	AActor* ActorOnFocus;
 
-	bool bCanInteract;
 	bool bIsTracing;
 	bool bEnabled;
 };

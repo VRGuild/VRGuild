@@ -10,6 +10,8 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
 
+#include "Blueprint/UserWidget.h"
+
 ACACarryInteractable::ACACarryInteractable()
 {
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
@@ -20,6 +22,7 @@ ACACarryInteractable::ACACarryInteractable()
 
 	HeldScale = FVector(.5f);
 	HoldSocketName = "RightSocketHold";
+	CarryType = ECarriedType::NONE;
 }
 
 void ACACarryInteractable::BeginPlay()
@@ -39,14 +42,27 @@ void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ACACarryInteractable, bEnabled);
 }
 
-void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner)
+void ACACarryInteractable::OnRep_bEnabled()
 {
-	bEnabled = bIsEnabled;
-	AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
-	SetOwner(owner);
+	//
 }
 
-bool ACACarryInteractable::IsActive() const
+void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
+{
+	bEnabled = bIsEnabled;
+	OnRep_bEnabled();
+	if (owner)
+	{
+		SetOwner(owner);
+	}
+
+	if (bAttachToOwner)
+	{
+		AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
+	}	
+}
+
+bool ACACarryInteractable::CanTrace(ACharacter* Initiator) const
 {
 	return bEnabled;
 }
@@ -72,8 +88,7 @@ void ACACarryInteractable::BeginInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111"));
-			carryComponent->StartCarry(ECarriedType::COMMISSION, SelfActor, PosterWidgetToDisplayClass);
+			carryComponent->StartCarry(this);
 		}
 	}	
 }
@@ -85,7 +100,6 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111"));
 			carryComponent->StartDrop();
 		}
 	}
@@ -95,4 +109,19 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 FVector ACACarryInteractable::GetHeldScale() const
 {
 	return HeldScale;
+}
+
+ECarriedType ACACarryInteractable::GetCarriedType() const
+{
+	return CarryType;
+}
+
+UUserWidget* ACACarryInteractable::GetPosterDisplayWidget() const
+{
+	return CreateWidget<UUserWidget>(GetWorld(), PosterWidgetToDisplayClass);
+}
+
+bool ACACarryInteractable::IsEnabled() const
+{
+	return bEnabled;
 }

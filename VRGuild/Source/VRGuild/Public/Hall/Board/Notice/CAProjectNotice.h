@@ -5,12 +5,12 @@
 #include "Global/Project/CBPLProject.h"
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Global/CACarryInteractable.h"
 #include "CAProjectNotice.generated.h"
 
 
 UCLASS()
-class VRGUILD_API ACAProjectNotice : public AActor
+class VRGUILD_API ACAProjectNotice : public ACACarryInteractable
 {
 	GENERATED_BODY()
 	
@@ -18,11 +18,17 @@ public:
 	// Sets default values for this actor's properties
 	ACAProjectNotice();
 
+	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner) override;
+
+	virtual UUserWidget* GetPosterDisplayWidget() const override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void OnRep_bEnabled() override;
 
 public:	
 	UPROPERTY(Replicated, BlueprintReadWrite)
@@ -44,5 +50,4 @@ public:
 	TSubclassOf<UUserWidget> WidgetFrontSide;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> WidgetBackSide;
-
 };

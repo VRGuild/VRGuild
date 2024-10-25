@@ -5,6 +5,9 @@
 #include "Components/WidgetComponent.h"
 #include "Hall/Board/Notice/UI/CWGProjectNotice.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/Character.h"
+#include "Hall/Board/Notice/UI/CWGProjectNoticeFull.h"
+
 
 // Sets default values
 ACAProjectNotice::ACAProjectNotice()
@@ -41,6 +44,26 @@ ACAProjectNotice::ACAProjectNotice()
 	}
 }
 
+void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
+{
+	Super::Init(bIsEnabled, owner, bAttachToOwner);
+}
+
+UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
+{
+	auto Widget = Super::GetPosterDisplayWidget();
+	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(Widget);
+	if (ensure(ProjectAPIWidget))
+	{
+		ProjectAPIWidget->ProjectDetailGetCall(NoticeData.ProjectNoticeId);
+		ProjectAPIWidget->ProjectNoticeFrontSide->SetProjectInfo(NoticeData);
+		
+		return ProjectAPIWidget;
+	}
+
+	return nullptr;
+}
+
 // Called when the game starts or when spawned
 void ACAProjectNotice::BeginPlay()
 {
@@ -56,6 +79,7 @@ void ACAProjectNotice::BeginPlay()
 	if (this->WidgetBackSide)
 	{
 		this->BackSideComp->SetWidgetClass(this->WidgetBackSide);
+		BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -64,4 +88,18 @@ void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACAProjectNotice, NoticeData);
+}
+
+void ACAProjectNotice::OnRep_bEnabled()
+{
+	Super::OnRep_bEnabled();
+	auto owner = GetOwner<ACharacter>();
+	if (owner && owner->IsLocallyControlled())
+	{
+		if (IsEnabled())
+		{
+			FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+		}
+		else FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	}
 }

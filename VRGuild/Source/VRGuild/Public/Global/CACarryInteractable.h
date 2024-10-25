@@ -10,6 +10,14 @@
  * 
  */
 
+UENUM(Blueprintable)
+enum class ECarriedType : uint8
+{
+	COMMISSION UMETA(DisplayName = "Commission"),
+	REGISTRATION UMETA(DisplayName = "Registration"),
+	NONE UMETA(DisplayName = "None")
+};
+
 class ACharacter;
 
 UCLASS()
@@ -20,15 +28,21 @@ class VRGUILD_API ACACarryInteractable : public ACAInteractable
 public:
 	ACACarryInteractable();
 
-	void Init(bool bIsEnabled, ACharacter* owner);
+	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner);
 
-	virtual bool IsActive() const override;
+	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 	FVector GetHeldScale() const;
+
+	ECarriedType GetCarriedType() const;
+
+	virtual UUserWidget* GetPosterDisplayWidget() const;
+
+	bool IsEnabled() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -50,7 +64,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FName HoldSocketName;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	ECarriedType CarryType;
+
+	UFUNCTION()
+	virtual void OnRep_bEnabled();
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_bEnabled)
 	bool bEnabled;
 };
