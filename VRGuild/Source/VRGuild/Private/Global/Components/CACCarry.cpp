@@ -33,18 +33,20 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 
 void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
 {
-	if (auto widgetClass = ActorToHold->GetPosterDisplayWidgetClass())
-	{		
+	auto widgetClass = ActorToHold->GetPosterDisplayWidget();
+	if (ensure(widgetClass))
+	{
 		if (ScrollBaseWidget)
 		{
 			ScrollBaseWidget->RemoveFromParent();
 		}
 
 		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
-		ScrollBaseWidget->Init(widgetClass);
+		//ScrollBaseWidget->Init(widgetClass);
 
 		ServerHold(ActorToHold->GetClass());
 	}
+	else UE_LOG(LogTemp, Warning, TEXT("no widgetclass in StartCarry()"));
 }
 
 void UCACCarry::StartDrop()

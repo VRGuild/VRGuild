@@ -167,11 +167,11 @@ void ACADisplayer::OnRep_ActorDisplayed()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Success in displaying Actor Displayed"));
 				
-		WidgetComponent->SetWidgetClass(ActorDisplayed->GetPosterDisplayWidgetClass());
+		WidgetComponent->SetWidget(ActorDisplayed->GetPosterDisplayWidget());
 	}
 	else
 	{
-		WidgetComponent->SetWidgetClass(nullptr);
+		WidgetComponent->SetWidget(nullptr);
 	}
 	
 }

@@ -10,6 +10,8 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
 
+#include "Blueprint/UserWidget.h"
+
 ACACarryInteractable::ACACarryInteractable()
 {
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
@@ -40,9 +42,15 @@ void ACACarryInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ACACarryInteractable, bEnabled);
 }
 
+void ACACarryInteractable::OnRep_bEnabled()
+{
+	//
+}
+
 void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
 {
 	bEnabled = bIsEnabled;
+	OnRep_bEnabled();
 	if (owner)
 	{
 		SetOwner(owner);
@@ -108,7 +116,12 @@ ECarriedType ACACarryInteractable::GetCarriedType() const
 	return CarryType;
 }
 
-TSubclassOf<UUserWidget> ACACarryInteractable::GetPosterDisplayWidgetClass() const
+UUserWidget* ACACarryInteractable::GetPosterDisplayWidget() const
 {
-	return PosterWidgetToDisplayClass;
+	return CreateWidget<UUserWidget>(GetWorld(), PosterWidgetToDisplayClass);
+}
+
+bool ACACarryInteractable::IsEnabled() const
+{
+	return bEnabled;
 }

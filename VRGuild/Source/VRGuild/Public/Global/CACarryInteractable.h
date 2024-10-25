@@ -28,7 +28,7 @@ class VRGUILD_API ACACarryInteractable : public ACAInteractable
 public:
 	ACACarryInteractable();
 
-	void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner);
+	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner);
 
 	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
@@ -40,7 +40,9 @@ public:
 
 	ECarriedType GetCarriedType() const;
 
-	TSubclassOf<UUserWidget> GetPosterDisplayWidgetClass() const;
+	virtual UUserWidget* GetPosterDisplayWidget() const;
+
+	bool IsEnabled() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -65,7 +67,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	ECarriedType CarryType;
 
+	UFUNCTION()
+	virtual void OnRep_bEnabled();
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_bEnabled)
 	bool bEnabled;
 };

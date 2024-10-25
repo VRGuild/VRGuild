@@ -16,7 +16,7 @@ class VRGUILD_API UCWGProjectAPI : public UCWGBaseAPI
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
