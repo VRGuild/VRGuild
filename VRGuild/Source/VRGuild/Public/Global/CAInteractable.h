@@ -10,6 +10,8 @@
 
 class UCGIGameInstance;
 class UBoxComponent;
+class USceneComponent;
+class UStaticMeshComponent;
 
 UCLASS()
 class VRGUILD_API ACAInteractable : public AActor, public ICIInteractionInterface
@@ -46,6 +48,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Settings|Components")
 	TObjectPtr<UBoxComponent> BoxOverlap;
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Components")
+	TObjectPtr<USceneComponent> RootComp; 
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Components")
+	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 
 	UFUNCTION()
 	virtual void OnPlayerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
@@ -54,9 +60,13 @@ protected:
 	virtual void OnPlayerOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	void SetHideMesh(bool bHide);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	FString TraceMessage;
 	TObjectPtr<UCGIGameInstance> GameInstance;
 	bool bIsInteracting;
+	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
+	bool bHideMesh;
 };

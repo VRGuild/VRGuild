@@ -6,6 +6,8 @@
 #include "Components/BoxComponent.h"
 #include "../../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Global/Components/CACInteraction.h"
+#include "Components/StaticMeshComponent.h"
+
 
 // Sets default values
 ACAInteractable::ACAInteractable()
@@ -14,9 +16,19 @@ ACAInteractable::ACAInteractable()
 	PrimaryActorTick.bCanEverTick = true;
 	TraceMessage = TEXT("Default Msg");
 	bIsInteracting = false;
-
+	
+	RootComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
+	RootComponent = RootComp;
+	
 	BoxOverlap = CreateDefaultSubobject<UBoxComponent>("PlayerBoxOverlap");
-	BoxOverlap->SetupAttachment(RootComponent);
+	BoxOverlap->SetupAttachment(RootComp);
+	BoxOverlap->SetBoxExtent(FVector(200.f));
+
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
+	StaticMeshComp->SetupAttachment(RootComp);
+	StaticMeshComp->SetCollisionProfileName("Interactable");
+
+	SetHideMesh(false);
 }
 
 FGameplayTagContainer ACAInteractable::GetGameplayTagContainer() const
@@ -28,6 +40,9 @@ FGameplayTagContainer ACAInteractable::GetGameplayTagContainer() const
 void ACAInteractable::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StaticMeshComp->SetHiddenInGame(bHideMesh);
+
 	GameInstance = GetWorld()->GetGameInstance<UCGIGameInstance>();
 
 	if (BoxOverlap)
@@ -135,4 +150,9 @@ void ACAInteractable::OnPlayerOverlapEnd(UPrimitiveComponent* OverlappedComponen
 			interactionComp->Disable(this);
 		}
 	}
+}
+
+void ACAInteractable::SetHideMesh(bool bHide)
+{
+	bHideMesh = bHide;
 }
