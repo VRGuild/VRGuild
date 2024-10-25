@@ -30,6 +30,8 @@ ACAProjectNotice::ACAProjectNotice()
 		this->FrontSideComp->SetWidgetClass(tempFrontSide.Class);
 	}
 
+	FrontSideComp->SetCollisionProfileName("Interactable");
+
 	this->BackSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("BackSide"));
 	this->BackSideComp->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	this->BackSideComp->SetRelativeLocation(FVector(-0.1,0,0));
@@ -42,6 +44,8 @@ ACAProjectNotice::ACAProjectNotice()
 	{
 		this->BackSideComp->SetWidgetClass(tempBackSide.Class);
 	}
+
+	BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
@@ -91,12 +95,15 @@ void ACAProjectNotice::OnRep_bEnabled()
 {
 	Super::OnRep_bEnabled();
 	auto owner = GetOwner<ACharacter>();
+
+	if (IsEnabled())
+	{
+		FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+	}
+	else FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
 	if (owner && owner->IsLocallyControlled())
 	{
-		if (IsEnabled())
-		{
-			FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
-		}
-		else FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		
 	}
 }
