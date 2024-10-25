@@ -341,6 +341,57 @@ public:
 	TArray<FProjectAllAPI>	data;
 };
 
+USTRUCT(BlueprintType, Atomic)
+struct FProjectSupportAPI
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FProjectSupportAPI() {};
+
+	UPROPERTY(BlueprintReadWrite)
+	int32	projectId;
+	UPROPERTY(BlueprintReadWrite)
+	int32	teamId;
+};
+
+USTRUCT(BlueprintType, Atomic)
+struct FProjectSupportInfoAPI
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FProjectSupportInfoAPI() {};
+
+	UPROPERTY(BlueprintReadWrite)
+	int32	supportId;
+	UPROPERTY(BlueprintReadWrite)
+	int32	projectId;
+	UPROPERTY(BlueprintReadWrite)
+	int32	teamId;
+	UPROPERTY(BlueprintReadWrite)
+	FString	supportConfirmation;
+};
+
+USTRUCT(BlueprintType, Atomic)
+struct FProjectSupportInfoDataAPI
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FProjectSupportInfoDataAPI() {};
+
+	UPROPERTY(BlueprintReadWrite)
+	FProjectSupportInfoAPI	data;
+};
+
+USTRUCT(BlueprintType, Atomic)
+struct FProjectSupportInfoDataListAPI
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FProjectSupportInfoDataListAPI() {};
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FProjectSupportInfoAPI>	data;
+};
 
 /**
  * 
