@@ -55,12 +55,9 @@ UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
 	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(Widget);
 	if (ensure(ProjectAPIWidget))
 	{
-		ProjectAPIWidget->ProjectDetailGetCall(NoticeData.ProjectNoticeId);
-		ProjectAPIWidget->ProjectNoticeFrontSide->SetProjectInfo(NoticeData);
-		
+		ProjectAPIWidget->OnSetDetailInfo (this->NoticeData);
 		return ProjectAPIWidget;
 	}
-
 	return nullptr;
 }
 
