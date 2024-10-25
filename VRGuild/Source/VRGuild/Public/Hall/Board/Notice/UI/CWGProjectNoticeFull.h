@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Global/Project/CBPLProject.h"
+
 #include "CoreMinimal.h"
 #include "Global/UI/API/CWGProjectAPI.h"
 #include "CWGProjectNoticeFull.generated.h"
@@ -17,7 +19,7 @@ class VRGUILD_API UCWGProjectNoticeFull : public UCWGProjectAPI
 {
 	GENERATED_BODY()
 	
-public: 
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UCWGProjectNotice> ProjectNoticeFrontSide;
+public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSetDetailInfo(FProjectNotice ProjectInfo);
 };
