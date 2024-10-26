@@ -76,6 +76,50 @@ void ATP_ThirdPersonCharacter::SetOwnerFor(AActor* target, ACharacter* newOwner)
 	}
 }
 
+void ATP_ThirdPersonCharacter::SetInteracting(ACharacter* player, AActor* target, bool bInteracting)
+{
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(player))
+	{
+		if (character)
+		{
+			character->bIsInteracting = bInteracting;
+
+			if (bInteracting)
+			{
+				character->InteractionComponent->Disable();
+				if (auto playerController = character->GetController<APlayerController>())
+				{
+					playerController->SetInputMode(FInputModeUIOnly());
+					playerController->SetShowMouseCursor(true);
+				}
+			}
+			else
+			{
+				character->InteractionComponent->Enable();
+				if (auto playerController = character->GetController<APlayerController>())
+				{
+					playerController->SetInputMode(FInputModeGameOnly());
+					playerController->SetShowMouseCursor(false);
+				}
+			}
+		}
+	}
+}
+
+bool ATP_ThirdPersonCharacter::IsInteracting(ACharacter* player)
+{
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(player))
+	{
+		if (character)
+		{
+			return character->IsInteracting(player);
+		}
+	}
+
+	return false;
+}
+
+
 void ATP_ThirdPersonCharacter::ServerSetOwnerFor_Implementation(AActor* target)
 {
 	target->SetOwner(this);

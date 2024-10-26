@@ -63,6 +63,11 @@ public:
 
 	static void SetOwnerFor(AActor* target, ACharacter* newOwner);
 
+	UFUNCTION(BlueprintCallable)
+	static void SetInteracting(ACharacter* player, AActor* target, bool bInteracting);
+
+	static bool IsInteracting(ACharacter* player);
+
 protected:
 
 	/** Called for movement input */
@@ -112,5 +117,7 @@ public:
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerSetOwnerFor(AActor* actorToSet);
+
+	bool bIsInteracting;
 };
 

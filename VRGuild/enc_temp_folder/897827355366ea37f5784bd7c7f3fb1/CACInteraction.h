@@ -47,15 +47,17 @@ protected:
 	float InteractDistance;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	float InteractRadius;
+	
+	UFUNCTION(BlueprintCallable)
+	void BeginInteract();
+	UFUNCTION(BlueprintCallable)
+	void EndInteract();
 
 private:
 	void UpdateActorsOverlapped(AActor* actoroverlapped, bool bAdd);
 
 	void BeginTrace();
 	void EndTrace();
-
-	void BeginInteract();
-	void EndInteract();
 
 	void UpdateTrace(AActor*& actorTraced);
 

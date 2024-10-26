@@ -51,6 +51,8 @@ void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
 		ScrollBaseWidget->Init(widgetToDisplay);
 
 		ServerHold(ActorToHold->GetClass());
+
+		
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("no widget to display in StartCarry()"));
 }

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Global/Components/CACInteraction.h"
 #include "Global/CACarryInteractable.h"
+#include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -41,50 +42,29 @@ void ACAReceptionist::BeginInteract(ACharacter* Initiator)
 
 	if (Initiator)
 	{
-		if (auto interactComp = Initiator->GetComponentByClass<UCACInteraction>())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("BeginInteract==================="));
-			interactComp->Disable(this);
-		}
+		ATP_ThirdPersonCharacter::SetInteracting(Initiator, this, true);
 
-		auto EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Initiator->GetController<APlayerController>()->GetLocalPlayer());
-		if (EnhancedInputSubsystem)
+		if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			if (ensure(DefaultInputContext) && EnhancedInputSubsystem->HasMappingContext(DefaultInputContext))
+			switch (carryComp->GetCarryType())
 			{
-				EnhancedInputSubsystem->RemoveMappingContext(DefaultInputContext);
+			case ECarriedType::COMMISSION:
+			{
+				DisplayCommossionPopup(true);
+				break;
 			}
-
-			if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+			case ECarriedType::REGISTRATION:
 			{
-				switch (carryComp->GetCarryType())
-				{
-				case ECarriedType::COMMISSION:
-				{
-					DisplayCommossionPopup(true);
-					if (ensure(ScrollInputContext) && EnhancedInputSubsystem->HasMappingContext(ScrollInputContext))
-					{
-						EnhancedInputSubsystem->RemoveMappingContext(ScrollInputContext);
-					}
-					break;
-				}
-				case ECarriedType::REGISTRATION:
-				{
-					break;
-				}
-				case ECarriedType::NONE:
-				{
-					DisplayDefaultPopup(true);
-					break;
-				}
-				}
+				break;
+			}
+			case ECarriedType::NONE:
+			{
+				DisplayDefaultPopup(true);
+				break;
+			}
 			}
 		}
-
-		Initiator->GetController<APlayerController>()->SetShowMouseCursor(true);
 	}
-
-
 
 	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginINteract"));
 }
@@ -95,47 +75,28 @@ void ACAReceptionist::EndInteract(ACharacter* Initiator)
 
 	if (Initiator)
 	{
-		if (auto InteractComp = Initiator->GetComponentByClass<UCACInteraction>())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("EndInteract==================="));
-			InteractComp->Enable(this);
-		}
+		ATP_ThirdPersonCharacter::SetInteracting(Initiator, this, false);
 
-		auto EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Initiator->GetController<APlayerController>()->GetLocalPlayer());
-		if (EnhancedInputSubsystem)
+		if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			if (ensure(DefaultInputContext) && !EnhancedInputSubsystem->HasMappingContext(DefaultInputContext))
+			switch (carryComp->GetCarryType())
 			{
-				EnhancedInputSubsystem->AddMappingContext(DefaultInputContext, 0);
+			case ECarriedType::COMMISSION:
+			{
+				DisplayCommossionPopup(true);
+				break;
 			}
-
-			if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+			case ECarriedType::REGISTRATION:
 			{
-				switch (carryComp->GetCarryType())
-				{
-				case ECarriedType::COMMISSION:
-				{
-					DisplayCommossionPopup(true);
-					if (ensure(ScrollInputContext) && !EnhancedInputSubsystem->HasMappingContext(ScrollInputContext))
-					{
-						EnhancedInputSubsystem->AddMappingContext(ScrollInputContext, 0);
-					}
-					break;
-				}
-				case ECarriedType::REGISTRATION:
-				{
-					break;
-				}
-				case ECarriedType::NONE:
-				{
-					DisplayDefaultPopup(false);
-					break;
-				}
-				}
+				break;
+			}
+			case ECarriedType::NONE:
+			{
+				DisplayDefaultPopup(false);
+				break;
+			}
 			}
 		}
-
-		Initiator->GetController<APlayerController>()->SetShowMouseCursor(false);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist EndINteract"));

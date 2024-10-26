@@ -87,8 +87,6 @@ void UCACInteraction::Enable()
 {	
 	if (ActorsOverlapped.Num() > 1) return;
 
-	if (bEnabled) return;
-
 	UE_LOG(LogTemp, Warning, TEXT("Interaction Enabled: Actor after begin: %d"), ActorsOverlapped.Num());
 	UE_LOG(LogTemp, Warning, TEXT("================================"));
 
@@ -102,8 +100,6 @@ void UCACInteraction::Enable()
 void UCACInteraction::Disable()
 {
 	if (ActorsOverlapped.Num() > 0) return;
-
-	if (!bEnabled) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Interaction Disabled: Actor after disable: %d"), ActorsOverlapped.Num());
 	UE_LOG(LogTemp, Warning, TEXT("================================"));
@@ -176,12 +172,10 @@ void UCACInteraction::UpdateActorsOverlapped(AActor* actorOverlapped, bool bAdd)
 	if (bAdd)
 	{
 		ActorsOverlapped.Add(actorOverlapped);
-		Enable();
 	}
 	else
 	{
 		ActorsOverlapped.Remove(actorOverlapped);
-		Disable();
 	}
 }
 
