@@ -33,20 +33,26 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 
 void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
 {
-	auto widgetClass = ActorToHold->GetPosterDisplayWidget();
-	if (ensure(widgetClass))
+	if (!ensure(ScrollBaseWidgetClass)) return;
+	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111"));
+
+	auto widgetToDisplay = ActorToHold->GetPosterDisplayWidget();
+	if (ensure(widgetToDisplay))
 	{
 		if (ScrollBaseWidget)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.1, remove %s from parent"), *GetNameSafe(ScrollBaseWidget));
 			ScrollBaseWidget->RemoveFromParent();
+			ScrollBaseWidget = nullptr;
 		}
 
+		UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.2"));
 		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
-		//ScrollBaseWidget->Init(widgetClass);
+		ScrollBaseWidget->Init(widgetToDisplay);
 
 		ServerHold(ActorToHold->GetClass());
 	}
-	else UE_LOG(LogTemp, Warning, TEXT("no widgetclass in StartCarry()"));
+	else UE_LOG(LogTemp, Warning, TEXT("no widget to display in StartCarry()"));
 }
 
 void UCACCarry::StartDrop()
@@ -102,25 +108,35 @@ AActor* UCACCarry::GetCarriedActor() const
 
 void UCACCarry::OnRep_ActorInHand()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 	if (Owner && Owner->IsLocallyControlled())
 	{
 		if (ActorInHand)
 		{
-			if(ScrollBaseWidget)
+			if (ScrollBaseWidget)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333.1 Add to Viewport"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 				ScrollBaseWidget->AddToViewport();
+			}
 		}
 		else
 		{
 			if (ScrollBaseWidget)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333.1 Remove from Parent"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 				ScrollBaseWidget->RemoveFromParent();
+			}
 		}
 	}
 }
 
 void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> ActorToHold)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Carry: 2222"));
 	if (Owner && ActorToHold)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Carry: 2222.1"));
+
 		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
 		ActorInHand->Init(false, Owner, true);
 		ActorInHand->FinishSpawning(Owner->GetActorTransform());

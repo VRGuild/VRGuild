@@ -6,7 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Components/ScrollBox.h"
 
-bool UCWScrollBase::Init(TSubclassOf<UUserWidget> widgetToDisplay)
+bool UCWScrollBase::Init(UUserWidget* widgetToDisplay)
 {
 	if (widgetToDisplay)
 	{
@@ -30,11 +30,16 @@ void UCWScrollBase::NativeConstruct()
 
 	if (WidgetToDisplay)
 	{
-		if (auto Widget = CreateWidget(GetOwningPlayer(), WidgetToDisplay))
+		if (ensure(WidgetToDisplay))
 		{
-			ScrollBox->AddChild(Widget);
-			ScrollBox->SetConsumeMouseWheel(EConsumeMouseWheel::Never);
+			if (!WidgetToDisplay->IsInViewport())
+			{
+				WidgetToDisplay->AddToViewport();
+			}
+			ScrollBox->AddChild(WidgetToDisplay);
 		}
+
+		ScrollBox->SetConsumeMouseWheel(EConsumeMouseWheel::Never);
 	}
 	EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetOwningPlayer()->GetLocalPlayer());
 	if (EnhancedInputSubsystem)
