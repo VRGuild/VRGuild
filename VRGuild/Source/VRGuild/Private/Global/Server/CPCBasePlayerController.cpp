@@ -86,11 +86,11 @@ void ACPCBasePlayerController::Tick(float DeltaTime)
 				}
 				else
 				{
-					if (PlayerState)
+					/*if (PlayerState)
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
 					}	
-					else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));
+					else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));*/
 				}
 			}
 		}
