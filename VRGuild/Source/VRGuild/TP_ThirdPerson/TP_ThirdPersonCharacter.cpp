@@ -143,6 +143,8 @@ void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATP_ThirdPersonCharacter::Look);
+
+		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ATP_ThirdPersonCharacter::Interact);
 	}
 	else
 	{
@@ -183,5 +185,15 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ATP_ThirdPersonCharacter::Interact(const FInputActionValue& Value)
+{
+	bool value = Value.Get<bool>();
+
+	if (InteractionComponent)
+	{
+		InteractionComponent->Interact();
 	}
 }
