@@ -27,7 +27,9 @@ protected:
 	virtual void InitializeComponent() override;
 
 public:	
+	UFUNCTION(BlueprintCallable)
 	void StartCarry(ACACarryInteractable* ActorToHold);
+	UFUNCTION(BlueprintCallable)
 	void StartDrop();
 
 	FGameplayTagContainer GetGameplayTagContainer() const;

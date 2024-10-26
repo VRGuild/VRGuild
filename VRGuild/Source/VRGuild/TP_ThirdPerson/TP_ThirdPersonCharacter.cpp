@@ -208,5 +208,8 @@ void ATP_ThirdPersonCharacter::ESCPressed(const FInputActionValue& Value)
 
 void ATP_ThirdPersonCharacter::Discard(const FInputActionValue& Value)
 {
-	DiscardCarryObject();
+	if (CarryComponent && CarryComponent->GetCarriedActor())
+	{
+		DiscardCarryObject();
+	}	
 }

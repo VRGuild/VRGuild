@@ -28,19 +28,12 @@ void UCWScrollBase::NativeConstruct()
 
 	ChangeInputModeToUI(bUIMode);
 
-	if (WidgetToDisplay)
+	if (ensure(WidgetToDisplay))
 	{
-		if (ensure(WidgetToDisplay))
-		{
-			if (!WidgetToDisplay->IsInViewport())
-			{
-				WidgetToDisplay->AddToViewport();
-			}
-			ScrollBox->AddChild(WidgetToDisplay);
-		}
-
-		ScrollBox->SetConsumeMouseWheel(EConsumeMouseWheel::Never);
+		ScrollBox->AddChild(WidgetToDisplay);
 	}
+	ScrollBox->SetConsumeMouseWheel(EConsumeMouseWheel::Never);
+	
 	EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetOwningPlayer()->GetLocalPlayer());
 	if (EnhancedInputSubsystem)
 	{
