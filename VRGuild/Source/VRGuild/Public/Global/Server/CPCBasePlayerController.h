@@ -111,4 +111,6 @@ private:
 	IVoiceChatUser* VoiceChatUser;
 	float TotalTime = 0.f;
 	float MaxTime = 2.f;
+	UPROPERTY(EditDefaultsOnly, Category=Settings, meta=(AllowPrivateAccess))
+	bool bEnableVoiceChatEcho;
 };
