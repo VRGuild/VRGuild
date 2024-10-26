@@ -19,7 +19,7 @@
 
 ACPCBasePlayerController::ACPCBasePlayerController()
 {
-
+	bEnableVoiceChatEcho = false;
 }
 
 void ACPCBasePlayerController::BeginPlay()
@@ -86,11 +86,11 @@ void ACPCBasePlayerController::Tick(float DeltaTime)
 				}
 				else
 				{
-					if (PlayerState)
+					/*if (PlayerState)
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
 					}	
-					else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));
+					else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));*/
 				}
 			}
 		}
@@ -204,7 +204,7 @@ void ACPCBasePlayerController::OnRep_PlayerState()
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) != TEXT("L_CustomMap"))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Not L_CustomMap"));
-		//StartVoiceChat();
+		StartVoiceChat();
 		if (auto GI = GetWorld()->GetGameInstance<UCGIGameInstance>())
 		{
 			ServerStartCustomCharacter(GI->CustomData);
@@ -397,7 +397,7 @@ void ACPCBasePlayerController::GetEOSRoomToken(FString playerName)
 					ChannelCredentials.ParticipantToken = TokenString;
 					UE_LOG(LogTemp, Warning, TEXT("Voice chat login successful %s"), *ChannelCredentials.ToJson());
 
-					JoinChannel(VoiceRoomName, true, ChannelCredentials.ToJson(false));
+					JoinChannel(VoiceRoomName, bEnableVoiceChatEcho, ChannelCredentials.ToJson(false));
 				});
 
 			RoomTokenRequest->ProcessRequest();
@@ -516,6 +516,7 @@ void ACPCBasePlayerController::ServerGetPort_Implementation()
 	auto GM = GetWorld()->GetAuthGameMode<ACGMBaseServer>();
 	if (GM)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ServerGetPort_Implementation"));
 		ClientGetPort(GM->GetNextPort());
 	}
 }
@@ -523,6 +524,7 @@ void ACPCBasePlayerController::ServerGetPort_Implementation()
 void ACPCBasePlayerController::ClientGetPort_Implementation(int64 nextPort)
 {
 	NextPort = nextPort;
+	UE_LOG(LogTemp, Warning, TEXT("ClientGetPort_Implementation"));
 	FindSessions();
 }
 
@@ -680,7 +682,7 @@ void ACPCBasePlayerController::HandleJoinSessionCompleted(FName sessionName, EOn
 			auto DedicatedServerJoinStatus =
 
 				GEngine->OnTravelFailure().AddUObject(this, &ThisClass::OnTravelError);
-			ClientTravel(ConnectString, ETravelType::TRAVEL_Partial);
+			ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
 
 			//FURL DedicatedServerURL(nullptr, *ConnectString, TRAVEL_Absolute);
 			//GEngine->Browse(GEngine->GetWorldContextFromWorldChecked(GetWorld()), DedicatedServerURL, DedicatedServerJoinError);	

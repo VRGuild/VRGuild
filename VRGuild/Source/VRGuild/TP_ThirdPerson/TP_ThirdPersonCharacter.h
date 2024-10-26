@@ -31,7 +31,7 @@ class ATP_ThirdPersonCharacter : public ACharacter
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FollowCamera;
+	UCameraComponent* FollowCamera;	
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -52,6 +52,12 @@ class ATP_ThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> IA_Interact;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> IA_ESC;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> IA_Discard;
+
 public:
 	ATP_ThirdPersonCharacter();
 
@@ -66,6 +72,13 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Interact(const FInputActionValue& Value);
+	void ESCPressed(const FInputActionValue& Value);
+	void Discard(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DisplayESCMenu();	
+	UFUNCTION(BlueprintImplementableEvent)
+	void DiscardCarryObject();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Settings)
 	TObjectPtr<UCACInteraction> InteractionComponent;

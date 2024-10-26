@@ -5,6 +5,7 @@
 #include "Character/Customize/CWCharacterCustom.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Global/CGIGameInstance.h"
+#include "Global/Server/CPCBasePlayerController.h"
 
 // Sets default values for this component's properties
 UCACCustomInteraction::UCACCustomInteraction()
@@ -72,9 +73,10 @@ void UCACCustomInteraction::SaveCustomData(FCharacterCustomData data)
 		{
 			if (auto characterOwner = Cast<ACharacter>(Owner))
 			{
-				if(auto playerController = characterOwner->GetController<APlayerController>())
+				if(auto playerController = characterOwner->GetController<ACPCBasePlayerController>())
 				{
-					playerController->ClientTravel(TEXT("127.0.0.1:7777"), ETravelType::TRAVEL_Absolute);
+					//playerController->ClientTravel(TEXT("127.0.0.1:7777"), ETravelType::TRAVEL_Absolute);
+					playerController->ConnectToServer();
 				}
 			}
 		}

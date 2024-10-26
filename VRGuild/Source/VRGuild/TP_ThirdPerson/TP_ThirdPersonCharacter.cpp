@@ -145,6 +145,8 @@ void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATP_ThirdPersonCharacter::Look);
 
 		EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Started, this, &ATP_ThirdPersonCharacter::Interact);
+		EnhancedInputComponent->BindAction(IA_ESC, ETriggerEvent::Started, this, &ATP_ThirdPersonCharacter::ESCPressed);
+		EnhancedInputComponent->BindAction(IA_Discard, ETriggerEvent::Started, this, &ATP_ThirdPersonCharacter::Discard);
 	}
 	else
 	{
@@ -196,4 +198,15 @@ void ATP_ThirdPersonCharacter::Interact(const FInputActionValue& Value)
 	{
 		InteractionComponent->Interact();
 	}
+}
+
+void ATP_ThirdPersonCharacter::ESCPressed(const FInputActionValue& Value)
+{
+
+	DisplayESCMenu();
+}
+
+void ATP_ThirdPersonCharacter::Discard(const FInputActionValue& Value)
+{
+	DiscardCarryObject();
 }
