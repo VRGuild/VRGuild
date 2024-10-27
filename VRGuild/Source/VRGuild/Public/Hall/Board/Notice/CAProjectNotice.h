@@ -18,9 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	ACAProjectNotice();
 
-	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner) override;
+	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
 
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
+
+	virtual bool CanTrace(ACharacter* player) const override; 
 
 protected:
 	// Called when the game starts or when spawned

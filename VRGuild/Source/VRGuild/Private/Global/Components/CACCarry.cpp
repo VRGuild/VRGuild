@@ -33,20 +33,19 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 
 void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
 {
-	auto widgetClass = ActorToHold->GetPosterDisplayWidget();
-	if (ensure(widgetClass))
+	if (!ensure(ScrollBaseWidgetClass)) return;
+	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111"));
+
+	if (ScrollBaseWidget)
 	{
-		if (ScrollBaseWidget)
-		{
-			ScrollBaseWidget->RemoveFromParent();
-		}
-
-		ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
-		//ScrollBaseWidget->Init(widgetClass);
-
-		ServerHold(ActorToHold->GetClass());
+		UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.1, remove %s from parent"), *GetNameSafe(ScrollBaseWidget));
+		ScrollBaseWidget->RemoveFromParent();
+		ScrollBaseWidget = nullptr;
 	}
-	else UE_LOG(LogTemp, Warning, TEXT("no widgetclass in StartCarry()"));
+
+	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.2"));
+
+	ServerHold(ActorToHold);
 }
 
 void UCACCarry::StartDrop()
@@ -90,8 +89,10 @@ FString UCACCarry::GetMessageForNPC()
 
 ECarriedType UCACCarry::GetCarryType() const
 {
-	if (ActorInHand) return ActorInHand->GetCarriedType();
-	
+	if (ActorInHand)
+	{
+		return ActorInHand->GetCarriedType();
+	}
 	return ECarriedType::NONE;
 }
 
@@ -102,27 +103,40 @@ AActor* UCACCarry::GetCarriedActor() const
 
 void UCACCarry::OnRep_ActorInHand()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 	if (Owner && Owner->IsLocallyControlled())
 	{
 		if (ActorInHand)
 		{
-			if(ScrollBaseWidget)
+			auto widgetToDisplay = ActorInHand->GetPosterDisplayWidget();
+			if (ensure(widgetToDisplay))
+			{
+				ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
+				ScrollBaseWidget->Init(widgetToDisplay);
 				ScrollBaseWidget->AddToViewport();
+			}
+			else UE_LOG(LogTemp, Warning, TEXT("no widget to display in StartCarry()"));
 		}
 		else
 		{
 			if (ScrollBaseWidget)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333.1 Remove from Parent"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 				ScrollBaseWidget->RemoveFromParent();
+			}
 		}
 	}
 }
 
-void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> ActorToHold)
+void UCACCarry::ServerHold_Implementation(ACACarryInteractable* actorToHold)
 {
-	if (Owner && ActorToHold)
+	UE_LOG(LogTemp, Warning, TEXT("Carry: 2222"));
+	if (Owner && actorToHold)
 	{
-		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(ActorToHold, Owner->GetActorTransform());
-		ActorInHand->Init(false, Owner, true);
+		UE_LOG(LogTemp, Warning, TEXT("Carry: 2222.1"));
+
+		ActorInHand = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(actorToHold->GetClass(), Owner->GetActorTransform());
+		ActorInHand->Init(false, Owner, true, actorToHold);
 		ActorInHand->FinishSpawning(Owner->GetActorTransform());
 
 		if (ActorInHand)
@@ -130,7 +144,7 @@ void UCACCarry::ServerHold_Implementation(TSubclassOf<ACACarryInteractable> Acto
 			UE_LOG(LogTemp, Warning, TEXT("%s Success %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"), *GetNameSafe(ActorInHand));
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("%s Failed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
-		
+
 		OnRep_ActorInHand();
 	}
 }
@@ -142,7 +156,7 @@ void UCACCarry::ServerDrop_Implementation()
 		ActorInHand->Destroy();
 		ActorInHand = nullptr;
 		UE_LOG(LogTemp, Warning, TEXT("%s ActorInHand destroyed "), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
-		
+
 		OnRep_ActorInHand();
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("%s Missing ActorInHand"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));

@@ -7,17 +7,17 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
 #include "Hall/Board/Notice/UI/CWGProjectNoticeFull.h"
-
+#include "Global/Components/CACCarry.h"
 
 // Sets default values
 ACAProjectNotice::ACAProjectNotice()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	/*this->RootSceneComp = CreateDefaultSubobject<USceneComponent>(FName("RootSceneComp"));
 	this->SetRootComponent(this->RootSceneComp);*/
 
-	SetReplicates(true);
+	bReplicates = true;
 
 	this->FrontSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("FrontSide"));
 	this->FrontSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -34,8 +34,8 @@ ACAProjectNotice::ACAProjectNotice()
 
 	this->BackSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("BackSide"));
 	this->BackSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	this->BackSideComp->SetRelativeLocation(FVector(-0.1,0,0));
-	this->BackSideComp->SetRelativeRotation(FRotator(0, 180,0));
+	this->BackSideComp->SetRelativeLocation(FVector(-0.1, 0, 0));
+	this->BackSideComp->SetRelativeRotation(FRotator(0, 180, 0));
 	this->BackSideComp->SetDrawSize(this->WidgetDrawSize);
 	this->BackSideComp->SetTwoSided(true);
 	this->BackSideComp->SetRelativeScale3D(FVector(0.2));
@@ -50,9 +50,14 @@ ACAProjectNotice::ACAProjectNotice()
 	SetHideMesh(true);
 }
 
-void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
+void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
 {
-	Super::Init(bIsEnabled, owner, bAttachToOwner);
+	Super::Init(bIsEnabled, owner, bAttachToOwner, actorInteracted);
+
+	if (auto notice = Cast<ACAProjectNotice>(actorInteracted))
+	{
+		NoticeData = notice->NoticeData;
+	}
 }
 
 UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
@@ -61,23 +66,37 @@ UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
 	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(Widget);
 	if (ensure(ProjectAPIWidget))
 	{
-		ProjectAPIWidget->OnSetDetailInfo (this->NoticeData);
+		ProjectAPIWidget->OnSetDetailInfo(this->NoticeData);
 		return ProjectAPIWidget;
 	}
 	return nullptr;
+}
+
+bool ACAProjectNotice::CanTrace(ACharacter* player) const
+{
+	bool bCanTrace = Super::CanTrace(player);
+
+	if (auto carryComp = player->GetComponentByClass<UCACCarry>())
+	{
+		if (auto carriedNotice = Cast<ACAProjectNotice>(carryComp->GetCarriedActor()))
+		{
+			return bCanTrace && NoticeData.ProjectTitle != carriedNotice->NoticeData.ProjectTitle;
+		}
+	}
+
+	return bCanTrace;
 }
 
 // Called when the game starts or when spawned
 void ACAProjectNotice::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (this->WidgetFrontSide)
 	{
-		this->FrontSideComp->SetWidgetClass(this->WidgetFrontSide);
-		UCWGProjectNotice* tempFrontSideComp = Cast<UCWGProjectNotice>(FrontSideComp->GetWidget());
-		if (tempFrontSideComp)
-			tempFrontSideComp->SetProjectInfo(this->NoticeData);
+		auto widget = CreateWidget<UCWGProjectNotice>(GetWorld(), this->WidgetFrontSide);
+		if (widget) widget->SetProjectInfo(this->NoticeData);
+		this->FrontSideComp->SetWidget(widget);
 	}
 	if (this->WidgetBackSide)
 	{
@@ -106,6 +125,6 @@ void ACAProjectNotice::OnRep_bEnabled()
 
 	if (owner && owner->IsLocallyControlled())
 	{
-		
+
 	}
 }

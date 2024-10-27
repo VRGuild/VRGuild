@@ -76,6 +76,50 @@ void ATP_ThirdPersonCharacter::SetOwnerFor(AActor* target, ACharacter* newOwner)
 	}
 }
 
+void ATP_ThirdPersonCharacter::SetInteracting(APawn* player, bool bInteracting)
+{
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(player))
+	{
+		if (character)
+		{
+			character->bIsInteracting = bInteracting;
+
+			if (bInteracting)
+			{
+				character->InteractionComponent->Disable();
+				if (auto playerController = character->GetController<APlayerController>())
+				{
+					playerController->SetInputMode(FInputModeUIOnly());
+					playerController->SetShowMouseCursor(true);
+				}
+			}
+			else
+			{
+				character->InteractionComponent->Enable();
+				if (auto playerController = character->GetController<APlayerController>())
+				{
+					playerController->SetInputMode(FInputModeGameOnly());
+					playerController->SetShowMouseCursor(false);
+				}
+			}
+		}
+	}
+}
+
+bool ATP_ThirdPersonCharacter::IsInteracting(APawn* player)
+{
+	if (auto character = Cast<ATP_ThirdPersonCharacter>(player))
+	{
+		if (character)
+		{
+			return character->bIsInteracting;
+		}
+	}
+
+	return false;
+}
+
+
 void ATP_ThirdPersonCharacter::ServerSetOwnerFor_Implementation(AActor* target)
 {
 	target->SetOwner(this);
@@ -208,5 +252,8 @@ void ATP_ThirdPersonCharacter::ESCPressed(const FInputActionValue& Value)
 
 void ATP_ThirdPersonCharacter::Discard(const FInputActionValue& Value)
 {
-	DiscardCarryObject();
+	if (CarryComponent && CarryComponent->GetCarriedActor())
+	{
+		DiscardCarryObject();
+	}	
 }

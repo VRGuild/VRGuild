@@ -16,11 +16,15 @@ UCACInteraction::UCACInteraction()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	PrimaryComponentTick.bStartWithTickEnabled = false;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 	SetIsReplicatedByDefault(false);
+
+	bEnabled = false;
 
 	InteractDistance = 600.f;
 	InteractRadius = 60.f;
+
+	bFullEnable = true;
 }
 
 
@@ -31,7 +35,9 @@ void UCACInteraction::BeginPlay()
 	
 	Owner = GetOwner<ACharacter>();
 	if (Owner && !Owner->IsLocallyControlled())
+	{
 		Owner = nullptr;
+	}		
 }
 
 // Called every frame
@@ -40,40 +46,42 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
-
 	AActor* actorTraced = nullptr;
 
-	if (Owner && Owner->IsLocallyControlled())
+	if (IsEnabled() && CanTrace())
 	{
-		UpdateTrace(actorTraced);
-		
-		if (actorTraced)
+		if (Owner && Owner->IsLocallyControlled())
 		{
-			if (actorTraced->Implements<UCIInteractionInterface>())
-			{
-				if (!ActorOnFocus)
-				{
-					ActorOnFocus = actorTraced;
-					BeginTrace();
-				}
-				else if (ActorOnFocus != actorTraced)
-				{
-					EndTrace();
+			UpdateTrace(actorTraced);
 
-					ActorOnFocus = actorTraced;
-					BeginTrace();
-				}
-				else
+			if (actorTraced)
+			{
+				if (actorTraced->Implements<UCIInteractionInterface>())
 				{
-					BeginTrace();
+					if (!ActorOnFocus)
+					{
+						ActorOnFocus = actorTraced;
+						BeginTrace();
+					}
+					else if (ActorOnFocus != actorTraced)
+					{
+						EndTrace();
+
+						ActorOnFocus = actorTraced;
+						BeginTrace();
+					}
+					else
+					{
+						BeginTrace();
+					}
 				}
 			}
+			else if (ActorOnFocus) {
+				EndTrace();
+				ActorOnFocus = nullptr;
+			}
 		}
-		else if (ActorOnFocus) {
-			EndTrace();
-			ActorOnFocus = nullptr;
-		}
-	}
+	}	
 
 	if (bDebugDraw)
 	{
@@ -81,11 +89,23 @@ void UCACInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	}
 }
 
-void UCACInteraction::Enable(AActor* actorOverlapped)
+void UCACInteraction::UpdateActorsOverlapped(AActor* actorOverlapped, bool bAdd)
 {
-	ActorsOverlapped.Add(actorOverlapped);
-	
-	if (ActorsOverlapped.Num() > 1) return;
+	if (bAdd)
+	{
+		ActorsOverlapped.Add(actorOverlapped);
+	}
+	else
+	{
+		ActorsOverlapped.Remove(actorOverlapped);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("ActorsOverlapped: %d"), ActorsOverlapped.Num());
+
+}
+
+void UCACInteraction::Enable()
+{	
+	if (bEnabled) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Interaction Enabled: Actor after begin: %d"), ActorsOverlapped.Num());
 	UE_LOG(LogTemp, Warning, TEXT("================================"));
@@ -93,15 +113,12 @@ void UCACInteraction::Enable(AActor* actorOverlapped)
 	if (Owner && Owner->IsLocallyControlled())
 	{
 		bEnabled = true;
-		SetComponentTickEnabled(true);
 	}
 }
 
-void UCACInteraction::Disable(AActor* actorOverlapped)
+void UCACInteraction::Disable()
 {
-	ActorsOverlapped.Remove(actorOverlapped);
-
-	if (ActorsOverlapped.Num() > 0) return;
+	if (!bEnabled) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Interaction Disabled: Actor after disable: %d"), ActorsOverlapped.Num());
 	UE_LOG(LogTemp, Warning, TEXT("================================"));
@@ -109,20 +126,18 @@ void UCACInteraction::Disable(AActor* actorOverlapped)
 	if (Owner && Owner->IsLocallyControlled())
 	{
 		bEnabled = false;
-		SetComponentTickEnabled(false);
 		EndTrace();
 		ActorOnFocus = nullptr;
 	}
 }
 
-bool UCACInteraction::IsEnabled()
-{
-	return ActorsOverlapped.Num() > 0;
-}
-
 void UCACInteraction::Interact()
 {
 	if (!ActorOnFocus) return;
+
+	if (!bEnabled) return;
+
+	if (ActorsOverlapped.Num() == 0) return;
 
 	if (auto inter = GetInterface(ActorOnFocus))
 	{
@@ -130,36 +145,31 @@ void UCACInteraction::Interact()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Cant Interact"));
 			return;
-		}
-
-		if (inter->IsInteracting(Owner))
-		{
-			EndInteract();
-		}
-		else BeginInteract();
+		}	
+		
+		BeginInteract();
 	}
 }
 
 void UCACInteraction::BeginInteract()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ActorOnFocus %s"),
-		*GetNameSafe(ActorOnFocus)
-		);
 	if (ActorOnFocus /*&& !InteractingActor && CanInteract(ActorOnFocus)*/)
 	{
-		//if(!GetInterface(ActorOnFocus)->CanInteract(Owner)) return;
+		if(!GetInterface(ActorOnFocus)->CanInteract(Owner)) return;
 
 		GetInterface(ActorOnFocus)->BeginInteract(Owner);
 
 		EndTrace();
 	}
-	else UE_LOG(LogTemp, Warning, TEXT("No begininteract"));
+	else UE_LOG(LogTemp, Warning, TEXT("No Begininteract"));
 }
 
 void UCACInteraction::EndInteract()
 {
-	if (ActorOnFocus)
+	if (ActorOnFocus /*&& !InteractingActor && CanInteract(ActorOnFocus)*/)
 	{
+		if (GetInterface(ActorOnFocus)->CanInteract(Owner)) return;
+
 		GetInterface(ActorOnFocus)->EndInteract(Owner);
 
 		EndTrace();
@@ -258,6 +268,16 @@ void UCACInteraction::UpdateTrace(AActor*& actorTraced)
 			}
 		}
 	}
+}
+
+bool UCACInteraction::IsEnabled() const
+{
+	return bEnabled;
+}
+
+bool UCACInteraction::CanTrace() const
+{
+	return ActorsOverlapped.Num() >= 1;
 }
 
 ICIInteractionInterface* UCACInteraction::GetInterface(AActor* actor) const

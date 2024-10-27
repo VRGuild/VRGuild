@@ -15,7 +15,6 @@ ACAInteractable::ACAInteractable()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	TraceMessage = TEXT("Default Msg");
-	bIsInteracting = false;
 	
 	RootComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
 	RootComponent = RootComp;
@@ -79,11 +78,6 @@ bool ACAInteractable::CanInteract(ACharacter* Initiator) const
 	return true;
 }
 
-bool ACAInteractable::IsInteracting(ACharacter* Initiator) const
-{
-	return bIsInteracting;
-}
-
 void ACAInteractable::BeginTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
@@ -102,12 +96,10 @@ void ACAInteractable::EndTrace(ACharacter* Initiator)
 
 void ACAInteractable::BeginInteract(ACharacter* Initiator)
 {
-	bIsInteracting = true;
 }
 
 void ACAInteractable::EndInteract(ACharacter* Initiator)
 {
-	bIsInteracting = false;
 }
 
 void ACAInteractable::OnRep_Owner()
@@ -128,7 +120,7 @@ void ACAInteractable::OnPlayerOverlapBegin(UPrimitiveComponent* OverlappedCompon
 				
 			}	
 			//UE_LOG(LogTemp, Warning, TEXT("Overlap begin with %s"), *GetNameSafe(OtherActor));
-			interactionComp->Enable(this);
+			interactionComp->UpdateActorsOverlapped(this, true);
 		}
 	}
 
@@ -147,7 +139,7 @@ void ACAInteractable::OnPlayerOverlapEnd(UPrimitiveComponent* OverlappedComponen
 				
 			}
 			//UE_LOG(LogTemp, Warning, TEXT("Overlap end with %s"), *GetNameSafe(OtherActor));
-			interactionComp->Disable(this);
+			interactionComp->UpdateActorsOverlapped(this, false);
 		}
 	}
 }

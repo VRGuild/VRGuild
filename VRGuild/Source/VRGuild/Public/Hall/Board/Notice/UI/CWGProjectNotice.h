@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Global/Project/CBPLProject.h"
 #include "CWGProjectNotice.generated.h"
 
 struct FProjectNotice;
@@ -19,4 +20,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetProjectInfo(FProjectNotice projectNotice);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FProjectNotice ProjectNotice;
 };

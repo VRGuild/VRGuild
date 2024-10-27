@@ -43,7 +43,7 @@ void ACACarryInteractable::OnRep_bEnabled()
 	//
 }
 
-void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner)
+void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
 {
 	bEnabled = bIsEnabled;
 	OnRep_bEnabled();

@@ -27,7 +27,9 @@ protected:
 	virtual void InitializeComponent() override;
 
 public:	
+	UFUNCTION(BlueprintCallable)
 	void StartCarry(ACACarryInteractable* ActorToHold);
+	UFUNCTION(BlueprintCallable)
 	void StartDrop();
 
 	FGameplayTagContainer GetGameplayTagContainer() const;
@@ -51,7 +53,7 @@ private:
 	void OnRep_ActorInHand();
 	
 	UFUNCTION(Server, Reliable)
-	void ServerHold(TSubclassOf<ACACarryInteractable> ActorToHold);
+	void ServerHold(ACACarryInteractable* actorToHold);
 	UFUNCTION(Server, Reliable)
 	void ServerDrop();
 };

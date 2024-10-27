@@ -17,6 +17,8 @@ class VRGUILD_API UCACInteraction : public UActorComponent
 {
 	GENERATED_BODY()
 
+	friend class ACAInteractable;
+
 public:	
 	// Sets default values for this component's properties
 	UCACInteraction();
@@ -30,12 +32,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void Enable(AActor* actorOverlapped);
+	void Enable();
 	UFUNCTION(BlueprintCallable)
-	void Disable(AActor* actorOverlapped);
+	void Disable();
 
 	UFUNCTION(BlueprintCallable)
-	bool IsEnabled();
+	bool IsEnabled() const;
 
 	UFUNCTION(BlueprintCallable)
 	void Interact();
@@ -45,17 +47,18 @@ protected:
 	float InteractDistance;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	float InteractRadius;
-	
-	UFUNCTION(BlueprintCallable)
-	void BeginInteract();
-	UFUNCTION(BlueprintCallable)
-	void EndInteract();
 
 private:
+	void UpdateActorsOverlapped(AActor* actoroverlapped, bool bAdd);
+
 	void BeginTrace();
 	void EndTrace();
 
+	void BeginInteract();
+	void EndInteract();
 	void UpdateTrace(AActor*& actorTraced);
+
+	bool CanTrace() const;
 
 	ICIInteractionInterface* GetInterface(AActor* actor) const;
 	TObjectPtr<ACharacter> Owner;
@@ -64,6 +67,7 @@ private:
 
 	bool bIsTracing;
 	bool bEnabled;
+	bool bFullEnable;
 	UPROPERTY()
 	TSet<AActor*> ActorsOverlapped;
 };

@@ -21,7 +21,7 @@ class VRGUILD_API UCWScrollBase : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	bool Init(TSubclassOf<UUserWidget> widgetToDisplay);
+	bool Init(UUserWidget* widgetToDisplay);
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
@@ -30,7 +30,7 @@ protected:
 	TObjectPtr<UScrollBox> ScrollBox;
 
 	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn))
-	TSubclassOf<UUserWidget> WidgetToDisplay;
+	TObjectPtr<UUserWidget> WidgetToDisplay;
 	
 	float Offset;
 	UPROPERTY(EditDefaultsOnly, Category = Settings)

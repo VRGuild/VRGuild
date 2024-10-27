@@ -26,7 +26,6 @@ class VRGUILD_API ICIInteractionInterface
 public:
 	virtual bool CanTrace(ACharacter* Initiator) const = 0;
 	virtual bool CanInteract(ACharacter* Initiator) const = 0;
-	virtual bool IsInteracting(ACharacter* Initiator) const = 0;
 
 	virtual void BeginTrace(ACharacter* Initiator) = 0;
 	virtual void EndTrace(ACharacter* Initiator) = 0;

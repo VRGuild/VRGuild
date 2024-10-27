@@ -28,7 +28,7 @@ class VRGUILD_API ACACarryInteractable : public ACAInteractable
 public:
 	ACACarryInteractable();
 
-	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner);
+	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted);
 
 	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual void BeginTrace(ACharacter* Initiator) override;
