@@ -95,6 +95,7 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 		}
 		case ECarriedType::NONE:
 		{
+			ServerPickupCommission(Initiator);
 			break;
 		}
 		}

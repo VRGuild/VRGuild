@@ -80,7 +80,6 @@ bool ACAProjectNotice::CanTrace(ACharacter* player) const
 	{
 		if (auto carriedNotice = Cast<ACAProjectNotice>(carryComp->GetCarriedActor()))
 		{
-			UE_LOG(LogTemp,Warning,TEXT("First: %s, Second: %s"), *NoticeData.ProjectTitle, *carriedNotice->NoticeData.ProjectTitle)
 			return bCanTrace && NoticeData.ProjectTitle != carriedNotice->NoticeData.ProjectTitle;
 		}
 	}

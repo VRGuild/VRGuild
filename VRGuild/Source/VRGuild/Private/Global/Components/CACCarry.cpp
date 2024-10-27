@@ -89,8 +89,10 @@ FString UCACCarry::GetMessageForNPC()
 
 ECarriedType UCACCarry::GetCarryType() const
 {
-	if (ActorInHand) return ActorInHand->GetCarriedType();
-
+	if (ActorInHand)
+	{
+		return ActorInHand->GetCarriedType();
+	}
 	return ECarriedType::NONE;
 }
 
