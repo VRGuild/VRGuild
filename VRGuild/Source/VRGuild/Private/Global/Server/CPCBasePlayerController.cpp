@@ -89,7 +89,7 @@ void ACPCBasePlayerController::Tick(float DeltaTime)
 					/*if (PlayerState)
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
-					}	
+					}
 					else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));*/
 				}
 			}
@@ -200,40 +200,48 @@ void ACPCBasePlayerController::TravelToNextServer()
 void ACPCBasePlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	
+	UE_LOG(LogTemp, Warning, TEXT("[%s] OnRep_PlayerState"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
+
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) != TEXT("L_CustomMap"))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Not L_CustomMap"));
 		StartVoiceChat();
 		if (auto GI = GetWorld()->GetGameInstance<UCGIGameInstance>())
 		{
-			ServerStartCustomCharacter(GI->CustomData);
+			if (auto character = Cast<ATP_ThirdPersonCharacter>(GetCharacter()))
+			{
+				character->SetCustomValue(GI->CustomData);
+				ServerStartCustomCharacter(GI->CustomData);
+			}
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("No GameInstance"));
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("At L_CustomMap"));
 }
 
-void ACPCBasePlayerController::OnPossess(APawn* aPawn)
-{
-	Super::OnPossess(aPawn);
-	if (IsLocalPlayerController())
-	{
-		if (auto character = Cast<ATP_ThirdPersonCharacter>(GetCharacter()))
-		{
-			if (auto GI = GetWorld()->GetGameInstance<UCGIGameInstance>())
-			{
-				character->SetCustomValue(GI->CustomData);
-			}
-		}
-	}	
-}
+//void ACPCBasePlayerController::OnPossess(APawn* aPawn)
+//{
+//	Super::OnPossess(aPawn);
+//	if (aPawn->IsLocallyControlled())
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("[%s] OnPossess"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
+//		if (auto character = Cast<ATP_ThirdPersonCharacter>(aPawn))
+//		{
+//			if (auto GI = GetWorld()->GetGameInstance<UCGIGameInstance>())
+//			{
+//				character->SetCustomValue(GI->CustomData);
+//				ServerStartCustomCharacter(GI->CustomData);
+//			}
+//		}
+//	}	
+//}
 
 void ACPCBasePlayerController::ServerStartCustomCharacter_Implementation(FCharacterCustomData customData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Inside ServerStartCustomCharacter_Implementation"));
 	if (auto character = Cast<ATP_ThirdPersonCharacter>(GetCharacter()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[%s] ServerStartCustomCharacter_Implementation"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 		character->SetCustomValue(customData);
 	}
 }
@@ -496,7 +504,7 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 		//FindSessions();
 
 		//
-		
+
 		//APICall Check
 		OnLoginAPICall();
 	}
