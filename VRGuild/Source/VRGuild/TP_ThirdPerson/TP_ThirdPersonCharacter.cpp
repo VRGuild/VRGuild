@@ -26,7 +26,10 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+	
+	//Overlap with Portal
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Overlap);
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -62,7 +65,7 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	InteractionComponent = CreateDefaultSubobject<UCACInteraction>("InteractionComponent");
 	CarryComponent = CreateDefaultSubobject<UCACCarry>("CarryComponent");
 
-	SetReplicates(true);
+	bReplicates = true;
 }
 
 void ATP_ThirdPersonCharacter::SetOwnerFor(AActor* target, ACharacter* newOwner)
@@ -90,6 +93,7 @@ void ATP_ThirdPersonCharacter::SetInteracting(APawn* player, bool bInteracting)
 				if (auto playerController = character->GetController<APlayerController>())
 				{
 					playerController->SetInputMode(FInputModeUIOnly());
+					playerController->SetIgnoreMoveInput(true);
 					playerController->SetShowMouseCursor(true);
 				}
 			}
@@ -99,6 +103,8 @@ void ATP_ThirdPersonCharacter::SetInteracting(APawn* player, bool bInteracting)
 				if (auto playerController = character->GetController<APlayerController>())
 				{
 					playerController->SetInputMode(FInputModeGameOnly());
+					playerController->ResetIgnoreMoveInput();
+					playerController->SetIgnoreMoveInput(false);
 					playerController->SetShowMouseCursor(false);
 				}
 			}
