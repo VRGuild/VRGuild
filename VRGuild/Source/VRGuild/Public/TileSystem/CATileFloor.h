@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TileSystem/CATileZone.h"
+#include "TileSystem/CATileSpace.h"
 #include "CATileFloor.generated.h"
 
 enum class ESpaceType : uint8;
@@ -12,10 +12,12 @@ enum class ESpaceType : uint8;
  * 
  */
 UCLASS()
-class VRGUILD_API ACATileFloor : public ACATileZone
+class VRGUILD_API ACATileFloor : public ACATileSpace
 {
 	GENERATED_BODY()
 
+public:
+	ACATileFloor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,13 +26,16 @@ protected:
 	virtual void CreateDefualtSpace() override;
 
 public:
+	virtual void AttachSpace(FVector relativeVector, ACATileSpace* newTileSpace) override;
+
+	virtual void Delete() override;
 
 	// interaction with widget
-	virtual bool InteractionCreate(FVector position, FVector gridRelativeVector) override;
+	//virtual bool InteractionCreate(FVector position, FVector gridRelativeVector) override;
 
-	virtual void OnCreatePass(FVector position, ESpaceType spaceType) override;
+	//virtual void OnCreatePass(FVector position, ESpaceType spaceType) override;
 
-	virtual bool InteractionDelete(FVector position) override;
-	
-	virtual void OnDeletePass(FVector position) override;
+	//virtual bool InteractionDelete(FVector position) override;
+	//
+	//virtual void OnDeletePass(FVector position) override;
 };

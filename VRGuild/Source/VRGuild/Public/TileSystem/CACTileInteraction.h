@@ -8,7 +8,7 @@
 #include "CACTileInteraction.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACTileInteraction : public UActorComponent
 {
 	GENERATED_BODY()
@@ -17,6 +17,8 @@ public:
 	// Sets default values for this component's properties
 	UCACTileInteraction();
 
+private:
+	class ACATileSpace* grapTileSpace;
 
 protected:
 	// Called when the game starts
@@ -32,16 +34,17 @@ protected:
 	FHitResult HitResult;
 
 public:	
-
 	bool DebugMode = false;
 
-
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	virtual void InitializeComponent() override;
-	
-	void TileLineTrace();
+
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	//UFUNCTION(Server, Reliable,)
+	//void SRPCAddTile(FVector relativePosition, class ACATileSpace* tileSpace);
+	//void SRPCAddTile_Implementation(FVector relativePosition, class ACATileSpace* tileSpace);
+
+	AActor* TileLineTrace();
 
 	void HoverTile();
 	void AddTile();
@@ -51,9 +54,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* TileAddAction;
 
-	bool bOnClick = false;
-
-	float OnClickTime = 0;
+	bool bHold = false;
+	float currHoldTime = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	float MaxHoldTime = 1;
@@ -61,5 +63,6 @@ public:
 	void OnClicked(const FInputActionValue& Value);
 	void OnHolding(const FInputActionValue& Value);
 	void OnReleased(const FInputActionValue& Value);
+
 
 };
