@@ -14,7 +14,7 @@ UCACTileInteraction::UCACTileInteraction()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	bWantsInitializeComponent = true;
 
 	// ...
@@ -47,31 +47,6 @@ void UCACTileInteraction::BeginPlay()
 	// ...
 }
 
-
-// Called every frame
-void UCACTileInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-	
-	CurrTime += DeltaTime;
-	if (CurrTime < RerenderTime)
-		return;
-	CurrTime = 0;
-
-	// ...
-
-	if (bOnClick)
-	{
-		this->OnClickTime += RerenderTime;
-		return;
-	}
-
-	TileLineTrace();
-
-}
-
 void UCACTileInteraction::InitializeComponent()
 {
 	Super::InitializeComponent();
@@ -85,10 +60,10 @@ void UCACTileInteraction::InitializeComponent()
 	}
 }
 
-void UCACTileInteraction::TileLineTrace()
+AActor* UCACTileInteraction::TileLineTrace()
 {
 	if (!OwnerCamera)
-		return;
+		return nullptr;
 	FHitResult hitResult;
 	FVector start = this->OwnerCamera->GetComponentLocation();
 	FVector end = start  + (this->OwnerCamera->GetForwardVector() * 3000);
@@ -100,9 +75,10 @@ void UCACTileInteraction::TileLineTrace()
 	if (hit)
 	{
 		HitResult = hitResult;
-		HoverTile();
+		return HitResult.GetActor();
 	}
-	//DrawDebugLine(GetWorld(), start, end, hit ? FColor::Cyan : FColor::Red, false, 3);
+	DrawDebugLine(GetWorld(), start, end, hit ? FColor::Cyan : FColor::Red, false, 3);
+	return nullptr;
 }
 
 void UCACTileInteraction::HoverTile()
@@ -113,24 +89,26 @@ void UCACTileInteraction::HoverTile()
 
 void UCACTileInteraction::OnClicked(const FInputActionValue& Value)
 {
+	bHold = true;
 	// 누르면 발생한다
 	if (DebugMode)
 		UE_LOG(LogTemp, Display, TEXT("OnClicked"));
-	bOnClick = true;
+	TileLineTrace();
 }
 
 void UCACTileInteraction::OnHolding(const FInputActionValue& Value)
 {
 	// 누르고 있을때 발생 한다
-	if (bOnClick) {
-		if (DebugMode)
-			UE_LOG(LogTemp, Display, TEXT("OnHolding %f"), OnClickTime);
-	}
-	if (OnClickTime > MaxHoldTime)
+	if (DebugMode)
+		UE_LOG(LogTemp, Display, TEXT("OnHolding"));
+	if (!bHold)
+		return ;
+	currHoldTime += GetWorld()->DeltaTimeSeconds;
+	if (currHoldTime > MaxHoldTime)
 	{
+		bHold = false;
+		currHoldTime = 0;
 		DeleteTile();
-		bOnClick = false;
-		this->OnClickTime = 0;
 	}
 }
 
@@ -138,11 +116,11 @@ void UCACTileInteraction::OnHolding(const FInputActionValue& Value)
 void UCACTileInteraction::OnReleased(const FInputActionValue& Value)
 {
 	// 짧게 누르고 띄면 발생한다
+	currHoldTime = 0;
+	bHold = false;
 	if (DebugMode)
 		UE_LOG(LogTemp, Display, TEXT("OnReleased"));
 	AddTile();
-	bOnClick = false;
-	this->OnClickTime = 0;
 }
 
 void UCACTileInteraction::AddTile()
@@ -154,7 +132,8 @@ void UCACTileInteraction::AddTile()
 
 	ACATileSpace* target = Cast<ACATileSpace>(HitResult.GetActor());
 	
-	target->AddSpace(HitResult.Normal);
+	if (target)
+		target->AttachSpace(HitResult.Normal + target->GetPosition(), target);
 }
 
 void UCACTileInteraction::DeleteTile()
@@ -166,6 +145,6 @@ void UCACTileInteraction::DeleteTile()
 
 	ACATileSpace* target = Cast<ACATileSpace>(HitResult.GetActor());
 
-	target->DeleteSpace();
+	target->Delete();
 }
 

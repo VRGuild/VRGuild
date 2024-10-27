@@ -4,12 +4,15 @@
 #include "TileSystem/CATileSpace.h"
 #include "TileSystem/CATileZone.h"
 #include "TileSystem/FL_TileTools.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ACATileSpace::ACATileSpace()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
+	bAlwaysRelevant = true;
 
 	this->TileSpaceMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("TileSpaceMesh"));
 	SetRootComponent(TileSpaceMesh);
@@ -20,68 +23,110 @@ ACATileSpace::ACATileSpace()
 		this->TileSpaceMesh->SetStaticMesh(tempMesh.Object);
 
 	// material 가져오기
-	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempBaseColor(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/TileSystem/Matrials/Instances/M_BaseColor_Inst.M_BaseColor_Inst'"));
-	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempOpacityColor(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/TileSystem/Matrials/Instances/M_OpacityColor_Inst.M_OpacityColor_Inst'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempBaseColor(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/TileSystem/Matrials/Instances/MI_BaseColor.MI_BaseColor'"));
 	
 	if (tempBaseColor.Succeeded())
-		this->TileBaseColor = tempBaseColor.Object;
+		this->TileBaseMat = tempBaseColor.Object;
+
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> tempOpacityColor(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/TileSystem/Matrials/Instances/MI_OpacityColor.MI_OpacityColor'"));
 	if (tempOpacityColor.Succeeded())
-		this->TileOpacityColor = tempOpacityColor.Object;
+		this->TileOpacityMat = tempOpacityColor.Object;
 
 	// 색상 적용
-	if (this->TileSpaceMesh && TileBaseColor)
-		TileSpaceMesh->SetMaterial(0, TileBaseColor);
+	if (this->TileSpaceMesh && TileBaseMat)
+		TileSpaceMesh->SetMaterial(0, TileBaseMat);
+
+
+	if (GetWorld() && GetWorld()->GetFirstPlayerController())
+	{
+		SetOwner(GetWorld()->GetFirstPlayerController());
+	}
+
 }
+
+
+ACATileSpace* ACATileSpace::Clone()
+{
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = GetOwner();
+    ACATileSpace* NewSpace = GetWorld()->SpawnActor<ACATileSpace>(GetClass(),
+        GetActorLocation(), GetActorRotation(), SpawnParams);
+
+    // 리플리케이션 설정
+    NewSpace->SetReplicates(true);
+    NewSpace->SetReplicateMovement(true);
+    NewSpace->SetOwner(this->GetOwner());
+
+    // Mesh 컴포넌트 복사
+    if (this->GetTileSpaceMesh() && NewSpace->GetTileSpaceMesh())
+    {
+        NewSpace->GetTileSpaceMesh()->SetStaticMesh(this->GetTileSpaceMesh()->GetStaticMesh());
+        NewSpace->GetTileSpaceMesh()->SetMaterial(0, this->GetTileBaseMat());
+        NewSpace->GetTileSpaceMesh()->SetVisibility(true);
+    }
+
+    // SpaceType 복사
+    NewSpace->SetSpaceType(this->GetSpaceType());
+
+    return NewSpace;
+}
+
+
 
 
 // Called when the game starts or when spawned
 void ACATileSpace::BeginPlay()
 {
 	Super::BeginPlay();
-	
-}
 
-void ACATileSpace::Initialize(ACATileZone* parentZone, FVector position)
-{
-	this->ParentZone = parentZone;
-	this->Position = UFL_TileTools::SnapGridVector(position, this->ParentZone->TileSize);
-	this->SetActorLocation(this->Position);
-	this->SetActorScale3D(FVector(this->ParentZone->TileSize));
-}
-
-void ACATileSpace::Initialize(ACATileZone* parentZone, FVector position, ESpaceType spaceType)
-{
-	Initialize(parentZone, position);
-	this->SpaceType = spaceType;
-}
-
-// Called every frame
-void ACATileSpace::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-bool ACATileSpace::AddSpace(FVector relativeVector)
-{
-	if (!this->ParentZone) {
-		UE_LOG(LogTemp, Display, TEXT("Parent Zone is Not Found"));
-		return false;
-	}
-
-	FVector normal = relativeVector* this->ParentZone->TileSize;
-	FVector gridVector = UFL_TileTools::SnapGridVector(normal, this->ParentZone->TileSize);
-
-	if (this->ParentZone->InteractionCreate(this->Position, gridVector))
+	if (GetWorld() && GetWorld()->GetFirstPlayerController())
 	{
-		UE_LOG(LogTemp, Display, TEXT("Wait to Create %s"), *gridVector.ToString());
-		return true;
+		SetOwner(GetWorld()->GetFirstPlayerController());
 	}
-	return false;
+    if (HasAuthority())
+    {
+        SetReplicates(true);
+        SetReplicateMovement(true);
+
+        // 필요한 경우 컴포넌트도 리플리케이션 설정
+        if (TileSpaceMesh)
+        {
+            TileSpaceMesh->SetIsReplicated(true);
+        }
+    }
 }
 
-void ACATileSpace::DeleteSpace()
+
+void ACATileSpace::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	this->ParentZone->InteractionDelete(this->Position);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACATileSpace, Position);
+	DOREPLIFETIME(ACATileSpace, ParentZone);
+	DOREPLIFETIME(ACATileSpace, SpaceType);
+}
+
+void ACATileSpace::CreateDefualtSpace()
+{
+    if (this->HasAuthority())
+    {
+
+    }
+}
+
+void ACATileSpace::AttachSpace(FVector relativeVector, ACATileSpace* newTileSpace)
+{
+	if (!ParentZone->IsValidLowLevel())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ParentZone is not valid"));
+		return;
+	}
+    this->ParentZone->AttachTile(relativeVector, newTileSpace);
+}
+
+void ACATileSpace::Delete()
+{
+	this->ParentZone->DeleteTile(this);
 }
 
 
