@@ -53,7 +53,7 @@ private:
 	void OnRep_ActorInHand();
 	
 	UFUNCTION(Server, Reliable)
-	void ServerHold(TSubclassOf<ACACarryInteractable> ActorToHold);
+	void ServerHold(ACACarryInteractable* actorToHold);
 	UFUNCTION(Server, Reliable)
 	void ServerDrop();
 };

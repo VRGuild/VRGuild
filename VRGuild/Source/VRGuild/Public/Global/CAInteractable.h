@@ -33,7 +33,6 @@ public:
 
 	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual bool CanInteract(ACharacter* Initiator) const override;
-	virtual bool IsInteracting(ACharacter* Initiator) const override;
 
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;
@@ -66,7 +65,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	FString TraceMessage;
 	TObjectPtr<UCGIGameInstance> GameInstance;
-	bool bIsInteracting;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	bool bHideMesh;
 };

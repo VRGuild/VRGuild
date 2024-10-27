@@ -42,7 +42,7 @@ void ACAReceptionist::BeginInteract(ACharacter* Initiator)
 
 	if (Initiator)
 	{
-		ATP_ThirdPersonCharacter::SetInteracting(Initiator, this, true);
+		ATP_ThirdPersonCharacter::SetInteracting(Initiator, true);
 
 		if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 		{
@@ -75,7 +75,7 @@ void ACAReceptionist::EndInteract(ACharacter* Initiator)
 
 	if (Initiator)
 	{
-		ATP_ThirdPersonCharacter::SetInteracting(Initiator, this, false);
+		ATP_ThirdPersonCharacter::SetInteracting(Initiator, false);
 
 		if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 		{

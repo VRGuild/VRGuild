@@ -47,11 +47,6 @@ bool ACADisplayer::CanInteract(ACharacter* Initiator) const
 	return Super::CanInteract(Initiator);
 }
 
-bool ACADisplayer::IsInteracting(ACharacter* Initiator) const
-{
-	return Super::IsInteracting(Initiator);
-}
-
 void ACADisplayer::BeginTrace(ACharacter* Initiator)
 {
 	bool bCan = false;
@@ -195,7 +190,7 @@ void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPass
 	{
 		ActorDisplayed = actorSpawned;
 		
-		ActorDisplayed->Init(false, Cast<ACharacter>(Owner), false);
+		ActorDisplayed->Init(false, Cast<ACharacter>(Owner), false, commissionPassed);
 				
 		ActorDisplayed->FinishSpawning(GetActorTransform());
 		

@@ -24,7 +24,6 @@ public:
 
 	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual bool CanInteract(ACharacter* Initiator) const override;
-	virtual bool IsInteracting(ACharacter* Initiator) const override;
 
 	virtual void BeginTrace(ACharacter* Initiator) override;
 	virtual void EndTrace(ACharacter* Initiator) override;

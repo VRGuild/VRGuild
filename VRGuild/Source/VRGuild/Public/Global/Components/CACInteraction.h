@@ -37,7 +37,7 @@ public:
 	void Disable();
 
 	UFUNCTION(BlueprintCallable)
-	bool IsEnabled();
+	bool IsEnabled() const;
 
 	UFUNCTION(BlueprintCallable)
 	void Interact();
@@ -56,8 +56,9 @@ private:
 
 	void BeginInteract();
 	void EndInteract();
-
 	void UpdateTrace(AActor*& actorTraced);
+
+	bool CanTrace() const;
 
 	ICIInteractionInterface* GetInterface(AActor* actor) const;
 	TObjectPtr<ACharacter> Owner;

@@ -76,7 +76,7 @@ void ATP_ThirdPersonCharacter::SetOwnerFor(AActor* target, ACharacter* newOwner)
 	}
 }
 
-void ATP_ThirdPersonCharacter::SetInteracting(ACharacter* player, AActor* target, bool bInteracting)
+void ATP_ThirdPersonCharacter::SetInteracting(APawn* player, bool bInteracting)
 {
 	if (auto character = Cast<ATP_ThirdPersonCharacter>(player))
 	{
@@ -106,13 +106,13 @@ void ATP_ThirdPersonCharacter::SetInteracting(ACharacter* player, AActor* target
 	}
 }
 
-bool ATP_ThirdPersonCharacter::IsInteracting(ACharacter* player)
+bool ATP_ThirdPersonCharacter::IsInteracting(APawn* player)
 {
 	if (auto character = Cast<ATP_ThirdPersonCharacter>(player))
 	{
 		if (character)
 		{
-			return character->IsInteracting(player);
+			return character->bIsInteracting;
 		}
 	}
 

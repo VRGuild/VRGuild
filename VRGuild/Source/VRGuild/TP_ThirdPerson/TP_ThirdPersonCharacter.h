@@ -64,9 +64,9 @@ public:
 	static void SetOwnerFor(AActor* target, ACharacter* newOwner);
 
 	UFUNCTION(BlueprintCallable)
-	static void SetInteracting(ACharacter* player, AActor* target, bool bInteracting);
+	static void SetInteracting(APawn* player, bool bInteracting);
 
-	static bool IsInteracting(ACharacter* player);
+	static bool IsInteracting(APawn* player);
 
 protected:
 
