@@ -93,6 +93,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnLoginAPICall();
 
+	//Set EpicNickName
+	UFUNCTION(BlueprintCallable)
+	void SetEpicNickNameToGameInstance();
+
 private:
 	FDelegateHandle DestroySessionDelegateHandle;
 	virtual void OnDestroySessionComplete(FName sessionName, bool bWasSuccessful);

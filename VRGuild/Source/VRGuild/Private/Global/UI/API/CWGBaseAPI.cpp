@@ -32,6 +32,7 @@ FString UCWGBaseAPI::GetAPIPath(const FString& FullURL)
 void UCWGBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("HttpCallBack"));
+	bHttpWaitResponse = false;
 	if (bConnectedSuccessfully && 200 <= res->GetResponseCode() && res->GetResponseCode() < 300)
 	{
 		OnSuccessAPI(req, res);
@@ -41,7 +42,6 @@ void UCWGBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool b
 		// 실패 했을때
 		OnFailAPI(req, res);
 	}
-	bHttpWaitResponse = false;
 }
 
 void UCWGBaseAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)

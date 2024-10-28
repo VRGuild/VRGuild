@@ -42,6 +42,12 @@ public:
 	// 토큰을 저장하기 위한 변수 입니다.
 	FString TokenID;
 
+
+	UPROPERTY(BlueprintReadOnly);
+	FString NickName;
+
+	void SetEpicNickNameInstance(FString nickname);
+
 	FCharacterCustomData CustomData;
 
 	UFUNCTION(BlueprintCallable)
@@ -52,6 +58,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayTraceMessage(bool bDisplay, FString msg);
+
+
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta=(AllowPrivateAccess))

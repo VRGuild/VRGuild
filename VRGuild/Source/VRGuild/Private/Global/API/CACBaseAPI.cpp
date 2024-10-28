@@ -59,6 +59,7 @@ FString UCACBaseAPI::GetAPIPath(const FString& FullURL)
 void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully)
 {
 	UE_LOG(LogTemp, Warning, TEXT("HttpCallBack"));
+	bHttpWaitResponse = false;
 	if (bConnectedSuccessfully && 200 <= res->GetResponseCode() && res->GetResponseCode() < 300)
 	{
 		OnSuccessAPI(req, res);
@@ -68,7 +69,6 @@ void UCACBaseAPI::HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool b
 		// 실패 했을때
 		OnFailAPI(req, res);
 	}
-	bHttpWaitResponse = false;
 }
 
 void UCACBaseAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
