@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Hall/Board/Notice/UI/CWGProjectNoticeFull.h"
 #include "Global/Components/CACCarry.h"
+#include "Global/Components/CACCharacterAnimMontage.h"
 
 // Sets default values
 ACAProjectNotice::ACAProjectNotice()
@@ -57,6 +58,16 @@ void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOw
 	if (auto notice = Cast<ACAProjectNotice>(actorInteracted))
 	{
 		NoticeData = notice->NoticeData;
+	}
+}
+
+void ACAProjectNotice::BeginInteract(ACharacter* Initiator)
+{
+	Super::BeginInteract(Initiator);
+
+	if (auto animMontage = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+	{
+		animMontage->StartAnimMontage(EAnimMontageType::POINT);
 	}
 }
 

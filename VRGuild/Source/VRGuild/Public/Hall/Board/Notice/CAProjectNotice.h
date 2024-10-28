@@ -20,6 +20,8 @@ public:
 
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
 
+	virtual void BeginInteract(ACharacter* Initiator) override;
+
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
 
 	virtual bool CanTrace(ACharacter* player) const override; 
