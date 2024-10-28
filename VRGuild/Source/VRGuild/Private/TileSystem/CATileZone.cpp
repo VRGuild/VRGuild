@@ -31,7 +31,7 @@ void ACATileZone::BeginPlay()
 	bAlwaysRelevant = true;
 
 	this->TileSize = 128;
-	CreateDefualtSpace();
+	CreateDefualtZone();
 }
 
 void ACATileZone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -59,19 +59,45 @@ void ACATileZone::OnRep_TileSpaces()
 void ACATileZone::OnRep_Owner()
 {
 	Super::OnRep_Owner();
-	SRPCAppendSpace(this->SendDataPosition, this->nSendDataNewTile);
+
+	if (OnRepIndex == 0)
+	{
+		SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
+	}
+	else if (OnRepIndex == 1)
+	{
+		SRPCCreateSpace(this->SendDataPosition, this->SendDataType);
+	}
 }
 
 
-void ACATileZone::CreateDefualtSpace()
+void ACATileZone::CreateDefualtZone()
 {
 	if (this->HasAuthority())
 	{
 		ACATileSpace* tempTile = GetWorld()->SpawnActor<ACATileSpace>();
 		tempTile->SetActorScale3D(FVector(this->TileSize));
-		SRPCAppendSpace(FVector(0,0,0), tempTile);
+		SRPCAppendSpace(FVector(0, 0, 0), tempTile);
 		tempTile->Destroy();
 	}
+}
+
+
+
+void ACATileZone::SRPCCreateSpace_Implementation(FVector relativePosition, const FString &type)
+{
+	UE_LOG(LogTemp, Display, TEXT("SRPCAppendSpace"));
+
+	FVector gridPosition = UFL_TileTools::SnapGridVector(relativePosition, 1);
+
+	if (this->TileSpacesMap.Contains(gridPosition))
+		return CRPCOnCreateSpace(false, nullptr);
+	CreateTileToZone(relativePosition, type);
+	CRPCOnCreateSpace(false, nullptr);
+}
+
+void ACATileZone::CRPCOnCreateSpace_Implementation(bool successed, ACATileSpace* tileSpace)
+{
 }
 
 void ACATileZone::SRPCAppendSpace_Implementation(FVector relativePosition, ACATileSpace* tileSpace)
@@ -127,10 +153,37 @@ void ACATileZone::CRPCOnRemoveSpace_Implementation(bool successed)
 }
 
 
-void ACATileZone::CloneTileToZone(FVector position, ACATileSpace* tileSpace)
+ACATileSpace* ACATileZone::CreateTileToZone(FVector relativePosition, FString type)
+{
+	if (!HasAuthority())
+		return nullptr;
+
+	FVector gridPosition = UFL_TileTools::SnapGridVector(relativePosition, 1);
+	ACATileSpace* newTileSpace;
+
+	newTileSpace = ACATileSpace().CreateDefault(type);
+
+	if (newTileSpace)
+	{
+		// 위치 및 부모 설정
+		newTileSpace->SetParentZone(this);
+		newTileSpace->SetPosition(this->GetActorLocation());
+		newTileSpace->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+		newTileSpace->SetActorRelativeLocation(relativePosition * TileSize);
+		newTileSpace->SetActorScale3D(FVector(this->TileSize));
+
+		// TArray에 추가
+		TileSpacesArray.Add(FTileSpaceData(relativePosition, newTileSpace));
+		// 로컬 맵에도 추가
+		TileSpacesMap.Add(relativePosition, newTileSpace);
+	}
+	return newTileSpace;
+}
+
+ACATileSpace* ACATileZone::CloneTileToZone(FVector position, ACATileSpace* tileSpace)
 {
 	if (!HasAuthority() || !tileSpace)
-		return;
+		return nullptr;
 
 	ACATileSpace* newTileSpace = tileSpace->Clone();
 
@@ -138,7 +191,7 @@ void ACATileZone::CloneTileToZone(FVector position, ACATileSpace* tileSpace)
 	{
 		// 위치 및 부모 설정
 		newTileSpace->SetParentZone(this);
-		newTileSpace->SetPosition(position);
+		newTileSpace->SetPosition(this->GetActorLocation());
 		newTileSpace->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		newTileSpace->SetActorRelativeLocation(position * TileSize);
 		newTileSpace->SetActorScale3D(FVector(this->TileSize));
@@ -148,6 +201,7 @@ void ACATileZone::CloneTileToZone(FVector position, ACATileSpace* tileSpace)
 		// 로컬 맵에도 추가
 		TileSpacesMap.Add(position, newTileSpace);
 	}
+	return newTileSpace;
 }
 
 void ACATileZone::DeleteTileToZone(FVector position)
@@ -203,7 +257,7 @@ void ACATileZone::AttachTile(FVector position, ACATileSpace* newTile)
 	bRPCWait = true;
 
 	this->SendDataPosition = position;
-	this->nSendDataNewTile = newTile;
+	this->SendDataNewTile = newTile;
 	SRPCAppendSpace(position, newTile);
 	ATP_ThirdPersonCharacter::SetOwnerFor(this, GetWorld()->GetFirstPlayerController()->GetCharacter());
 

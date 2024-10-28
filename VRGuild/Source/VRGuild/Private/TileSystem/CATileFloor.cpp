@@ -17,7 +17,7 @@ void ACATileFloor::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ACATileFloor::CreateDefualtSpace()
+void ACATileFloor::CreateDefualtZone()
 {
 	if (this->HasAuthority())
 	{
@@ -25,6 +25,7 @@ void ACATileFloor::CreateDefualtSpace()
 		{
 			for (int x = -3; x <= 3; x++)
 			{
+
 			}
 		}
 	}
@@ -33,11 +34,27 @@ void ACATileFloor::CreateDefualtSpace()
 
 void ACATileFloor::AttachSpace(FVector relativeVector, ACATileSpace* newTileSpace)
 {
+	if (!ParentZone->IsValidLowLevel())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ParentZone is not valid"));
+		return;
+	}
+	this->ParentZone->AttachTile(relativeVector, newTileSpace);
 }
 
 void ACATileFloor::Delete()
 {
+	this->ParentZone->DeleteTile(this);
 }
+
+void ACATileFloor::SetTiledata(FChannelnfoCreateAPI* TileInfo)
+{
+	for (FTileInfo tile : TileInfo->positionTypes)
+	{	
+		this->ParentZone->CreateTileToZone(tile.position, tile.type);
+	}
+}
+
 
 //bool ACATileFloor::InteractionCreate(FVector position, FVector gridRelativeVector)
 //{

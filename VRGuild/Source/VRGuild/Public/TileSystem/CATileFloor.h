@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Global/API/BPL/CBPLChannel.h"
+
 #include "CoreMinimal.h"
 #include "TileSystem/CATileSpace.h"
 #include "CATileFloor.generated.h"
@@ -23,12 +25,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void CreateDefualtSpace() override;
+	virtual void CreateDefualtZone() override;
 
 public:
 	virtual void AttachSpace(FVector relativeVector, ACATileSpace* newTileSpace) override;
 
 	virtual void Delete() override;
+
+	void SetTiledata(FChannelnfoCreateAPI* TileInfo);
 
 	// interaction with widget
 	//virtual bool InteractionCreate(FVector position, FVector gridRelativeVector) override;

@@ -15,7 +15,7 @@ public:
 	FTileInfo() {};
 
 	UPROPERTY(BlueprintReadWrite)
-	FVector TileList;
+	FVector position;
 
 	UPROPERTY(BlueprintReadWrite)
 	FString type;

@@ -26,6 +26,9 @@ public:
 	// Sets default values for this actor's properties
 	ACATileSpace();
 
+
+	UFUNCTION(BlueprintCallable)
+	ACATileSpace* CreateDefault(FString Type);
 	// 복사 생성을 위한 Clone 함수
 	UFUNCTION(BlueprintCallable)
 	ACATileSpace* Clone();
@@ -52,7 +55,7 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void CreateDefualtSpace() override;
+	virtual void CreateDefualtZone() override;
 
 	UPROPERTY(Replicated)
 	ACATileZone* ParentZone;

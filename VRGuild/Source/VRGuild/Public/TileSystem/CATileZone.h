@@ -44,7 +44,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void CreateDefualtSpace();
+	virtual void CreateDefualtZone();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -59,9 +59,12 @@ protected:
 	virtual void OnRep_Owner() override;
 
 	FVector SendDataPosition;
+	FString SendDataType;
 
-	class ACATileSpace* nSendDataNewTile;
+	class ACATileSpace* SendDataNewTile;
 public:
+
+	int32 OnRepIndex;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SRPCAppendSpace(FVector relativePosition, class ACATileSpace* tileSpace);
@@ -83,8 +86,19 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPCOnRemoveSpace(bool successed);
 
-	void CloneTileToZone(FVector position, class ACATileSpace* tileSpace);
+	ACATileSpace* CreateTileToZone(FVector relativePosition, FString type);
+	ACATileSpace* CloneTileToZone(FVector position, class ACATileSpace* tileSpace);
 	void DeleteTileToZone(FVector position);
+
+
+	UFUNCTION(Server, Reliable)
+	void SRPCCreateSpace(FVector relativePosition, const FString &type );
+	void SRPCCreateSpace_Implementation(FVector relativePosition, const FString &type);
+
+	UFUNCTION(Client, Reliable)
+	void CRPCOnCreateSpace(bool successed, class ACATileSpace* tileSpace);
+	void CRPCOnCreateSpace_Implementation(bool successed, class ACATileSpace* tileSpace);
+
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)

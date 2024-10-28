@@ -45,6 +45,31 @@ ACATileSpace::ACATileSpace()
 }
 
 
+ACATileSpace* ACATileSpace::CreateDefault(FString type)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = GetOwner();
+	ACATileSpace* NewSpace = GetWorld()->SpawnActor<ACATileSpace>(GetClass(),
+		GetActorLocation(), GetActorRotation(), SpawnParams);
+
+	if (!NewSpace)
+		return nullptr;
+	// 리플리케이션 설정
+	NewSpace->SetReplicates(true);
+	NewSpace->SetReplicateMovement(true);
+	NewSpace->SetOwner(this->GetOwner());
+
+	if (type == "None")
+	{
+	}
+	else if (type == "Wall")
+	{
+
+	}
+
+	return NewSpace;
+}
+
 ACATileSpace* ACATileSpace::Clone()
 {
     FActorSpawnParameters SpawnParams;
@@ -106,7 +131,7 @@ void ACATileSpace::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(ACATileSpace, SpaceType);
 }
 
-void ACATileSpace::CreateDefualtSpace()
+void ACATileSpace::CreateDefualtZone()
 {
     if (this->HasAuthority())
     {
