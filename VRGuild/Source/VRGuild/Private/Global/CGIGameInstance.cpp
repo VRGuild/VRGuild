@@ -69,6 +69,11 @@ void UCGIGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSucc
     DestroySessionDelegateHandle.Reset();   
 }
 
+void UCGIGameInstance::SetEpicNickNameInstance(FString nickname)
+{
+    this->NickName = nickname;
+}
+
 void UCGIGameInstance::AttachCustomSelections(ACharacter* NewCharacter)
 {
     if (NewCharacter)

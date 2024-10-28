@@ -6,6 +6,7 @@
 #include "OnlineSubsystemUtils.h"
 #include "OnlineSubsystemTypes.h"
 #include "Interfaces/OnlineIdentityInterface.h"
+#include "Interfaces/OnlineUserInterface.h" 
 #include "OnlineSessionSettings.h"
 #include "GameFramework/GameSession.h"
 #include "Kismet/GameplayStatics.h"
@@ -468,6 +469,20 @@ void ACPCBasePlayerController::JoinChannel(FString voiceRoomName, bool bEnableEc
 		}),
 		Properties
 	);
+}
+
+void ACPCBasePlayerController::SetEpicNickNameToGameInstance()
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	if (!Subsystem)
+		return;
+	IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
+
+	if (!Identity)
+		return;
+	UCGIGameInstance* baseGI = Cast<UCGIGameInstance>(GetWorld()->GetGameInstance());
+	if (baseGI)
+		baseGI->SetEpicNickNameInstance(Identity->GetPlayerNickname(0));
 }
 
 void ACPCBasePlayerController::OnDestroySessionComplete(FName sessionName, bool bWasSuccessful)

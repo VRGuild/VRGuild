@@ -10,7 +10,7 @@
 #include "CPCBasePlayerController.generated.h"
 
 /**
- * 
+ * b
  */
 class FOnlineSessionSearch;
 class FOnlineSessionSearchResult;
@@ -92,6 +92,10 @@ protected:
 	// API Call
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnLoginAPICall();
+
+	//Set EpicNickName
+	UFUNCTION(BlueprintCallable)
+	void SetEpicNickNameToGameInstance();
 
 private:
 	FDelegateHandle DestroySessionDelegateHandle;

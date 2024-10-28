@@ -2,6 +2,8 @@
 
 #pragma once
 
+
+#include "Global/Project/CBPLProject.h"
 #include "Global/API/BPL/CBPLTeam.h"
 
 #include "CoreMinimal.h"
@@ -83,5 +85,46 @@ public:
 	void OnTeamMemberSearchGetCallBack(FTeamInfoDataArrayAPI ParseData);
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFailTeamMemberSearchGetCallBack();
+
+
+
+
+	UFUNCTION(BlueprintCallable)
+	void ProjectSupportPostCall(FProjectSupportAPI supportInfo);
+	void ProjectSupportPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnProjectSupportPostCallBack(FProjectAllDataAPI allProject);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailProjectSupportPostCallBack();
+
+
+	UFUNCTION(BlueprintCallable)
+	void ProjectSupportDeleteCall(int32 supportId);
+	void ProjectSupportDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnProjectSupportDeleteCallBack(FProjectAllDataAPI allProject);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailProjectSupportDeleteCallBack();
+
+
+
+
+	UFUNCTION(BlueprintCallable)
+	void ProjectSupportGetCall(int32 supportId);
+	void ProjectSupportGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnProjectSupportGetCallBack(FProjectAllDataAPI allProject);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailProjectSupportGetCallBack();
+
+
+	UFUNCTION(BlueprintCallable)
+	void ProjectSupportTeamGetCall(int32 teamId);
+	void ProjectSupportTeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnProjectSupportTeamGetCallBack(FProjectAllDataAPI allProject);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailProjectSupportTeamGetCallBack();
+
 
 };

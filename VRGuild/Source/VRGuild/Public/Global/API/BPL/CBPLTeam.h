@@ -94,4 +94,5 @@ UCLASS()
 class VRGUILD_API UCBPLTeam : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
+
 };

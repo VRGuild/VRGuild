@@ -5,14 +5,19 @@
 
 void UCWGTeamAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FRegexPattern PostTeamPattern(TEXT(R"(POST\s+/api/team)"));
-    FRegexPattern PatchTeamPattern(TEXT(R"(PATCH\s+/api/team)"));
-    FRegexPattern GetTeamByIdPattern(TEXT(R"(GET\s+/api/team/(\d+))"));
-    FRegexPattern DeleteTeamByIdPattern(TEXT(R"(DELETE\s+/api/team/(\d+))"));
-    FRegexPattern GetTeamByManagerPattern(TEXT(R"(GET\s+/api/team/manager)"));
-    FRegexPattern PostTeamByMemberPattern(TEXT(R"(POST\s+/api/team/member)"));
-    FRegexPattern DeleteTeamByMemberPattern(TEXT(R"(DELETE\s+/api/team/member)"));
-    FRegexPattern GetTeamByMembersSearchPattern(TEXT(R"(GET\s+/api/team/members/search)"));
+    FRegexPattern PostTeamPattern(TEXT(R"(POST\s+/api/team$)"));
+    FRegexPattern PatchTeamPattern(TEXT(R"(PATCH\s+/api/team$)"));
+    FRegexPattern GetTeamByIdPattern(TEXT(R"(GET\s+/api/team/(\d+)$)"));
+    FRegexPattern DeleteTeamByIdPattern(TEXT(R"(DELETE\s+/api/team/(\d+)$)"));
+    FRegexPattern GetTeamByManagerPattern(TEXT(R"(GET\s+/api/team/manager$)"));
+    FRegexPattern PostTeamByMemberPattern(TEXT(R"(POST\s+/api/team/member$)"));
+    FRegexPattern DeleteTeamByMemberPattern(TEXT(R"(DELETE\s+/api/team/member$)"));
+    FRegexPattern GetTeamByMembersSearchPattern(TEXT(R"(GET\s+/api/team/members/search$)"));
+
+    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support$)"));
+    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support$)"));
+    FRegexPattern GetProjectSupportPattern(TEXT(R"(GET\s+/api/support/project/(\d+)$)"));
+    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+)$)"));
 
     // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
@@ -49,6 +54,22 @@ void UCWGTeamAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     {
         TeamMemberSearchGetCallBack(req, res);
     }
+    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportPostCallBack(req, res);
+    }
+    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportDeleteCallBack(req, res);
+    }
+    else if (FRegexMatcher(GetProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportGetCallBack(req, res);
+    }
+    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
+    {
+        ProjectSupportTeamGetCallBack(req, res);
+    }
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("No matching endpoint found for URL: %s"), *UrlToMatch);
@@ -58,14 +79,19 @@ void UCWGTeamAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 
 void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FRegexPattern PostTeamPattern(TEXT(R"(POST\s+/api/team)"));
-    FRegexPattern PatchTeamPattern(TEXT(R"(PATCH\s+/api/team)"));
-    FRegexPattern GetTeamByIdPattern(TEXT(R"(GET\s+/api/team/(\d+))"));
-    FRegexPattern DeleteTeamByIdPattern(TEXT(R"(DELETE\s+/api/team/(\d+))"));
-    FRegexPattern GetTeamByManagerPattern(TEXT(R"(GET\s+/api/team/manager)"));
-    FRegexPattern PostTeamByMemberPattern(TEXT(R"(POST\s+/api/team/member)"));
-    FRegexPattern DeleteTeamByMemberPattern(TEXT(R"(DELETE\s+/api/team/member)"));
-    FRegexPattern GetTeamByMembersSearchPattern(TEXT(R"(GET\s+/api/team/members/search)"));
+    FRegexPattern PostTeamPattern(TEXT(R"(POST\s+/api/team$)"));
+    FRegexPattern PatchTeamPattern(TEXT(R"(PATCH\s+/api/team$)"));
+    FRegexPattern GetTeamByIdPattern(TEXT(R"(GET\s+/api/team/(\d+)$)"));
+    FRegexPattern DeleteTeamByIdPattern(TEXT(R"(DELETE\s+/api/team/(\d+)$)"));
+    FRegexPattern GetTeamByManagerPattern(TEXT(R"(GET\s+/api/team/manager$)"));
+    FRegexPattern PostTeamByMemberPattern(TEXT(R"(POST\s+/api/team/member$)"));
+    FRegexPattern DeleteTeamByMemberPattern(TEXT(R"(DELETE\s+/api/team/member$)"));
+    FRegexPattern GetTeamByMembersSearchPattern(TEXT(R"(GET\s+/api/team/members/search$)"));
+
+    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support$)"));
+    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support$)"));
+    FRegexPattern GetProjectSupportPattern(TEXT(R"(GET\s+/api/support/project/(\d+)$)"));
+    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+)$)"));
 
     // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
@@ -101,6 +127,22 @@ void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     else if (FRegexMatcher(GetTeamByMembersSearchPattern, UrlToMatch).FindNext())
     {
         OnFailTeamMemberSearchGetCallBack();
+    }
+    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportPostCallBack();
+    }
+    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportDeleteCallBack();
+    }
+    else if (FRegexMatcher(GetProjectSupportPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportGetCallBack();
+    }
+    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectSupportTeamGetCallBack();
     }
     else
     {
@@ -226,3 +268,61 @@ void UCWGTeamAPI::TeamMemberSearchGetCallBack(FHttpRequestPtr req, FHttpResponse
     OnTeamMemberSearchGetCallBack(ParseData);
 }
 
+
+void UCWGTeamAPI::ProjectSupportPostCall(FProjectSupportAPI supportInfo)
+{
+    this->API = "api/support";
+
+    HttpPostCall<FProjectSupportAPI>(supportInfo);
+}
+
+void UCWGTeamAPI::ProjectSupportPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportPostCallBack(ParseData);
+}
+void UCWGTeamAPI::ProjectSupportDeleteCall(int32 supportId)
+{
+    this->API = "api/support" + FString::FromInt(supportId);
+
+    HttpDeleteCall();
+}
+
+void UCWGTeamAPI::ProjectSupportDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportDeleteCallBack(ParseData);
+}
+
+void UCWGTeamAPI::ProjectSupportGetCall(int32 supportId)
+{
+    this->API = "api/support/project/" + FString::FromInt(supportId);
+
+    HttpGetCall();
+}
+
+void UCWGTeamAPI::ProjectSupportGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportGetCallBack(ParseData);
+}
+void UCWGTeamAPI::ProjectSupportTeamGetCall(int32 teamId)
+{
+    this->API = "api/support/team/" + FString::FromInt(teamId);
+
+    HttpGetCall();
+}
+
+void UCWGTeamAPI::ProjectSupportTeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString jsonString = res->GetContentAsString();
+    FProjectAllDataAPI ParseData;
+    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
+    OnProjectSupportTeamGetCallBack(ParseData);
+}
