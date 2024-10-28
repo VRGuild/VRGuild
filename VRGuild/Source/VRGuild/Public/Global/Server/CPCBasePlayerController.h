@@ -103,6 +103,9 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerStartCustomCharacter(FCharacterCustomData customData);
 	//virtual void OnPossess(APawn* aPawn) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void LoginVoiceChatWithEIK();
 private:
 	//=============EOS Voice Chat===============
 	void StartVoiceChat();
