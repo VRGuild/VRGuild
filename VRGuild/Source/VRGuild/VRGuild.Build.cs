@@ -9,7 +9,7 @@ public class VRGuild : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG",
-        "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemEOS",
+        "OnlineSubsystem", "OnlineSubsystemUtils",
 		"HTTP", "Json", "JsonUtilities",
         "VoiceChat",
 		"GameplayTags"
