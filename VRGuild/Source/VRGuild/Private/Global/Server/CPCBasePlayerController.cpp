@@ -42,63 +42,63 @@ void ACPCBasePlayerController::Tick(float DeltaTime)
 	TotalTime += DeltaTime;
 	if (TotalTime > MaxTime)
 	{
-		if (VoiceChatUser)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Connected to voice chat"));
-			if (IOnlineIdentityPtr Identity = Online::GetSubsystem(GetWorld())->GetIdentityInterface())
-			{
-				//const FUniqueNetIdRepl nice = PlayerState->GetUniqueId();
-				//*nice.GetUniqueNetId()
-				FString PlayerName = Identity->GetPlayerNickname(0);
-				if (PlayerName != "")
-				{
-					for (FString Channel : VoiceChatUser->GetChannels())
-					{
-						UE_LOG(LogTemp, Warning, TEXT("------[%s]------"), *Channel);
+		//if (VoiceChatUser)
+		//{
+		//	UE_LOG(LogTemp, Warning, TEXT("Connected to voice chat"));
+		//	if (IOnlineIdentityPtr Identity = Online::GetSubsystem(GetWorld())->GetIdentityInterface())
+		//	{
+		//		//const FUniqueNetIdRepl nice = PlayerState->GetUniqueId();
+		//		//*nice.GetUniqueNetId()
+		//		FString PlayerName = Identity->GetPlayerNickname(0);
+		//		if (PlayerName != "")
+		//		{
+		//			for (FString Channel : VoiceChatUser->GetChannels())
+		//			{
+		//				UE_LOG(LogTemp, Warning, TEXT("------[%s]------"), *Channel);
 
-						for (FString player : VoiceChatUser->GetPlayersInChannel(Channel))
-						{
-							UE_LOG(LogTemp, Warning, TEXT("[%s] %s"), *Channel, *player);
-						}
-						UE_LOG(LogTemp, Warning, TEXT("------------"));
-					}
+		//				for (FString player : VoiceChatUser->GetPlayersInChannel(Channel))
+		//				{
+		//					UE_LOG(LogTemp, Warning, TEXT("[%s] %s"), *Channel, *player);
+		//				}
+		//				UE_LOG(LogTemp, Warning, TEXT("------------"));
+		//			}
 
-					FString name = VoiceChatUser->GetInputDeviceInfo().DisplayName;
-					if (VoiceChatUser->GetAudioInputDeviceMuted())
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Audio device is Muted %s"), *name);
-					}
-					else UE_LOG(LogTemp, Warning, TEXT("Audio device %s"), *name);
+		//			FString name = VoiceChatUser->GetInputDeviceInfo().DisplayName;
+		//			if (VoiceChatUser->GetAudioInputDeviceMuted())
+		//			{
+		//				UE_LOG(LogTemp, Warning, TEXT("Audio device is Muted %s"), *name);
+		//			}
+		//			else UE_LOG(LogTemp, Warning, TEXT("Audio device %s"), *name);
 
-					if (VoiceChatUser->IsPlayerMuted(PlayerName))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("%s is Muted"), *PlayerName);
-					}
-					else
-					{
-						UE_LOG(LogTemp, Warning, TEXT("%s is not Muted"), *PlayerName);
-						if (VoiceChatUser->IsPlayerTalking(*PlayerName))
-						{
-							UE_LOG(LogTemp, Warning, TEXT("%s is Talking"), *PlayerName);
-						}
-						else UE_LOG(LogTemp, Warning, TEXT("%s is not Talking"), *PlayerName);
-					}
-				}
-				else
-				{
-					/*if (PlayerState)
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
-					}
-					else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));*/
-				}
-			}
-		}
-		else UE_LOG(LogTemp, Warning, TEXT("No VoiceChatUser"));
-		/*if (CVarVoiceChat.GetValueOnGameThread())
-		{
+		//			if (VoiceChatUser->IsPlayerMuted(PlayerName))
+		//			{
+		//				UE_LOG(LogTemp, Warning, TEXT("%s is Muted"), *PlayerName);
+		//			}
+		//			else
+		//			{
+		//				UE_LOG(LogTemp, Warning, TEXT("%s is not Muted"), *PlayerName);
+		//				if (VoiceChatUser->IsPlayerTalking(*PlayerName))
+		//				{
+		//					UE_LOG(LogTemp, Warning, TEXT("%s is Talking"), *PlayerName);
+		//				}
+		//				else UE_LOG(LogTemp, Warning, TEXT("%s is not Talking"), *PlayerName);
+		//			}
+		//		}
+		//		else
+		//		{
+		//			/*if (PlayerState)
+		//			{
+		//				UE_LOG(LogTemp, Warning, TEXT("Could not get player name with %s"), *PlayerState->GetUniqueId()->ToString());
+		//			}
+		//			else UE_LOG(LogTemp, Warning, TEXT("PlayerState missing"));*/
+		//		}
+		//	}
+		//}
+		//else UE_LOG(LogTemp, Warning, TEXT("No VoiceChatUser"));
+		///*if (CVarVoiceChat.GetValueOnGameThread())
+		//{
 
-		}*/
+		//}*/
 		TotalTime = 0;
 	}
 }
@@ -205,7 +205,11 @@ void ACPCBasePlayerController::OnRep_PlayerState()
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) != TEXT("L_CustomMap"))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Not L_CustomMap"));
-		StartVoiceChat();
+		
+		LoginVoiceChatWithEIK();
+
+		//StartVoiceChat();
+
 		if (auto GI = GetWorld()->GetGameInstance<UCGIGameInstance>())
 		{
 			if (auto character = Cast<ATP_ThirdPersonCharacter>(GetCharacter()))
@@ -264,9 +268,9 @@ void ACPCBasePlayerController::StartVoiceChat()
 						FString playerName = Identity->GetPlayerNickname(0);
 						UE_LOG(LogTemp, Warning, TEXT("Getting EOS Room token with name %s"), *playerName);
 
-						VoiceChatUser = voiceChat->CreateUser();
+						//VoiceChatUser = voiceChat->CreateUser();
 
-						VoiceChatUser->Login(platformUserId, playerName, "", FOnVoiceChatLoginCompleteDelegate::CreateLambda([this](const FString& playerName, const FVoiceChatResult& result)
+						/*VoiceChatUser->Login(platformUserId, playerName, "", FOnVoiceChatLoginCompleteDelegate::CreateLambda([this](const FString& playerName, const FVoiceChatResult& result)
 							{
 								if (result.IsSuccess())
 								{
@@ -275,7 +279,7 @@ void ACPCBasePlayerController::StartVoiceChat()
 								else UE_LOG(LogTemp, Warning, TEXT("Voice chat login fail"));
 							}
 						)
-						);
+						);*/
 					}
 					else UE_LOG(LogTemp, Warning, TEXT("Voice chat connect unsuccessful"));
 
