@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.4",
+	"EngineAssociation": "{931BF54C-4D4F-8A6C-B565-0BA2AA6E8C6C}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -24,7 +24,7 @@
 		},
 		{
 			"Name": "OnlineSubsystemEOS",
-			"Enabled": true
+			"Enabled": false
 		},
 		{
 			"Name": "EasyFileDialog",
@@ -35,6 +35,11 @@
 			"Name": "ElectronicNodes",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/5cb2a394d0c04e73891762be4cbd7216"
+		},
+		{
+			"Name": "EOSIntegrationKit",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/dba0aa05bdd144e69405653a387ad63e"
 		}
 	]
 }

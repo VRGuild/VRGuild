@@ -1,3 +1,6 @@
 [submodule "VRGuild/Plugins/EOSIntegrationKit"]
 	path = VRGuild/Plugins/EOSIntegrationKit
 	url = https://github.com/betidestudio/EOSIntegrationKit.git
+[submodule "VRGuild/Plugins/EOSVoiceIntegrationKit"]
+	path = VRGuild/Plugins/EOSVoiceIntegrationKit
+	url = https://github.com/betidestudio/EOSVoiceIntegrationKit.git
