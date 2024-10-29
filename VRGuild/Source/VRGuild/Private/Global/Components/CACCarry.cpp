@@ -15,6 +15,8 @@ UCACCarry::UCACCarry()
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 	bWantsInitializeComponent = true;
 	SetIsReplicatedByDefault(true);
+
+	bProcessingHold = false;
 }
 
 void UCACCarry::InitializeComponent()
@@ -31,10 +33,14 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(UCACCarry, ActorInHand);
 }
 
-void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
+void UCACCarry::StartCarry(ACACarryInteractable* actorToHold)
 {
 	if (!ensure(ScrollBaseWidgetClass)) return;
 	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111"));
+
+	if (bProcessingHold) return;
+
+	bProcessingHold = true;
 
 	if (ScrollBaseWidget)
 	{
@@ -45,7 +51,13 @@ void UCACCarry::StartCarry(ACACarryInteractable* ActorToHold)
 
 	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.2"));
 
-	ServerHold(ActorToHold);
+	if (ActorInHand)
+	{
+		ActorInHand->Destroy();
+		ActorInHand = nullptr;
+	}
+
+	ServerHold(actorToHold);
 }
 
 void UCACCarry::StartDrop()
@@ -148,11 +160,21 @@ void UCACCarry::OnRep_ActorInHand()
 			}
 		}
 	}
+
+	bProcessingHold = false;
 }
 
 void UCACCarry::ServerHold_Implementation(ACACarryInteractable* actorToHold)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Carry: 2222"));
+
+	if (ActorInHand)
+	{
+		ActorInHand->Destroy();
+		ActorInHand = nullptr;
+		OnRep_ActorInHand();
+	}
+
 	if (Owner && actorToHold)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Carry: 2222.1"));
