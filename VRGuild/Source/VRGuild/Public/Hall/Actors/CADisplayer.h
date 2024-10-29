@@ -12,6 +12,7 @@
 
 class ACACarryInteractable;
 class UWidgetComponent;
+class ATP_ThirdPersonCharacter;
 
 UCLASS()
 class VRGUILD_API ACADisplayer : public ACAInteractable
@@ -31,6 +32,8 @@ public:
 	virtual void EndInteract(ACharacter* Initiator) override;
 
 protected:
+	virtual void Tick(float DeltaTime) override;
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnRep_Owner() override;
 	
@@ -46,6 +49,13 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerPickupCommission(ACharacter* player);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartAnimateScrolling();
+	UFUNCTION(BlueprintImplementableEvent)
+	void StopAnimateScrolling();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMousePressInteract(FVector2D result);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
 	FString ErrorMessage;
@@ -60,6 +70,10 @@ private:
 	TObjectPtr<ACACarryInteractable> ActorDisplayed;
 	UFUNCTION()
 	void OnRep_ActorDisplayed();
+
+	FVector2D StartMousePos;
+	FVector2D UpdatedMousePos;
+	TObjectPtr<ATP_ThirdPersonCharacter> OwnerCharacter;
 
 	/*UPROPERTY(EditDefaultsOnly, Category = Settings)
 	TSubclassOf<UUserWidget> BackSideWidgetClass;*/

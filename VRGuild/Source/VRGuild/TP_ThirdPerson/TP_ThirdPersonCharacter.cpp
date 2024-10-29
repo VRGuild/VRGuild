@@ -127,6 +127,10 @@ bool ATP_ThirdPersonCharacter::IsInteracting(APawn* player)
 	return false;
 }
 
+FVector2D ATP_ThirdPersonCharacter::GetMousePos() const
+{
+	return MousePos;
+}
 
 void ATP_ThirdPersonCharacter::ServerSetOwnerFor_Implementation(AActor* target)
 {
@@ -233,6 +237,8 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	MousePos = LookAxisVector;
 
 	if (Controller != nullptr)
 	{

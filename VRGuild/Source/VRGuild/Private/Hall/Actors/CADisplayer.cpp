@@ -39,6 +39,25 @@ void ACADisplayer::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ACADisplayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (OwnerCharacter)
+	{
+		UpdatedMousePos = OwnerCharacter->GetMousePos();
+
+		OnMousePressInteract(StartMousePos - UpdatedMousePos);
+	}	
+}
+
+void ACADisplayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACADisplayer, ActorDisplayed);
+}
+
 bool ACADisplayer::CanTrace(ACharacter* Initiator) const
 {
 	if (ActorDisplayed)
@@ -86,38 +105,56 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 
 	if (!Initiator) return;
 
-	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	if (ActorDisplayed)
 	{
-		switch (carryComp->GetCarryType())
+		OwnerCharacter = GetOwner<ATP_ThirdPersonCharacter>();
+
+		if (!OwnerCharacter) return;
+
+		if (auto carry = OwnerCharacter->GetComponentByClass<UCACCarry>())
 		{
-		case ECarriedType::COMMISSION:
+			carry->HideCarryWidget();
+		}
+		//ATP_ThirdPersonCharacter::SetInteracting(character, true);
+				
+		StartMousePos = OwnerCharacter->GetMousePos();
+		SetActorTickEnabled(true);
+	}
+	else
+	{
+		if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			AActor* actorCarried = carryComp->GetCarriedActor();
-			if (ensure(actorCarried) && !ActorDisplayed)
+			switch (carryComp->GetCarryType())
 			{
-				ATP_ThirdPersonCharacter::SetOwnerFor(this, Initiator);
+			case ECarriedType::COMMISSION:
+			{
+				AActor* actorCarried = carryComp->GetCarriedActor();
+				if (ensure(actorCarried) && !ActorDisplayed)
+				{
+					ATP_ThirdPersonCharacter::SetOwnerFor(this, Initiator);
+
+					if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+					{
+						montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
+					}
+				}
+				break;
+			}
+			case ECarriedType::NONE:
+			{
+				ServerPickupCommission(Initiator);
+				UE_LOG(LogTemp, Warning, TEXT("Not nice"));
+
 
 				if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
 				{
 					montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
 				}
+				break;
 			}
-			break;
-		}
-		case ECarriedType::NONE:
-		{
-			ServerPickupCommission(Initiator);
-			UE_LOG(LogTemp, Warning, TEXT("Not nice"));
-
-
-			if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
-			{
-				montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
 			}
-			break;
 		}
-		}
-	}
+	}	
 }
 
 void ACADisplayer::EndInteract(ACharacter* Initiator)
@@ -148,13 +185,6 @@ void ACADisplayer::EndInteract(ACharacter* Initiator)
 		}
 		}
 	}
-}
-
-void ACADisplayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ACADisplayer, ActorDisplayed);
 }
 
 void ACADisplayer::OnRep_Owner()
@@ -193,6 +223,9 @@ void ACADisplayer::OnRep_ActorDisplayed()
 				
 		WidgetComponent->SetWidget(ActorDisplayed->GetPosterDisplayWidget());
 		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+
+		StartAnimateScrolling();
+
 		/*WidgetComponent->SetTwoSided(true);
 
 		WidgetComponent2->SetWidgetClass(BackSideWidgetClass);
@@ -202,6 +235,8 @@ void ACADisplayer::OnRep_ActorDisplayed()
 	{
 		WidgetComponent->SetWidget(nullptr);
 		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+		StopAnimateScrolling();
 
 		/*WidgetComponent2->SetWidget(nullptr);
 		WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);*/

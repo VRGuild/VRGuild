@@ -68,6 +68,8 @@ public:
 
 	static bool IsInteracting(APawn* player);
 
+	FVector2D GetMousePos() const;
+
 protected:
 
 	/** Called for movement input */
@@ -119,5 +121,6 @@ private:
 	void ServerSetOwnerFor(AActor* actorToSet);
 
 	bool bIsInteracting;
+	FVector2D MousePos;
 };
 
