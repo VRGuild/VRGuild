@@ -12,12 +12,17 @@
 
 #include "Blueprint/UserWidget.h"
 
+#include "Engine/SkeletalMeshSocket.h"
+
 ACACarryInteractable::ACACarryInteractable()
 {
 	bReplicates = true;
 	bEnabled = true;
 
 	HeldScale = FVector(.5f);
+	RelativeSocketRot = FRotator(0.f);
+	RelativeSocketLoc = FVector(0.f);
+
 	HoldSocketName = "RightSocketHold";
 	CarryType = ECarriedType::NONE;
 }
@@ -54,8 +59,46 @@ void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttach
 
 	if (bAttachToOwner)
 	{
-		AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HoldSocketName);
-	}	
+
+		if (owner->GetMesh()->DoesSocketExist(HoldSocketName))
+		{
+			/*FTransform socketTransform;
+			socketTransform.SetTranslation(RelativeSocketLoc);
+			socketTransform.SetRotation(RelativeSocketRot.Quaternion());
+			socketTransform.SetScale3D(HeldScale);
+			SetActorTransform(socketTransform);*/
+
+			//FTransform socketTransform;
+			//int32 outBoneIndex;
+			//owner->GetMesh()->GetSocketInfoByName(HoldSocketName, socketTransform, outBoneIndex);
+			//
+			//UE_LOG(LogTemp, Warning, TEXT("Trans before: %s"), *socketTransform.ToString());
+			//
+			//socketTransform.SetTranslation(RelativeSocketLoc);
+			//socketTransform.SetRotation(RelativeSocketRot.Quaternion());
+			//socketTransform.SetScale3D(HeldScale);
+
+			//owner->GetMesh()->GetSocketInfoByName(HoldSocketName, socketTransform, outBoneIndex);
+			//
+			//UE_LOG(LogTemp, Warning, TEXT("Trans after: %s"), *socketTransform.ToString());
+
+			AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HoldSocketName);
+
+			UE_LOG(LogTemp, Warning, TEXT("SUCCESS"));
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("NONE"));
+		//else
+		//{			
+		//	USkeletalMeshSocket* NewSocket = NewObject<USkeletalMeshSocket>(owner->GetMesh()->SkeletalMesh);
+		//	NewSocket->SocketName = HoldSocketName;
+		//	NewSocket->RelativeLocation = RelativeSocketLoc;
+		//	NewSocket->RelativeRotation = RelativeSocketRot;
+		//	NewSocket->RelativeScale = HeldScale;
+
+		//	// Add the socket to the skeletal mesh
+		//	owner->GetMesh()->SkeletalMesh->AddSocket(NewSocket, true);
+		//}		
+	}
 }
 
 bool ACACarryInteractable::CanTrace(ACharacter* Initiator) const
@@ -86,7 +129,7 @@ void ACACarryInteractable::BeginInteract(ACharacter* Initiator)
 		{
 			carryComponent->StartCarry(this);
 		}
-	}	
+	}
 }
 
 void ACACarryInteractable::EndInteract(ACharacter* Initiator)

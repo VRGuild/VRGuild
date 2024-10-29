@@ -49,6 +49,10 @@ ACAProjectNotice::ACAProjectNotice()
 	BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	SetHideMesh(true);
+
+	HeldScale = FVector(.2f);
+	RelativeSocketRot = FRotator(-30.7f, -90.f, -60.f);
+	RelativeSocketLoc = FVector(8.7f, 0.f, -1.6f);
 }
 
 void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
