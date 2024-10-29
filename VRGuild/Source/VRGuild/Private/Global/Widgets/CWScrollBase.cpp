@@ -5,6 +5,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Components/ScrollBox.h"
+#include "../../../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "Global/Components/CACInteraction.h"
 
 bool UCWScrollBase::Init(UUserWidget* widgetToDisplay)
 {
@@ -115,7 +117,10 @@ void UCWScrollBase::OnUIModeActive(const FInputActionValue& Action)
 		{
 			EnhancedInputSubsystem->RemoveMappingContext(ScrollingInputContext);
 		}
-		else EnhancedInputSubsystem->AddMappingContext(ScrollingInputContext, 0);
+		else
+		{
+			EnhancedInputSubsystem->AddMappingContext(ScrollingInputContext, 0);
+		}
 	}
 	
 	ChangeInputModeToUI(value);
@@ -128,11 +133,16 @@ void UCWScrollBase::ChangeInputModeToUI(bool bEnable)
 		GetOwningPlayer()->SetShowMouseCursor(true);
 		if (EnhancedInputSubsystem)
 		{
+			if(auto interactionComp = GetOwningPlayerPawn()->GetComponentByClass<UCACInteraction>())
+				interactionComp->Disable();
+			
 			EnhancedInputSubsystem->RemoveMappingContext(DefaultInputContext);
 		}
 	}
 	else
 	{
+		if (auto interactionComp = GetOwningPlayerPawn()->GetComponentByClass<UCACInteraction>())
+			interactionComp->Enable();
 		GetOwningPlayer()->SetShowMouseCursor(false);
 		if (EnhancedInputSubsystem && !EnhancedInputSubsystem->HasMappingContext(DefaultInputContext))
 		{
