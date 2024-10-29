@@ -20,6 +20,8 @@ public:
 
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
 
+	virtual void BeginTrace(ACharacter* Initiator) override;
+
 	virtual void BeginInteract(ACharacter* Initiator) override;
 
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
@@ -54,4 +56,8 @@ public:
 	TSubclassOf<UUserWidget> WidgetFrontSide;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> WidgetBackSide;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category=Settings)
+	FString PlayerCarryingMessage;
 };

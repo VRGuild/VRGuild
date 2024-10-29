@@ -53,6 +53,8 @@ ACAProjectNotice::ACAProjectNotice()
 	HeldScale = FVector(.2f);
 	RelativeSocketRot = FRotator(-30.7f, -90.f, -60.f);
 	RelativeSocketLoc = FVector(8.7f, 0.f, -1.6f);
+
+	PlayerCarryingMessage = TEXT("Replace Poster");
 }
 
 void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
@@ -63,6 +65,23 @@ void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOw
 	{
 		NoticeData = notice->NoticeData;
 	}
+}
+
+void ACAProjectNotice::BeginTrace(ACharacter* Initiator)
+{
+	FString message = GetTraceMessage();
+
+	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	{
+		if (carryComp->GetCarriedActor() && carryComp->GetCarryType() == ECarriedType::COMMISSION)
+		{
+			message = PlayerCarryingMessage;
+		}
+	}
+
+	SetTraceMessage(message);
+
+	Super::BeginTrace(Initiator);
 }
 
 void ACAProjectNotice::BeginInteract(ACharacter* Initiator)
