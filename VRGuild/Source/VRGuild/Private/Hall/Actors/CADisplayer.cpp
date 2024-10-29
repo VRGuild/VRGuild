@@ -10,6 +10,7 @@
 #include "Components/BoxComponent.h"
 
 #include "Global/CACarryInteractable.h"
+#include "Global/Components/CACCharacterAnimMontage.h"
 
 ACADisplayer::ACADisplayer()
 {
@@ -90,12 +91,23 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 			{
 				ATP_ThirdPersonCharacter::SetOwnerFor(this, Initiator);
 
+				if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+				{
+					montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
+				}
 			}
 			break;
 		}
 		case ECarriedType::NONE:
 		{
 			ServerPickupCommission(Initiator);
+			UE_LOG(LogTemp, Warning, TEXT("Not nice"));
+
+
+			if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+			{
+				montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
+			}
 			break;
 		}
 		}

@@ -65,9 +65,9 @@ void ACAProjectNotice::BeginInteract(ACharacter* Initiator)
 {
 	Super::BeginInteract(Initiator);
 
-	if (auto animMontage = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+	if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
 	{
-		animMontage->StartAnimMontage(EAnimMontageType::POINT);
+		montageComp->StartAnimMontage(EAnimMontageType::PICKUP);
 	}
 }
 
