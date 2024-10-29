@@ -57,7 +57,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FVector HeldScale;
-
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	FVector RelativeSocketLoc;
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	FRotator RelativeSocketRot;
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FName HoldSocketName;
 
