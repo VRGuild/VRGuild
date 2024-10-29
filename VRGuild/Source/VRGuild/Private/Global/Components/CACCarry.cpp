@@ -56,6 +56,28 @@ void UCACCarry::StartDrop()
 	}
 }
 
+void UCACCarry::HideCarryWidget()
+{
+	if (ScrollBaseWidget && ActorInHand)
+	{
+		if (ScrollBaseWidget->IsVisible())
+		{
+			ScrollBaseWidget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
+
+void UCACCarry::UnHideCarryWidget()
+{
+	if (ScrollBaseWidget && ActorInHand)
+	{
+		if (!ScrollBaseWidget->IsVisible())
+		{
+			ScrollBaseWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+}
+
 FGameplayTagContainer UCACCarry::GetGameplayTagContainer() const
 {
 	if (ActorInHand)
@@ -113,7 +135,7 @@ void UCACCarry::OnRep_ActorInHand()
 			{
 				ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
 				ScrollBaseWidget->Init(widgetToDisplay);
-				ScrollBaseWidget->AddToViewport();
+				ScrollBaseWidget->AddToViewport(-1);
 			}
 			else UE_LOG(LogTemp, Warning, TEXT("no widget to display in StartCarry()"));
 		}

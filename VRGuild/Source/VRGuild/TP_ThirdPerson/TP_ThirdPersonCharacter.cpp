@@ -90,6 +90,7 @@ void ATP_ThirdPersonCharacter::SetInteracting(APawn* player, bool bInteracting)
 			if (bInteracting)
 			{
 				character->InteractionComponent->Disable();
+				character->CarryComponent->HideCarryWidget();
 				if (auto playerController = character->GetController<APlayerController>())
 				{
 					playerController->SetInputMode(FInputModeUIOnly());
@@ -100,6 +101,7 @@ void ATP_ThirdPersonCharacter::SetInteracting(APawn* player, bool bInteracting)
 			else
 			{
 				character->InteractionComponent->Enable();
+				character->CarryComponent->UnHideCarryWidget();
 				if (auto playerController = character->GetController<APlayerController>())
 				{
 					playerController->SetInputMode(FInputModeGameOnly());
