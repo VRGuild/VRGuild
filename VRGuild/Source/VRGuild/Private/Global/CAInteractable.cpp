@@ -14,7 +14,6 @@ ACAInteractable::ACAInteractable()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	TraceMessage = TEXT("Default Msg");
 	
 	RootComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
 	RootComponent = RootComp;
@@ -51,21 +50,15 @@ void ACAInteractable::BeginPlay()
 	}
 }
 
-void ACAInteractable::SetTraceMessage(FString newMsg)
+FString ACAInteractable::GetTraceMessage(ACharacter* Initiator) const
 {
-	TraceMessage = newMsg;
-}
-
-FString ACAInteractable::GetTraceMessage() const
-{
-	return TraceMessage;
+	return TEXT("");
 }
 
 // Called every frame
 void ACAInteractable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 bool ACAInteractable::CanTrace(ACharacter* Initiator) const
@@ -82,7 +75,7 @@ void ACAInteractable::BeginTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayTraceMessage(true, TraceMessage);
+		GameInstance->DisplayTraceMessage(true, GetTraceMessage(Initiator));
 	}
 }
 
@@ -90,7 +83,7 @@ void ACAInteractable::EndTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayTraceMessage(false, TraceMessage);
+		GameInstance->DisplayTraceMessage(false, GetTraceMessage(Initiator));
 	}
 }
 

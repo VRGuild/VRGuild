@@ -16,7 +16,6 @@
 #include "Global/Components/CACCarry.h"
 #include "Global/Components/CACInteraction.h"
 
-
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////

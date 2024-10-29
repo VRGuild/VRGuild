@@ -25,8 +25,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	void SetTraceMessage(FString newMsg);
-	FString GetTraceMessage() const;
+	virtual FString GetTraceMessage(ACharacter* Initiator) const;
 	
 public:
 	FGameplayTagContainer GetGameplayTagContainer() const;
@@ -62,8 +61,6 @@ protected:
 	void SetHideMesh(bool bHide);
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
-	FString TraceMessage;
 	TObjectPtr<UCGIGameInstance> GameInstance;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	bool bHideMesh;

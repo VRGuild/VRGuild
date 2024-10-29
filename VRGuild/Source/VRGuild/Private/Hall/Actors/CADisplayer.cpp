@@ -11,6 +11,7 @@
 
 #include "Global/CACarryInteractable.h"
 #include "Global/Components/CACCharacterAnimMontage.h"
+#include "Global/Components/CWCDisplayScroll.h"
 
 ACADisplayer::ACADisplayer()
 {
@@ -20,7 +21,7 @@ ACADisplayer::ACADisplayer()
 	DisplayMessage = TEXT("Place Commission");
 	PickupMessage = TEXT("Pick up displayed actor");
 
-	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>("WidgetComponent");
+	WidgetComponent = CreateDefaultSubobject<UCWCDisplayScroll>("WidgetComponent");
 	WidgetComponent->SetupAttachment(RootComponent);
 	WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
@@ -39,17 +40,17 @@ void ACADisplayer::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ACADisplayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (OwnerCharacter)
-	{
-		UpdatedMousePos = OwnerCharacter->GetMousePos();
-
-		OnMousePressInteract(StartMousePos - UpdatedMousePos);
-	}	
-}
+//void ACADisplayer::Tick(float DeltaTime)
+//{
+//	Super::Tick(DeltaTime);
+//
+//	if (PlayerThatStartedInteracting)
+//	{
+//		UpdatedMousePos = PlayerThatStartedInteracting->GetMousePos();
+//
+//		OnMousePressInteract(StartMousePos - UpdatedMousePos);
+//	}	
+//}
 
 void ACADisplayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -75,28 +76,27 @@ bool ACADisplayer::CanInteract(ACharacter* Initiator) const
 
 void ACADisplayer::BeginTrace(ACharacter* Initiator)
 {
-	bool bCan = false;
-
-	UE_LOG(LogTemp, Warning, TEXT("BeginTrace"));
-
-	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
-	{
-		bCan = carryComp->GetCarryType() == ECarriedType::COMMISSION;
-	}
-
-	FString Message = bCan ? DisplayMessage : ErrorMessage;
-
-	if (ActorDisplayed && Owner == Initiator && Initiator->IsLocallyControlled())
-		Message = PickupMessage;
-
-	SetTraceMessage(Message);
-
 	Super::BeginTrace(Initiator);
 }
 
 void ACADisplayer::EndTrace(ACharacter* Initiator)
 {
 	Super::EndTrace(Initiator);
+
+	/*if (ActorDisplayed)
+	{
+		SetActorTickEnabled(false);
+
+		if (auto carry = PlayerThatStartedInteracting->GetComponentByClass<UCACCarry>())
+		{
+			carry->UnHideCarryWidget();
+		}
+	}*/
+}
+
+void ACADisplayer::EndScroll(ACharacter* Initiator)
+{
+
 }
 
 void ACADisplayer::BeginInteract(ACharacter* Initiator)
@@ -105,56 +105,56 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 
 	if (!Initiator) return;
 
-	if (ActorDisplayed)
+	/*if (ActorDisplayed)
 	{
-		OwnerCharacter = GetOwner<ATP_ThirdPersonCharacter>();
+		SetActorTickEnabled(true);
 
-		if (!OwnerCharacter) return;
+		PlayerThatStartedInteracting = Cast<ATP_ThirdPersonCharacter>(Initiator);
 
-		if (auto carry = OwnerCharacter->GetComponentByClass<UCACCarry>())
+		if (auto carry = PlayerThatStartedInteracting->GetComponentByClass<UCACCarry>())
 		{
 			carry->HideCarryWidget();
 		}
-		//ATP_ThirdPersonCharacter::SetInteracting(character, true);
 				
-		StartMousePos = OwnerCharacter->GetMousePos();
-		SetActorTickEnabled(true);
+		StartMousePos = PlayerThatStartedInteracting->GetMousePos();		
 	}
 	else
 	{
-		if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+		
+	}*/	
+
+	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	{
+		switch (carryComp->GetCarryType())
 		{
-			switch (carryComp->GetCarryType())
+		case ECarriedType::COMMISSION:
+		{
+			AActor* actorCarried = carryComp->GetCarriedActor();
+			if (ensure(actorCarried) && !ActorDisplayed)
 			{
-			case ECarriedType::COMMISSION:
-			{
-				AActor* actorCarried = carryComp->GetCarriedActor();
-				if (ensure(actorCarried) && !ActorDisplayed)
-				{
-					ATP_ThirdPersonCharacter::SetOwnerFor(this, Initiator);
-
-					if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
-					{
-						montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
-					}
-				}
-				break;
-			}
-			case ECarriedType::NONE:
-			{
-				ServerPickupCommission(Initiator);
-				UE_LOG(LogTemp, Warning, TEXT("Not nice"));
-
+				ATP_ThirdPersonCharacter::SetOwnerFor(this, Initiator);
 
 				if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
 				{
 					montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
 				}
-				break;
 			}
-			}
+			break;
 		}
-	}	
+		case ECarriedType::NONE:
+		{
+			ServerPickupCommission(Initiator);
+			UE_LOG(LogTemp, Warning, TEXT("Not nice"));
+
+
+			if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+			{
+				montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
+			}
+			break;
+		}
+		}
+	}
 }
 
 void ACADisplayer::EndInteract(ACharacter* Initiator)
@@ -211,6 +211,27 @@ void ACADisplayer::OnRep_Owner()
 			WidgetComponent->SetWidgetClass(nullptr);
 		}
 	}
+}
+
+FString ACADisplayer::GetTraceMessage(ACharacter* player) const
+{
+	Super::GetTraceMessage(player);
+
+	bool bCan = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("BeginTrace"));
+
+	if (auto carryComp = player->GetComponentByClass<UCACCarry>())
+	{
+		bCan = carryComp->GetCarryType() == ECarriedType::COMMISSION;
+	}
+
+	FString Message = bCan ? DisplayMessage : ErrorMessage;
+
+	if (ActorDisplayed && Owner == player && player->IsLocallyControlled())
+		Message = PickupMessage;
+
+	return Message;
 }
 
 void ACADisplayer::OnRep_ActorDisplayed()

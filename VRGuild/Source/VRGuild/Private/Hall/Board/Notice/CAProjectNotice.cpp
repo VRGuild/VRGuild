@@ -69,18 +69,6 @@ void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOw
 
 void ACAProjectNotice::BeginTrace(ACharacter* Initiator)
 {
-	FString message = GetTraceMessage();
-
-	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
-	{
-		if (carryComp->GetCarriedActor() && carryComp->GetCarryType() == ECarriedType::COMMISSION)
-		{
-			message = PlayerCarryingMessage;
-		}
-	}
-
-	SetTraceMessage(message);
-
 	Super::BeginTrace(Initiator);
 }
 
@@ -161,4 +149,21 @@ void ACAProjectNotice::OnRep_bEnabled()
 	{
 
 	}
+}
+
+FString ACAProjectNotice::GetTraceMessage(ACharacter* player) const
+{
+	Super::GetTraceMessage(player);
+
+	FString message = TEXT("Hold");
+
+	if (auto carryComp = player->GetComponentByClass<UCACCarry>())
+	{
+		if (carryComp->GetCarriedActor() && carryComp->GetCarryType() == ECarriedType::COMMISSION)
+		{
+			message = PlayerCarryingMessage;
+		}
+	}
+
+	return message;
 }

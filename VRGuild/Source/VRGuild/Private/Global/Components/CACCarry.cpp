@@ -160,6 +160,8 @@ void UCACCarry::OnRep_ActorInHand()
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333.1 Remove from Parent"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 				ScrollBaseWidget->RemoveFromParent();
+				ScrollBaseWidget = nullptr;
+				
 			}
 		}
 	}
