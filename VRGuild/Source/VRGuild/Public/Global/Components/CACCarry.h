@@ -32,6 +32,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartDrop();
 
+	UFUNCTION(BlueprintCallable)
+	void HideCarryWidget();
+	UFUNCTION(BlueprintCallable)
+	void UnHideCarryWidget();
+
 	FGameplayTagContainer GetGameplayTagContainer() const;
 
 	FString GetMessageForNPC();
