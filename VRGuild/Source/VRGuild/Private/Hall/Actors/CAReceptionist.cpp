@@ -24,7 +24,11 @@ void ACAReceptionist::BeginTrace(ACharacter* Initiator)
 
 	if (auto CarryComponent = Initiator->GetComponentByClass<UCACCarry>())
 	{
-		SetTraceMessage(CarryComponent->GetMessageForNPC());
+		FString message = CarryComponent->GetMessageForNPC();
+		
+		if (message == TEXT("")) message = GetTraceMessage();
+		
+		SetTraceMessage(message);
 	}
 
 	Super::BeginTrace(Initiator);

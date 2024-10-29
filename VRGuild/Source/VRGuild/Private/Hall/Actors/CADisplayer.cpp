@@ -24,6 +24,12 @@ ACADisplayer::ACADisplayer()
 	WidgetComponent->SetupAttachment(RootComponent);
 	WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
+	/*WidgetComponent2 = CreateDefaultSubobject<UWidgetComponent>("WidgetComponent2");
+	WidgetComponent2->SetupAttachment(WidgetComponent);
+	WidgetComponent2->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
+	WidgetComponent2->SetRelativeLocation(FVector(1.f, 0.f, 0.f));
+	WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);*/
+
 	BoxOverlap->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
 	StaticMeshComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 }
@@ -187,11 +193,18 @@ void ACADisplayer::OnRep_ActorDisplayed()
 				
 		WidgetComponent->SetWidget(ActorDisplayed->GetPosterDisplayWidget());
 		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+		/*WidgetComponent->SetTwoSided(true);
+
+		WidgetComponent2->SetWidgetClass(BackSideWidgetClass);
+		WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);*/
 	}
 	else
 	{
 		WidgetComponent->SetWidget(nullptr);
 		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+		/*WidgetComponent2->SetWidget(nullptr);
+		WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);*/
 	}
 	
 }

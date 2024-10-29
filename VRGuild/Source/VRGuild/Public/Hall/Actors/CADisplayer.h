@@ -37,6 +37,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Settings)
 	TObjectPtr<UWidgetComponent> WidgetComponent;
 
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Settings)
+	TObjectPtr<UWidgetComponent> WidgetComponent2;*/
+
 	UFUNCTION(Server, Reliable)
 	void ServerDisplayCommission(AActor* commissionPassed);
 	
@@ -57,4 +60,7 @@ private:
 	TObjectPtr<ACACarryInteractable> ActorDisplayed;
 	UFUNCTION()
 	void OnRep_ActorDisplayed();
+
+	/*UPROPERTY(EditDefaultsOnly, Category = Settings)
+	TSubclassOf<UUserWidget> BackSideWidgetClass;*/
 };

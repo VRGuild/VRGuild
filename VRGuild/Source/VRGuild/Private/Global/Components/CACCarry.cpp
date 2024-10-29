@@ -101,13 +101,13 @@ FGameplayTagContainer UCACCarry::GetGameplayTagContainer() const
 
 FString UCACCarry::GetMessageForNPC()
 {
-	if (!ActorInHand) return TEXT("Default String");
+	if (!ActorInHand) return TEXT("");
 
 	switch (ActorInHand->GetCarriedType())
 	{
 	case ECarriedType::COMMISSION:
 	{
-		return TEXT("Submit Commission");
+		return TEXT("Apply for Commission");
 	}
 	case ECarriedType::REGISTRATION:
 	{
@@ -118,7 +118,7 @@ FString UCACCarry::GetMessageForNPC()
 		return TEXT("No carried objects");
 	}
 	}
-	return TEXT("Default string");
+	return TEXT("");
 }
 
 ECarriedType UCACCarry::GetCarryType() const
