@@ -159,7 +159,7 @@ void UCACInteraction::BeginInteract()
 
 		GetInterface(ActorOnFocus)->BeginInteract(Owner);
 
-		EndTrace();
+		//EndTrace();
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Begininteract"));
 }
@@ -172,7 +172,7 @@ void UCACInteraction::EndInteract()
 
 		GetInterface(ActorOnFocus)->EndInteract(Owner);
 
-		EndTrace();
+		//EndTrace();
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("No Endinteract"));
 }

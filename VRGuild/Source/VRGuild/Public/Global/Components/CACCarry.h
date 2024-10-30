@@ -46,6 +46,7 @@ public:
 	AActor* GetCarriedActor() const;
 private:
 	TObjectPtr<ACharacter> Owner;
+	UPROPERTY()
 	TObjectPtr<UCWScrollBase> ScrollBaseWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess))

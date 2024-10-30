@@ -36,13 +36,16 @@ void UCACCarry::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 void UCACCarry::StartCarry(ACACarryInteractable* actorToHold)
 {
 	if (!ensure(ScrollBaseWidgetClass)) return;
+
+	if (!actorToHold) return;
+
 	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111"));
 
 	if (bProcessingHold) return;
 
 	bProcessingHold = true;
 
-	if (ScrollBaseWidget)
+	if (IsValid(ScrollBaseWidget))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.1, remove %s from parent"), *GetNameSafe(ScrollBaseWidget));
 		ScrollBaseWidget->RemoveFromParent();
@@ -51,7 +54,7 @@ void UCACCarry::StartCarry(ACACarryInteractable* actorToHold)
 
 	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.2"));
 
-	if (ActorInHand)
+	if (IsValid(ActorInHand))
 	{
 		ActorInHand->Destroy();
 		ActorInHand = nullptr;
@@ -157,6 +160,8 @@ void UCACCarry::OnRep_ActorInHand()
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333.1 Remove from Parent"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 				ScrollBaseWidget->RemoveFromParent();
+				ScrollBaseWidget = nullptr;
+				
 			}
 		}
 	}

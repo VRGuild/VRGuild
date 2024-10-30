@@ -36,6 +36,8 @@ protected:
 
 	virtual void OnRep_bEnabled() override;
 
+	virtual FString GetTraceMessage(ACharacter* player) const override;
+
 public:	
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FProjectNotice NoticeData;

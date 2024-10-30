@@ -11,6 +11,7 @@
 
 #include "Global/CACarryInteractable.h"
 #include "Global/Components/CACCharacterAnimMontage.h"
+#include "Global/Components/CWCDisplayScroll.h"
 
 ACADisplayer::ACADisplayer()
 {
@@ -20,7 +21,7 @@ ACADisplayer::ACADisplayer()
 	DisplayMessage = TEXT("Place Commission");
 	PickupMessage = TEXT("Pick up displayed actor");
 
-	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>("WidgetComponent");
+	WidgetComponent = CreateDefaultSubobject<UCWCDisplayScroll>("WidgetComponent");
 	WidgetComponent->SetupAttachment(RootComponent);
 	WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
@@ -37,6 +38,25 @@ ACADisplayer::ACADisplayer()
 void ACADisplayer::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+//void ACADisplayer::Tick(float DeltaTime)
+//{
+//	Super::Tick(DeltaTime);
+//
+//	if (PlayerThatStartedInteracting)
+//	{
+//		UpdatedMousePos = PlayerThatStartedInteracting->GetMousePos();
+//
+//		OnMousePressInteract(StartMousePos - UpdatedMousePos);
+//	}	
+//}
+
+void ACADisplayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACADisplayer, ActorDisplayed);
 }
 
 bool ACADisplayer::CanTrace(ACharacter* Initiator) const
@@ -56,28 +76,27 @@ bool ACADisplayer::CanInteract(ACharacter* Initiator) const
 
 void ACADisplayer::BeginTrace(ACharacter* Initiator)
 {
-	bool bCan = false;
-
-	UE_LOG(LogTemp, Warning, TEXT("BeginTrace"));
-
-	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
-	{
-		bCan = carryComp->GetCarryType() == ECarriedType::COMMISSION;
-	}
-
-	FString Message = bCan ? DisplayMessage : ErrorMessage;
-
-	if (ActorDisplayed && Owner == Initiator && Initiator->IsLocallyControlled())
-		Message = PickupMessage;
-
-	SetTraceMessage(Message);
-
 	Super::BeginTrace(Initiator);
 }
 
 void ACADisplayer::EndTrace(ACharacter* Initiator)
 {
 	Super::EndTrace(Initiator);
+
+	/*if (ActorDisplayed)
+	{
+		SetActorTickEnabled(false);
+
+		if (auto carry = PlayerThatStartedInteracting->GetComponentByClass<UCACCarry>())
+		{
+			carry->UnHideCarryWidget();
+		}
+	}*/
+}
+
+void ACADisplayer::EndScroll(ACharacter* Initiator)
+{
+
 }
 
 void ACADisplayer::BeginInteract(ACharacter* Initiator)
@@ -85,6 +104,24 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 	Super::BeginInteract(Initiator);
 
 	if (!Initiator) return;
+
+	/*if (ActorDisplayed)
+	{
+		SetActorTickEnabled(true);
+
+		PlayerThatStartedInteracting = Cast<ATP_ThirdPersonCharacter>(Initiator);
+
+		if (auto carry = PlayerThatStartedInteracting->GetComponentByClass<UCACCarry>())
+		{
+			carry->HideCarryWidget();
+		}
+				
+		StartMousePos = PlayerThatStartedInteracting->GetMousePos();		
+	}
+	else
+	{
+		
+	}*/	
 
 	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
 	{
@@ -150,13 +187,6 @@ void ACADisplayer::EndInteract(ACharacter* Initiator)
 	}
 }
 
-void ACADisplayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ACADisplayer, ActorDisplayed);
-}
-
 void ACADisplayer::OnRep_Owner()
 {
 	Super::OnRep_Owner();
@@ -183,6 +213,27 @@ void ACADisplayer::OnRep_Owner()
 	}
 }
 
+FString ACADisplayer::GetTraceMessage(ACharacter* player) const
+{
+	Super::GetTraceMessage(player);
+
+	bool bCan = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("BeginTrace"));
+
+	if (auto carryComp = player->GetComponentByClass<UCACCarry>())
+	{
+		bCan = carryComp->GetCarryType() == ECarriedType::COMMISSION;
+	}
+
+	FString Message = bCan ? DisplayMessage : ErrorMessage;
+
+	if (ActorDisplayed && Owner == player && player->IsLocallyControlled())
+		Message = PickupMessage;
+
+	return Message;
+}
+
 void ACADisplayer::OnRep_ActorDisplayed()
 {
 	if (!WidgetComponent) return;
@@ -193,6 +244,9 @@ void ACADisplayer::OnRep_ActorDisplayed()
 				
 		WidgetComponent->SetWidget(ActorDisplayed->GetPosterDisplayWidget());
 		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+
+		StartAnimateScrolling();
+
 		/*WidgetComponent->SetTwoSided(true);
 
 		WidgetComponent2->SetWidgetClass(BackSideWidgetClass);
@@ -202,6 +256,8 @@ void ACADisplayer::OnRep_ActorDisplayed()
 	{
 		WidgetComponent->SetWidget(nullptr);
 		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+		StopAnimateScrolling();
 
 		/*WidgetComponent2->SetWidget(nullptr);
 		WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);*/

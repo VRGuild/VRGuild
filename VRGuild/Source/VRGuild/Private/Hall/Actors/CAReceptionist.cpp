@@ -18,19 +18,6 @@ void ACAReceptionist::BeginPlay()
 
 void ACAReceptionist::BeginTrace(ACharacter* Initiator)
 {
-	if (!Initiator) return;
-
-	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist BeginTrace"));
-
-	if (auto CarryComponent = Initiator->GetComponentByClass<UCACCarry>())
-	{
-		FString message = CarryComponent->GetMessageForNPC();
-		
-		if (message == TEXT("")) message = GetTraceMessage();
-		
-		SetTraceMessage(message);
-	}
-
 	Super::BeginTrace(Initiator);
 }
 
@@ -104,4 +91,34 @@ void ACAReceptionist::EndInteract(ACharacter* Initiator)
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("ACAReceptionist EndINteract"));
+}
+
+FString ACAReceptionist::GetTraceMessage(ACharacter* Initiator) const
+{
+	Super::GetTraceMessage(Initiator);
+
+	if (!Initiator) return TEXT("Error");
+
+	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	{
+		switch (carryComp->GetCarryType())
+		{
+		case ECarriedType::COMMISSION:
+		{
+			return TEXT("Apply for Commission");
+			break;
+		}
+		case ECarriedType::REGISTRATION:
+		{
+			break;
+		}
+		case ECarriedType::NONE:
+		{
+			return TEXT("Guild Receptionist");
+			break;
+		}
+		}
+	}
+	
+	return TEXT("Error");
 }

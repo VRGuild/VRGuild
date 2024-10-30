@@ -28,6 +28,8 @@ protected:
 	void DisplayCommossionPopup(bool bDisplay);
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayDefaultPopup(bool bDisplay);
+
+	virtual FString GetTraceMessage(ACharacter* Initiator) const override;
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta=(AllowPrivateAccess))
 	TObjectPtr<UInputMappingContext> DefaultInputContext;
