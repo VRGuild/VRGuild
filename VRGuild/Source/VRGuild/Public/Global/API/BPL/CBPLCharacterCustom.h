@@ -19,9 +19,9 @@ struct FCharacterCustomInfo {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(BlueprintReadWrite)
-	int32 characterId;
+	int32 characterId = 0;
 	UPROPERTY(BlueprintReadWrite)
-	FString accountId;
+	FString accountId = "";
 	UPROPERTY(BlueprintReadWrite)
 	TArray <int32> Status;
 };
