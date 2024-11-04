@@ -40,18 +40,13 @@ public:
 
 	ECarriedType GetCarriedType() const;
 
-	virtual UUserWidget* GetPosterDisplayWidget() const;
-
 	bool IsEnabled() const;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, Category="Settings")
-	TSubclassOf<UUserWidget> PosterWidgetToDisplayClass;
-	
+protected:	
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	TSubclassOf<ACACarryInteractable> SelfActor;
 	

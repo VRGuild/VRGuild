@@ -10,7 +10,7 @@
  * 
  */
 
-class ACACarryInteractable;
+class ACAProjectNotice;
 class UWidgetComponent;
 class ATP_ThirdPersonCharacter;
 class UCWCDisplayScroll;
@@ -72,7 +72,7 @@ private:
 	FString PickupMessage;
 
 	UPROPERTY(ReplicatedUsing = OnRep_ActorDisplayed)
-	TObjectPtr<ACACarryInteractable> ActorDisplayed;
+	TObjectPtr<ACAProjectNotice> ActorDisplayed;
 	UFUNCTION()
 	void OnRep_ActorDisplayed();
 

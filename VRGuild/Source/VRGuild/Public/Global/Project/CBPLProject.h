@@ -46,7 +46,7 @@ public:
 	FProjectNotice() {};
 
 	UPROPERTY(BlueprintReadWrite)
-	int32 ProjectNoticeId;
+	int32 ProjectNoticeId = -1;
 	UPROPERTY(BlueprintReadWrite)
 	int32 ProjectDetailId;
 	UPROPERTY(BlueprintReadWrite)

@@ -31,13 +31,12 @@ void ACANoticeBoard::BeginPlay()
 
 void ACANoticeBoard::PostProjectNotice(FVector position, FProjectNotice projectNotice)
 {
-
 	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActor<ACAProjectNotice>(this->ProjectNoticeClass);
 
 	newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	newProjectNotice->SetActorRelativeLocation(position);
 	
-	newProjectNotice->NoticeData = projectNotice;
+	newProjectNotice->SetNoticeData(projectNotice);
 
 	if (UCWGProjectNotice* FrontSideWidget = Cast<UCWGProjectNotice>(newProjectNotice->FrontSideComp->GetWidget()))
 		FrontSideWidget->SetProjectInfo(projectNotice);

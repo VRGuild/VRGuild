@@ -10,106 +10,6 @@
 #include "Global/Components/CACCarry.h"
 #include "Global/Components/CACCharacterAnimMontage.h"
 
-// Sets default values
-ACAProjectNotice::ACAProjectNotice()
-{
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
-	/*this->RootSceneComp = CreateDefaultSubobject<USceneComponent>(FName("RootSceneComp"));
-	this->SetRootComponent(this->RootSceneComp);*/
-
-	bReplicates = true;
-
-	this->FrontSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("FrontSide"));
-	this->FrontSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	this->FrontSideComp->SetDrawSize(this->WidgetDrawSize);
-	this->FrontSideComp->SetRelativeScale3D(FVector(0.1));
-	ConstructorHelpers::FClassFinder<UUserWidget> tempFrontSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeFrontSide.WBP_ProjectNoticeFrontSide_C'"));
-
-	if (tempFrontSide.Succeeded())
-	{
-		this->FrontSideComp->SetWidgetClass(tempFrontSide.Class);
-	}
-
-	FrontSideComp->SetCollisionProfileName("Interactable");
-
-	this->BackSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("BackSide"));
-	this->BackSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	this->BackSideComp->SetRelativeLocation(FVector(-0.1, 0, 0));
-	this->BackSideComp->SetRelativeRotation(FRotator(0, 180, 0));
-	this->BackSideComp->SetDrawSize(this->WidgetDrawSize);
-	this->BackSideComp->SetTwoSided(true);
-	this->BackSideComp->SetRelativeScale3D(FVector(0.1));
-	ConstructorHelpers::FClassFinder<UUserWidget> tempBackSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeBackSide.WBP_ProjectNoticeBackSide_C'"));
-	if (tempBackSide.Succeeded())
-	{
-		this->BackSideComp->SetWidgetClass(tempBackSide.Class);
-	}
-
-	BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	SetHideMesh(true);
-
-	HeldScale = FVector(.2f);
-	RelativeSocketRot = FRotator(-30.7f, -90.f, -60.f);
-	RelativeSocketLoc = FVector(8.7f, 0.f, -1.6f);
-
-	PlayerCarryingMessage = TEXT("Replace Poster");
-}
-
-void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
-{
-	Super::Init(bIsEnabled, owner, bAttachToOwner, actorInteracted);
-
-	if (auto notice = Cast<ACAProjectNotice>(actorInteracted))
-	{
-		NoticeData = notice->NoticeData;
-	}
-}
-
-void ACAProjectNotice::BeginTrace(ACharacter* Initiator)
-{
-	Super::BeginTrace(Initiator);
-}
-
-void ACAProjectNotice::BeginInteract(ACharacter* Initiator)
-{
-	Super::BeginInteract(Initiator);
-
-	if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
-	{
-		montageComp->StartAnimMontage(EAnimMontageType::PICKUP);
-	}
-}
-
-UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
-{
-	auto Widget = Super::GetPosterDisplayWidget();
-	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(Widget);
-	if (ensure(ProjectAPIWidget))
-	{
-		ProjectAPIWidget->OnSetDetailInfo(this->NoticeData);
-		return ProjectAPIWidget;
-	}
-	return nullptr;
-}
-
-bool ACAProjectNotice::CanTrace(ACharacter* player) const
-{
-	bool bCanTrace = Super::CanTrace(player);
-
-	if (auto carryComp = player->GetComponentByClass<UCACCarry>())
-	{
-		if (auto carriedNotice = Cast<ACAProjectNotice>(carryComp->GetCarriedActor()))
-		{
-			return bCanTrace && NoticeData.ProjectTitle != carriedNotice->NoticeData.ProjectTitle;
-		}
-	}
-
-	return bCanTrace;
-}
-
-// Called when the game starts or when spawned
 void ACAProjectNotice::BeginPlay()
 {
 	Super::BeginPlay();
@@ -127,6 +27,28 @@ void ACAProjectNotice::BeginPlay()
 	}
 }
 
+void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
+{
+	Super::Init(bIsEnabled, owner, bAttachToOwner, actorInteracted);
+
+	if (auto notice = Cast<ACAProjectNotice>(actorInteracted))
+	{
+		NoticeData = notice->NoticeData;
+	}
+}
+
+UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
+{
+	auto widget = Super::GetPosterDisplayWidget();
+	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(widget);
+	if (ensure(ProjectAPIWidget))
+	{
+		ProjectAPIWidget->OnSetDetailInfo(this->NoticeData);
+		return ProjectAPIWidget;
+	}
+	return nullptr;
+}
+
 void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -134,36 +56,21 @@ void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ACAProjectNotice, NoticeData);
 }
 
-void ACAProjectNotice::OnRep_bEnabled()
+void ACAProjectNotice::SetNoticeData(const FProjectNotice& newData)
 {
-	Super::OnRep_bEnabled();
-	auto owner = GetOwner<ACharacter>();
-
-	if (IsEnabled())
-	{
-		FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
-	}
-	else FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
-
-	if (owner && owner->IsLocallyControlled())
-	{
-
-	}
+	if(newData.ProjectNoticeId != -1)
+		NoticeData = newData;
 }
 
-FString ACAProjectNotice::GetTraceMessage(ACharacter* player) const
+bool ACAProjectNotice::CheckCanTrace(ACharacter* player) const
 {
-	Super::GetTraceMessage(player);
-
-	FString message = TEXT("Hold");
-
 	if (auto carryComp = player->GetComponentByClass<UCACCarry>())
 	{
-		if (carryComp->GetCarriedActor() && carryComp->GetCarryType() == ECarriedType::COMMISSION)
+		if (auto carriedNotice = Cast<ACAProjectNotice>(carryComp->GetCarriedActor()))
 		{
-			message = PlayerCarryingMessage;
+			return NoticeData.ProjectTitle != carriedNotice->NoticeData.ProjectTitle;
 		}
 	}
 
-	return message;
+	return true;
 }

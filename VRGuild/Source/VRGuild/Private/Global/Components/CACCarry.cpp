@@ -8,6 +8,7 @@
 
 #include "Global/Widgets/CWScrollBase.h"
 #include "Global/CACarryInteractable.h"
+#include "Global/Actors/CABasePoster.h"
 
 UCACCarry::UCACCarry()
 {
@@ -143,9 +144,9 @@ void UCACCarry::OnRep_ActorInHand()
 	UE_LOG(LogTemp, Warning, TEXT("[%s] Carry: 3333"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 	if (Owner && Owner->IsLocallyControlled())
 	{
-		if (ActorInHand)
+		if (auto actor = Cast<ACABasePoster>(ActorInHand))
 		{
-			auto widgetToDisplay = ActorInHand->GetPosterDisplayWidget();
+			auto widgetToDisplay = actor->GetPosterDisplayWidget();
 			if (ensure(widgetToDisplay))
 			{
 				ScrollBaseWidget = CreateWidget<UCWScrollBase>(GetWorld(), ScrollBaseWidgetClass);
