@@ -155,11 +155,6 @@ ECarriedType ACACarryInteractable::GetCarriedType() const
 	return CarryType;
 }
 
-UUserWidget* ACACarryInteractable::GetPosterDisplayWidget() const
-{
-	return CreateWidget<UUserWidget>(GetWorld(), PosterWidgetToDisplayClass);
-}
-
 bool ACACarryInteractable::IsEnabled() const
 {
 	return bEnabled;

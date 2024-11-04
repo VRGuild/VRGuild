@@ -5,61 +5,28 @@
 #include "Global/Project/CBPLProject.h"
 
 #include "CoreMinimal.h"
-#include "Global/CACarryInteractable.h"
+#include "Global/Actors/CABasePoster.h"
 #include "CAProjectNotice.generated.h"
 
-
 UCLASS()
-class VRGUILD_API ACAProjectNotice : public ACACarryInteractable
+class VRGUILD_API ACAProjectNotice : public ACABasePoster
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ACAProjectNotice();
-
-	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
-
-	virtual void BeginTrace(ACharacter* Initiator) override;
-
-	virtual void BeginInteract(ACharacter* Initiator) override;
-
-	virtual UUserWidget* GetPosterDisplayWidget() const override;
-
-	virtual bool CanTrace(ACharacter* player) const override; 
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void OnRep_bEnabled() override;
+public:
+	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
 
-	virtual FString GetTraceMessage(ACharacter* player) const override;
+	virtual UUserWidget* GetPosterDisplayWidget() const override;
+	
+	void SetNoticeData(const FProjectNotice& newData);
 
-public:	
+protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FProjectNotice NoticeData;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FVector2D WidgetDrawSize = { 400,440 };
-
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	USceneComponent* RootSceneComp;*/
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class UWidgetComponent* FrontSideComp;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class UWidgetComponent* BackSideComp;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> WidgetFrontSide;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> WidgetBackSide;
-
-protected:
-	UPROPERTY(EditDefaultsOnly, Category=Settings)
-	FString PlayerCarryingMessage;
+	virtual bool CheckCanTrace(ACharacter* player) const override;
 };

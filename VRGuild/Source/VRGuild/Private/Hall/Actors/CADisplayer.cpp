@@ -9,7 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/BoxComponent.h"
 
-#include "Global/CACarryInteractable.h"
+#include "Hall/Board/Notice/CAProjectNotice.h"
 #include "Global/Components/CACCharacterAnimMontage.h"
 #include "Global/Components/CWCDisplayScroll.h"
 
@@ -267,7 +267,7 @@ void ACADisplayer::OnRep_ActorDisplayed()
 
 void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPassed)
 {
-	if (auto actorSpawned = GetWorld()->SpawnActorDeferred<ACACarryInteractable>(commissionPassed->GetClass(), GetActorTransform(), this,
+	if (auto actorSpawned = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(commissionPassed->GetClass(), GetActorTransform(), this,
 		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
 	{
 		ActorDisplayed = actorSpawned;
