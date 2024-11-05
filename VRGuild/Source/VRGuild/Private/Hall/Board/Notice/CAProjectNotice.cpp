@@ -55,11 +55,11 @@ void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOw
 	}
 }
 
-void ACAProjectNotice::Init(const FProjectNotice& newData)
+void ACAProjectNotice::Init(const FProjectDetailInfo& newData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ProjectNotice SetNoticeData success"));
 
-	if (newData.ProjectNoticeId != -1)
+	if (newData.projectId != -1)
 		NoticeData = newData;
 }
 
@@ -86,7 +86,7 @@ bool ACAProjectNotice::CheckCanTrace(ACharacter* player) const
 	{
 		if (auto carriedNotice = Cast<ACAProjectNotice>(carryComp->GetCarriedActor()))
 		{
-			return NoticeData.ProjectTitle != carriedNotice->NoticeData.ProjectTitle;
+			return NoticeData.projectId != carriedNotice->NoticeData.projectId;
 		}
 	}
 

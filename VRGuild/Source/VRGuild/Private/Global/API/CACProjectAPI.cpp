@@ -145,9 +145,9 @@ void UCACProjectAPI::ProjectCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr
     }
 }
 
-void UCACProjectAPI::ProjectGetCall(const FString& ProjectId)
+void UCACProjectAPI::ProjectGetCall(const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/%s"), *ProjectId);
+    this->API = FString::Printf(TEXT("api/project/%d"), ProjectId);
     HttpGetCall();
 }
 
@@ -166,9 +166,9 @@ void UCACProjectAPI::ProjectGetCallBack(FHttpRequestPtr req, FHttpResponsePtr re
     }
 }
 
-void UCACProjectAPI::ProjectUpdateCall(const FString& ProjectId, const FProjectInfo& ProjectInfo)
+void UCACProjectAPI::ProjectUpdateCall(const int64 ProjectId, const FProjectInfo& ProjectInfo)
 {
-    this->API = FString::Printf(TEXT("api/project/%s"), *ProjectId);
+    this->API = FString::Printf(TEXT("api/project/%d"), ProjectId);
     HttpPatchCall<FProjectInfo>(ProjectInfo);
 }
 
@@ -187,9 +187,9 @@ void UCACProjectAPI::ProjectUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr
     }
 }
 
-void UCACProjectAPI::ProjectDetailGetCall(const FString& ProjectId)
+void UCACProjectAPI::ProjectDetailGetCall(const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/detail/%s"), *ProjectId);
+    this->API = FString::Printf(TEXT("api/project/detail/%d"), ProjectId);
     HttpGetCall();
 }
 
@@ -208,9 +208,9 @@ void UCACProjectAPI::ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponse
     }
 }
 
-void UCACProjectAPI::ProjectListGetCall(const FString& Number)
+void UCACProjectAPI::ProjectListGetCall(const int64 Number)
 {
-    this->API = FString::Printf(TEXT("api/project/list/%s"), *Number);
+    this->API = FString::Printf(TEXT("api/project/list/%d"), Number);
     HttpGetCall();
 }
 
@@ -221,7 +221,7 @@ void UCACProjectAPI::ProjectListGetCallBack(FHttpRequestPtr req, FHttpResponsePt
 
     if (ParsedResponse.status == TEXT("success"))
     {
-        OnProjectListGetCallBack(ParsedResponse.data);
+        OnProjectListGetCallBack(ParsedResponse);
     }
     else
     {
@@ -229,9 +229,9 @@ void UCACProjectAPI::ProjectListGetCallBack(FHttpRequestPtr req, FHttpResponsePt
     }
 }
 
-void UCACProjectAPI::ProjectTeamListGetCall(const FString& ProjectId)
+void UCACProjectAPI::ProjectTeamListGetCall(const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/team/%s"), *ProjectId);
+    this->API = FString::Printf(TEXT("api/project/team/%d"), ProjectId);
     HttpGetCall();
 }
 
@@ -250,9 +250,9 @@ void UCACProjectAPI::ProjectTeamListGetCallBack(FHttpRequestPtr req, FHttpRespon
     }
 }
 
-void UCACProjectAPI::ProjectCommentListGetCall(const FString& ProjectId)
+void UCACProjectAPI::ProjectCommentListGetCall(const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/comment/%s"), *ProjectId);
+    this->API = FString::Printf(TEXT("api/project/comment/%d"), ProjectId);
     HttpGetCall();
 }
 
@@ -263,7 +263,7 @@ void UCACProjectAPI::ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpRes
 
     if (ParsedResponse.status == TEXT("success"))
     {
-        OnProjectCommentListGetCallBack(ParsedResponse.data.commentList);
+        OnProjectCommentListGetCallBack(ParsedResponse.data);
     }
     else
     {
@@ -271,9 +271,9 @@ void UCACProjectAPI::ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpRes
     }
 }
 
-void UCACProjectAPI::ProjectApplyCall(const FString& ProjectId)
+void UCACProjectAPI::ProjectApplyCall(const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/apply/%s"), *ProjectId);
+    this->API = FString::Printf(TEXT("api/project/apply/%d"), ProjectId);
     HttpGetCall();
 }
 

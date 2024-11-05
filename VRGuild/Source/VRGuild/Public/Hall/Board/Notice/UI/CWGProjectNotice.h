@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "Global/API/BPL/CBPLProject.h"
+
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Global/Project/CBPLProjectOld.h"
 #include "CWGProjectNotice.generated.h"
 
-struct FProjectNotice;
 /**
  * 
  */
@@ -18,8 +19,8 @@ class VRGUILD_API UCWGProjectNotice : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetProjectInfo(FProjectNotice projectNotice);
+	void SetProjectInfo(FProjectDetailInfo projectInfo);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FProjectNotice ProjectNotice;
+	FProjectDetailInfo ProjectInfo;
 };

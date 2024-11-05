@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Global/Project/CBPLProjectOld.h"
+#include "Global/API/BPL/CBPLProject.h"
 
 #include "CoreMinimal.h"
 #include "Global/Actors/CABasePoster.h"
@@ -18,7 +18,7 @@ protected:
 
 public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
-	void Init(const FProjectNotice& newData); /*Change to FReviewNotice*/
+	void Init(const FEvaluation& newData); /*Change to FReviewNotice*/
 
 	virtual void OnCompletedCallback() override;
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
@@ -26,7 +26,7 @@ public:
 
 protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	FProjectNotice NoticeData; 
+	FEvaluation NoticeData;
 
 	virtual bool CheckCanTrace(ACharacter* player) const override;
 	virtual void ServerExecuteOnCompletedDelegate_Implementation() override;

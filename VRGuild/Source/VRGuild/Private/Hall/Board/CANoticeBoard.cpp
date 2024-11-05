@@ -28,7 +28,17 @@ void ACANoticeBoard::BeginPlay()
 	FProjectNotice test = FProjectNotice();
 }
 
-void ACANoticeBoard::PostProjectNotice(FVector position, FProjectNotice projectNotice)
+void ACANoticeBoard::PostAllProjectNotice(FProjectListResponse projectNoticeList)
+{
+	this->ProjectDetailInfoList.Empty();
+	this->ProjectDetailInfoList.Append(projectNoticeList.data);
+	for (int32 i = 0; i < projectNoticeList.data.Num() ;  i++ )
+	{
+		PostProjectNotice(FVector(0, -120 * i, 0), projectNoticeList.data[i]);
+	}
+}
+
+void ACANoticeBoard::PostProjectNotice(FVector position, FProjectDetailInfo projectNotice)
 {
 	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(this->ProjectNoticeClass, FTransform::Identity);
 	if (ensure(newProjectNotice))
@@ -42,7 +52,7 @@ void ACANoticeBoard::PostProjectNotice(FVector position, FProjectNotice projectN
 	}	
 }
 
-void ACANoticeBoard::PostReviewNotice(FVector position, FProjectNotice reviewNotice) /*Change to FReviewNotice*/ 
+void ACANoticeBoard::PostReviewNotice(FVector position, FEvaluation reviewNotice) /*Change to FReviewNotice*/
 {
 	ACAReviewNotice* newReviewNotice = GetWorld()->SpawnActorDeferred<ACAReviewNotice>(this->ReviewNoticeClass, FTransform::Identity);
 	if (ensure(newReviewNotice))

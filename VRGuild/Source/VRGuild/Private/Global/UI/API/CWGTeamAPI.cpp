@@ -116,9 +116,9 @@ void UCWGTeamAPI::TeamCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCWGTeamAPI::TeamGetCall(const FString& TeamId)
+void UCWGTeamAPI::TeamGetCall(const int64& TeamId)
 {
-    this->API = FString::Printf(TEXT("api/team/%s"), *TeamId);
+    this->API = FString::Printf(TEXT("api/team/%d"), TeamId);
     HttpGetCall();
 }
 
@@ -137,9 +137,9 @@ void UCWGTeamAPI::TeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCWGTeamAPI::TeamUpdateCall(const FString& TeamId, const FTeamInfo& TeamInfo)
+void UCWGTeamAPI::TeamUpdateCall(const int64& TeamId, const FTeamInfo& TeamInfo)
 {
-    this->API = FString::Printf(TEXT("api/team/%s"), *TeamId);
+    this->API = FString::Printf(TEXT("api/team/%d"), TeamId);
     HttpPatchCall<FTeamInfo>(TeamInfo);
 }
 

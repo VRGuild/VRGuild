@@ -21,5 +21,5 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FProjectNotice ProjectNotice; /*Change to FReviewNotice*/
+	FProjectNotice ProjectInfo; /*Change to FReviewNotice*/
 };
