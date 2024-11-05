@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Global/Project/CBPLProjectOld.h"
+#include "Global/API/BPL/CBPLProject.h"
 
 #include "CoreMinimal.h"
 #include "Global/Actors/CABasePoster.h"
@@ -19,15 +19,14 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
-	void Init(const FProjectNotice& newData);
+	void Init(const FProjectDetailInfo& newData);
 
 	virtual void OnCompletedCallback() override;
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
-	
 
 protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	FProjectNotice NoticeData;
+	FProjectDetailInfo NoticeData;
 
 	virtual bool CheckCanTrace(ACharacter* player) const override;
 };

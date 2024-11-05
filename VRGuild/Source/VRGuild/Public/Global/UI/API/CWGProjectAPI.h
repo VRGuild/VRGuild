@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "Global/Project/CBPLProjectOld.h"
-
 #include "CoreMinimal.h"
 #include "Global/UI/API/CWGBaseAPI.h"
 #include "CWGProjectAPI.generated.h"
@@ -17,81 +15,78 @@ class VRGUILD_API UCWGProjectAPI : public UCWGBaseAPI
 	GENERATED_BODY()
 
 public:
-	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
-	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+    virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+    virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
-	UFUNCTION(BlueprintCallable)
-	void ProjectNewProjectPostCall(FProjectAPI projectInfo);
-	void ProjectNewProjectPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectNewProjectPostCallBack(FProjectInfoAPI projectDetail);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectNewProjectPostCallBack();
+    // Create Project
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectCreateCall(const FProjectInfo& ProjectInfo);
+    void ProjectCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectCreateCallBack(const FProjectInfo& ProjectInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectCreateCallBack();
 
+    // Get Project
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectGetCall(const int64& ProjectId);
+    void ProjectGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectGetCallBack(const FProjectInfo& ProjectInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void ProjectPatchCall(FProjectAPI projectInfo);
-	void ProjectPatchCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectPatchCallBack(FProjectInfoAPI projectDetail);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectPatchCallBack();
+    // Update Project
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectUpdateCall(const int64& ProjectId, const FProjectInfo& ProjectInfo);
+    void ProjectUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectUpdateCallBack(const FProjectInfo& ProjectInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectUpdateCallBack();
 
+    // Get Project Detail
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectDetailGetCall(const int64& ProjectId);
+    void ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectDetailGetCallBack(const FProjectDetailInfo& ProjectDetail);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectDetailGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void ProjectDetailGetCall(int32 projectId);
-	void ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectDetailGetCallBack(FProjectDetailAPI projectDetail);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectDetailGetCallBack();
+    // Get Project List
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectListGetCall(const int64& Number);
+    void ProjectListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectListGetCallBack(const TArray<FProjectDetailInfo>& ProjectList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectListGetCallBack();
 
+    // Get Project Team List
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectTeamListGetCall(const int64& ProjectId);
+    void ProjectTeamListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectTeamListGetCallBack(const FProjectTeamList& TeamList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectTeamListGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void ProjectDetailDeleteCall(int32 projectId);
-	void ProjectDetailDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectDetailDeleteCallBack();
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectDetailDeleteCallBack();
+    // Get Project Comment List
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectCommentListGetCall(const int64& ProjectId);
+    void ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectCommentListGetCallBack(const TArray<int64>& CommentList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectCommentListGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void ProjectAllGetCall();
-	void ProjectAllGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectAllGetCallBack(FProjectAllDataAPI allProject);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectAllGetCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void ProjectSupportPostCall(FProjectSupportAPI supportInfo);
-	void ProjectSupportPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectSupportPostCallBack(FProjectAllDataAPI allProject);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectSupportPostCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void ProjectSupportDeleteCall(int32 supportId);
-	void ProjectSupportDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectSupportDeleteCallBack(FProjectAllDataAPI allProject);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectSupportDeleteCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void ProjectSupportGetCall(int32 supportId);
-	void ProjectSupportGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectSupportGetCallBack(FProjectAllDataAPI allProject);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectSupportGetCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void ProjectSupportTeamGetCall(int32 teamId);
-	void ProjectSupportTeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnProjectSupportTeamGetCallBack(FProjectAllDataAPI allProject);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailProjectSupportTeamGetCallBack();
+    // Apply To Project
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectApplyCall(const int64& ProjectId);
+    void ProjectApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectApplyCallBack(const FProjectTeamList& TeamList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectApplyCallBack(const FString& ErrorMessage);
 };

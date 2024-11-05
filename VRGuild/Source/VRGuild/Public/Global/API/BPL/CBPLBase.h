@@ -39,7 +39,7 @@ struct FEvaluation
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Skill|Evaluation")
-    int64 evaluationId;
+    int64 evaluationId = -1;
     UPROPERTY(BlueprintReadWrite, Category = "Skill|Evaluation")
     int64 userId;
     UPROPERTY(BlueprintReadWrite, Category = "Skill|Evaluation")
@@ -237,7 +237,7 @@ struct FProjectInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Project")
-    int64 projectId;
+    int64 projectId = -1;
     UPROPERTY(BlueprintReadWrite, Category = "Project")
     int64 userId;
     UPROPERTY(BlueprintReadWrite, Category = "Project")
@@ -271,7 +271,7 @@ struct FSupportInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Support")
-    int64 supportId;
+    int64 supportId = -1;
     UPROPERTY(BlueprintReadWrite, Category = "Support")
     int64 teamId;
     UPROPERTY(BlueprintReadWrite, Category = "Support")
@@ -285,7 +285,7 @@ struct FExperience
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "User|Experience")
-    int64 expId;
+    int64 expId = -1;
     UPROPERTY(BlueprintReadWrite, Category = "User|Experience")
     int64 userId;
     UPROPERTY(BlueprintReadWrite, Category = "User|Experience")

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Global/API/BPL/CBPLProject.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CANoticeBoard.generated.h"
@@ -13,8 +15,6 @@ enum class EPosterType : uint8
 	REVIEW UMETA(DisplayName = "Review"),
 	NONE UMETA(DisplayName = "None")
 };
-
-struct FProjectNotice;
 
 UCLASS()
 class VRGUILD_API ACANoticeBoard : public AActor
@@ -36,18 +36,26 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMesh* BoardMesh;
 
+
 protected:
-	UFUNCTION(BlueprintCallable)
-	void PostProjectNotice(FVector position, FProjectNotice projectNotice);
 
 	UFUNCTION(BlueprintCallable)
-	void PostReviewNotice(FVector position, FProjectNotice reviewNotice); /*Change to FReviewNotice*/ 
+	void PostAllProjectNotice(FProjectListResponse projectNoticeList);
+
+	UFUNCTION(BlueprintCallable)
+	void PostProjectNotice(FVector position, FProjectDetailInfo projectNotice);
+
+	UFUNCTION(BlueprintCallable)
+	void PostReviewNotice(FVector position, FEvaluation reviewNotice); /*Change to FReviewNotice*/
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Notices)
 	TSubclassOf<class ACAProjectNotice> ProjectNoticeClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class ACAReviewNotice> ReviewNoticeClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FProjectDetailInfo> ProjectDetailInfoList;
 
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess), Category="Settings")

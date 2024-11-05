@@ -33,7 +33,7 @@ public:
 
     // Get Team
     UFUNCTION(BlueprintCallable, Category = "Team API")
-    void TeamGetCall(const FString& TeamId);
+    void TeamGetCall(const int64& TeamId);
     void TeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
     void OnTeamGetCallBack(const FTeamInfo& TeamInfo);
@@ -42,7 +42,7 @@ public:
 
     // Update Team
     UFUNCTION(BlueprintCallable, Category = "Team API")
-    void TeamUpdateCall(const FString& TeamId, const FTeamInfo& TeamInfo);
+    void TeamUpdateCall(const int64& TeamId, const FTeamInfo& TeamInfo);
     void TeamUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
     void OnTeamUpdateCallBack(const FTeamInfo& TeamInfo);

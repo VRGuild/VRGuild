@@ -2,273 +2,289 @@
 
 
 #include "Global/UI/API/CWGProjectAPI.h"
+#include "Global/API/BPL/CBPLProject.h"
 
 void UCWGProjectAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FRegexPattern PostProjectPattern(TEXT(R"(POST\s+/api/project)"));
-    FRegexPattern PatchProjectPattern(TEXT(R"(PATCH\s+/api/project)"));
-    FRegexPattern GetProjectByIdPattern(TEXT(R"(GET\s+/api/project/(\d+))"));
-    FRegexPattern DeleteProjectPattern(TEXT(R"(DELETE\s+/api/project/(\d+))"));
-    FRegexPattern GetProjectAllPattern(TEXT(R"(GET\s+/api/project/summary)"));
+    UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
 
-    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support)"));
-    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support/(\d+))"));
-    FRegexPattern GetProjectSupportPorjectPattern(TEXT(R"(GET\s+/api/support/project/(\d+))"));
-    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+))"));
+    FRegexPattern CreateProjectPattern(TEXT(R"(POST\s+/api/project$)"));
+    FRegexPattern GetProjectPattern(TEXT(R"(GET\s+/api/project/(\d+)$)"));
+    FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
+    FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
+    FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
+    FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
+    FRegexPattern GetProjectCommentPattern(TEXT(R"(GET\s+/api/project/comment/(\d+)$)"));
+    FRegexPattern ApplyProjectPattern(TEXT(R"(GET\s+/api/project/apply/(\d+)$)"));
 
-    // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
-    UE_LOG(LogTemp, Display, TEXT("%s"), *UrlToMatch);
-    if (FRegexMatcher(PostProjectPattern, UrlToMatch).FindNext())
+    UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
+
+    if (FRegexMatcher(CreateProjectPattern, UrlToMatch).FindNext())
     {
-        UE_LOG(LogTemp, Display, TEXT("POST new project"));
-        ProjectNewProjectPostCallBack(req, res);
+        ProjectCreateCallBack(req, res);
     }
-    else if (FRegexMatcher(PatchProjectPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectPattern, UrlToMatch).FindNext())
     {
-        UE_LOG(LogTemp, Display, TEXT("PATCH update project"));
-        ProjectPatchCallBack(req, res);
+        ProjectGetCallBack(req, res);
     }
-    else if (FRegexMatcher(GetProjectByIdPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(UpdateProjectPattern, UrlToMatch).FindNext())
     {
-        FRegexMatcher Matcher(GetProjectByIdPattern, UrlToMatch);
-        Matcher.FindNext();
-        FString ProjectId = Matcher.GetCaptureGroup(1);
-        UE_LOG(LogTemp, Display, TEXT("GET Project ID: %s"), *ProjectId);
+        ProjectUpdateCallBack(req, res);
+    }
+    else if (FRegexMatcher(GetProjectDetailPattern, UrlToMatch).FindNext())
+    {
         ProjectDetailGetCallBack(req, res);
     }
-    else if (FRegexMatcher(DeleteProjectPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectListPattern, UrlToMatch).FindNext())
     {
-        FRegexMatcher Matcher(DeleteProjectPattern, UrlToMatch);
-        Matcher.FindNext();
-        FString ProjectId = Matcher.GetCaptureGroup(1);
-        UE_LOG(LogTemp, Display, TEXT("DELETE Project ID: %s"), *ProjectId);
-        ProjectDetailDeleteCallBack(req, res);
+        ProjectListGetCallBack(req, res);
     }
-    else if (FRegexMatcher(GetProjectAllPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectTeamPattern, UrlToMatch).FindNext())
     {
-        ProjectAllGetCallBack(req, res);
+        ProjectTeamListGetCallBack(req, res);
     }
-    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectCommentPattern, UrlToMatch).FindNext())
     {
-        ProjectSupportPostCallBack(req, res);
+        ProjectCommentListGetCallBack(req, res);
     }
-    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(ApplyProjectPattern, UrlToMatch).FindNext())
     {
-        ProjectSupportDeleteCallBack(req, res);
-    }
-    else if (FRegexMatcher(GetProjectSupportPorjectPattern, UrlToMatch).FindNext())
-    {
-        ProjectSupportGetCallBack(req, res);
-    }
-    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
-    {
-        ProjectSupportTeamGetCallBack(req, res);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No matching endpoint found for URL: %s"), *UrlToMatch);
-        // Handle 404 case
+        ProjectApplyCallBack(req, res);
     }
 }
-
 
 void UCWGProjectAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    UE_LOG(LogTemp, Display, TEXT("OnFailAPI : %s \n"), *req->GetURL());
-    FRegexPattern PostProjectPattern(TEXT(R"(POST\s+/api/project)"));
-    FRegexPattern PatchProjectPattern(TEXT(R"(PATCH\s+/api/project)"));
-    FRegexPattern GetProjectByIdPattern(TEXT(R"(GET\s+/api/project/(\d+))"));
-    FRegexPattern DeleteProjectPattern(TEXT(R"(DELETE\s+/api/project/(\d+))"));
-    FRegexPattern GetProjectAllPattern(TEXT(R"(GET\s+/api/project/summary)"));
-
-    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support)"));
-    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support/(\d+))"));
-    FRegexPattern GetProjectSupportPorjectPattern(TEXT(R"(GET\s+/api/support/project/(\d+))"));
-    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+))"));
-
-    // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
-    UE_LOG(LogTemp, Display, TEXT("%s"), *UrlToMatch);
-    if (FRegexMatcher(PostProjectPattern, UrlToMatch).FindNext())
+
+    FRegexPattern CreateProjectPattern(TEXT(R"(POST\s+/api/project$)"));
+    FRegexPattern GetProjectPattern(TEXT(R"(GET\s+/api/project/(\d+)$)"));
+    FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
+    FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
+    FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
+    FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
+    FRegexPattern GetProjectCommentPattern(TEXT(R"(GET\s+/api/project/comment/(\d+)$)"));
+    FRegexPattern ApplyProjectPattern(TEXT(R"(GET\s+/api/project/apply/(\d+)$)"));
+
+    if (FRegexMatcher(CreateProjectPattern, UrlToMatch).FindNext())
     {
-        UE_LOG(LogTemp, Display, TEXT("POST new project"));
-        OnFailProjectNewProjectPostCallBack();
+        OnFailProjectCreateCallBack();
     }
-    else if (FRegexMatcher(PatchProjectPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectPattern, UrlToMatch).FindNext())
     {
-        UE_LOG(LogTemp, Display, TEXT("PATCH update project"));
-        OnFailProjectPatchCallBack();
+        OnFailProjectGetCallBack();
     }
-    else if (FRegexMatcher(GetProjectByIdPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(UpdateProjectPattern, UrlToMatch).FindNext())
     {
-        FRegexMatcher Matcher(GetProjectByIdPattern, UrlToMatch);
-        Matcher.FindNext();
-        FString ProjectId = Matcher.GetCaptureGroup(1);
-        UE_LOG(LogTemp, Display, TEXT("GET Project ID: %s"), *ProjectId);
+        OnFailProjectUpdateCallBack();
+    }
+    else if (FRegexMatcher(GetProjectDetailPattern, UrlToMatch).FindNext())
+    {
         OnFailProjectDetailGetCallBack();
     }
-    else if (FRegexMatcher(DeleteProjectPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectListPattern, UrlToMatch).FindNext())
     {
-        FRegexMatcher Matcher(DeleteProjectPattern, UrlToMatch);
-        Matcher.FindNext();
-        FString ProjectId = Matcher.GetCaptureGroup(1);
-        UE_LOG(LogTemp, Display, TEXT("DELETE Project ID: %s"), *ProjectId);
-        OnFailProjectDetailDeleteCallBack();
+        OnFailProjectListGetCallBack();
     }
-    else if (FRegexMatcher(GetProjectAllPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectTeamPattern, UrlToMatch).FindNext())
     {
-        OnFailProjectAllGetCallBack();
+        OnFailProjectTeamListGetCallBack();
     }
-    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetProjectCommentPattern, UrlToMatch).FindNext())
     {
-        OnFailProjectSupportPostCallBack();
+        OnFailProjectCommentListGetCallBack();
     }
-    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(ApplyProjectPattern, UrlToMatch).FindNext())
     {
-        OnFailProjectSupportDeleteCallBack();
+        FString ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다.");
+        if (res->GetResponseCode() == 400)
+        {
+            TSharedPtr<FJsonObject> JsonObject;
+            TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(res->GetContentAsString());
+            if (FJsonSerializer::Deserialize(Reader, JsonObject))
+            {
+                ErrorMessage = JsonObject->GetStringField(TEXT("message"));
+            }
+        }
+        OnFailProjectApplyCallBack(ErrorMessage);
     }
-    else if (FRegexMatcher(GetProjectSupportPorjectPattern, UrlToMatch).FindNext())
+}
+
+void UCWGProjectAPI::ProjectCreateCall(const FProjectInfo& ProjectInfo)
+{
+    this->API = TEXT("api/project");
+    HttpPostCall<FProjectInfo>(ProjectInfo);
+}
+
+void UCWGProjectAPI::ProjectCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
+
+    if (ParsedResponse.status == TEXT("success"))
     {
-        OnFailProjectSupportGetCallBack();
-    }
-    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
-    {
-        OnFailProjectSupportTeamGetCallBack();
+        OnProjectCreateCallBack(ParsedResponse.data);
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("No matching endpoint found for URL: %s"), *UrlToMatch);
-        // Handle 404 case
+        OnFailProjectCreateCallBack();
     }
 }
 
-void UCWGProjectAPI::ProjectNewProjectPostCall(FProjectAPI projectInfo)
+void UCWGProjectAPI::ProjectGetCall(const int64& ProjectId)
 {
-    this->API = "api/project";
-
-    HttpPostCall<FProjectAPI>(projectInfo);
+    this->API = FString::Printf(TEXT("api/project/%d"), ProjectId);
+    HttpGetCall();
 }
 
-void UCWGProjectAPI::ProjectNewProjectPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGProjectAPI::ProjectGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FProjectInfoAPI ParseData;
-    ParseData = JsonPerse<FProjectInfoAPI>(jsonString);
-    OnProjectNewProjectPostCallBack(ParseData);
+    FString JsonString = res->GetContentAsString();
+    FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
+
+    if (ParsedResponse.status == TEXT("success"))
+    {
+        OnProjectGetCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailProjectGetCallBack();
+    }
 }
 
-void UCWGProjectAPI::ProjectPatchCall(FProjectAPI projectInfo)
+void UCWGProjectAPI::ProjectUpdateCall(const int64& ProjectId, const FProjectInfo& ProjectInfo)
 {
-    this->API = "api/project";
-
-    HttpPostCall<FProjectAPI>(projectInfo);
+    this->API = FString::Printf(TEXT("api/project/%d"), ProjectId);
+    HttpPatchCall<FProjectInfo>(ProjectInfo);
 }
 
-void UCWGProjectAPI::ProjectPatchCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGProjectAPI::ProjectUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FProjectInfoAPI ParseData;
-    ParseData = JsonPerse<FProjectInfoAPI>(jsonString);
-    OnProjectPatchCallBack(ParseData);
+    FString JsonString = res->GetContentAsString();
+    FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
+
+    if (ParsedResponse.status == TEXT("success"))
+    {
+        OnProjectUpdateCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailProjectUpdateCallBack();
+    }
 }
 
-void UCWGProjectAPI::ProjectDetailGetCall(int32 projectId)
+void UCWGProjectAPI::ProjectDetailGetCall(const int64& ProjectId)
 {
-    this->API = "api/project/" + FString::FromInt(projectId) + "/detail";
-
+    this->API = FString::Printf(TEXT("api/project/detail/%d"), ProjectId);
     HttpGetCall();
 }
 
 void UCWGProjectAPI::ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FProjectDetailAPI ParseData;
-    ParseData = JsonPerse<FProjectDetailAPI>(jsonString);
-    OnProjectDetailGetCallBack(ParseData);
+    FString JsonString = res->GetContentAsString();
+    FProjectDetailResponse ParsedResponse = JsonPerse<FProjectDetailResponse>(JsonString);
+
+    if (ParsedResponse.status == TEXT("success"))
+    {
+        OnProjectDetailGetCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailProjectDetailGetCallBack();
+    }
 }
 
-void UCWGProjectAPI::ProjectDetailDeleteCall(int32 projectId)
+void UCWGProjectAPI::ProjectListGetCall(const int64& Number)
 {
-    this->API = "api/project/" + FString::FromInt(projectId);
-
-    HttpDeleteCall();
-}
-
-void UCWGProjectAPI::ProjectDetailDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    OnProjectDetailDeleteCallBack();
-}
-
-void UCWGProjectAPI::ProjectAllGetCall()
-{
-    this->API = "api/project/summary";
-
+    this->API = FString::Printf(TEXT("api/project/list/%d"), Number);
     HttpGetCall();
 }
 
-void UCWGProjectAPI::ProjectAllGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGProjectAPI::ProjectListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectAllGetCallBack(ParseData);
+    FString JsonString = res->GetContentAsString();
+    FProjectListResponse ParsedResponse = JsonPerse<FProjectListResponse>(JsonString);
+
+    if (ParsedResponse.status == TEXT("success"))
+    {
+        OnProjectListGetCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailProjectListGetCallBack();
+    }
 }
 
-void UCWGProjectAPI::ProjectSupportPostCall(FProjectSupportAPI supportInfo)
+void UCWGProjectAPI::ProjectTeamListGetCall(const int64& ProjectId)
 {
-    this->API = "api/support";
-
-    HttpPostCall<FProjectSupportAPI>(supportInfo);
-}
-
-void UCWGProjectAPI::ProjectSupportPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportPostCallBack(ParseData);
-}
-void UCWGProjectAPI::ProjectSupportDeleteCall(int32 supportId)
-{
-    this->API = "api/support" + FString::FromInt(supportId);
-
-    HttpDeleteCall();
-}
-
-void UCWGProjectAPI::ProjectSupportDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportDeleteCallBack(ParseData);
-}
-
-void UCWGProjectAPI::ProjectSupportGetCall(int32 supportId)
-{
-    this->API = "api/support/project/" + FString::FromInt(supportId);
-
+    this->API = FString::Printf(TEXT("api/project/team/%d"), ProjectId);
     HttpGetCall();
 }
 
-void UCWGProjectAPI::ProjectSupportGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGProjectAPI::ProjectTeamListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportGetCallBack(ParseData);
-}
-void UCWGProjectAPI::ProjectSupportTeamGetCall(int32 teamId)
-{
-    this->API = "api/support/team/" + FString::FromInt(teamId);
+    FString JsonString = res->GetContentAsString();
+    FProjectTeamListResponse ParsedResponse = JsonPerse<FProjectTeamListResponse>(JsonString);
 
+    if (ParsedResponse.status == TEXT("success"))
+    {
+        OnProjectTeamListGetCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailProjectTeamListGetCallBack();
+    }
+}
+
+void UCWGProjectAPI::ProjectCommentListGetCall(const int64& ProjectId)
+{
+    this->API = FString::Printf(TEXT("api/project/comment/%d"), ProjectId);
     HttpGetCall();
 }
 
-void UCWGProjectAPI::ProjectSupportTeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGProjectAPI::ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportTeamGetCallBack(ParseData);
+    FString JsonString = res->GetContentAsString();
+    FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
+
+    if (ParsedResponse.status == TEXT("success"))
+    {
+        OnProjectCommentListGetCallBack(ParsedResponse.data.commentList);
+    }
+    else
+    {
+        OnFailProjectCommentListGetCallBack();
+    }
+}
+
+void UCWGProjectAPI::ProjectApplyCall(const int64& ProjectId)
+{
+    this->API = FString::Printf(TEXT("api/project/apply/%d"), ProjectId);
+    HttpGetCall();
+}
+
+void UCWGProjectAPI::ProjectApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FProjectTeamListResponse ParsedResponse = JsonPerse<FProjectTeamListResponse>(JsonString);
+
+    if (ParsedResponse.status == TEXT("success"))
+    {
+        OnProjectApplyCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        FString ErrorMessage = TEXT("프로젝트 지원에 실패했습니다.");
+        if (res->GetResponseCode() == 400)
+        {
+            TSharedPtr<FJsonObject> JsonObject;
+            TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(res->GetContentAsString());
+            if (FJsonSerializer::Deserialize(Reader, JsonObject))
+            {
+                ErrorMessage = JsonObject->GetStringField(TEXT("message"));
+            }
+        }
+        OnFailProjectApplyCallBack(ErrorMessage);
+    }
 }

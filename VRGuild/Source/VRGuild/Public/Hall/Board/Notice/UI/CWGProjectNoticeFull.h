@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Global/Project/CBPLProjectOld.h"
+#include "Global/API/BPL/CBPLProject.h"
 
 #include "CoreMinimal.h"
 #include "Global/UI/API/CWGProjectAPI.h"
@@ -11,9 +11,6 @@
 /**
  * 
  */
-
-class UCWGProjectNotice;
-
 UCLASS()
 class VRGUILD_API UCWGProjectNoticeFull : public UCWGProjectAPI
 {
@@ -21,5 +18,5 @@ class VRGUILD_API UCWGProjectNoticeFull : public UCWGProjectAPI
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnSetDetailInfo(FProjectNotice ProjectInfo);
+	void OnSetDetailInfo(FProjectDetailInfo ProjectInfo);
 };
