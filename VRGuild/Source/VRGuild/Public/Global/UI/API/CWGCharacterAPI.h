@@ -1,27 +1,26 @@
-﻿#pragma once
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
 
 #include "CoreMinimal.h"
-#include "Global/API/CACBaseAPI.h"
-#include "CACCharacterAPI.generated.h"
+#include "Global/UI/API/CWGBaseAPI.h"
+#include "CWGCharacterAPI.generated.h"
 
 struct FCharacterDetailResponse;
 struct FCharacterInfo;
 
-
-UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class VRGUILD_API UCACCharacterAPI : public UCACBaseAPI
+/**
+ * 
+ */
+UCLASS()
+class VRGUILD_API UCWGCharacterAPI : public UCWGBaseAPI
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
-public:
-    UCACCharacterAPI();
-
-protected:
-    virtual void BeginPlay() override;
-    virtual void InitializeComponent() override;
     virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
     virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
+protected:
     // Get Character
     UFUNCTION(BlueprintCallable, Category = "Character API")
     void CharacterGetCall();
