@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Global/Project/CBPLProject.h"
+#include "Global/Project/CBPLProjectOld.h"
 #include "CWGProjectNotice.generated.h"
 
 struct FProjectNotice;

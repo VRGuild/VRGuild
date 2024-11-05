@@ -2,7 +2,7 @@
 
 
 #include "Hall/Board/CANoticeBoard.h"
-#include "Global/Project/CBPLProject.h"
+#include "Global/Project/CBPLProjectOld.h"
 #include "Hall/Board/Notice/CAProjectNotice.h"
 #include "Components/WidgetComponent.h"
 #include "Hall/Board/Notice/UI/CWGProjectNotice.h"
