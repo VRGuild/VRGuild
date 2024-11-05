@@ -2,327 +2,238 @@
 
 
 #include "Global/UI/API/CWGTeamAPI.h"
+#include "Global/API/BPL/CBPLTeam.h"
 
 void UCWGTeamAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FRegexPattern PostTeamPattern(TEXT(R"(POST\s+/api/team$)"));
-    FRegexPattern PatchTeamPattern(TEXT(R"(PATCH\s+/api/team$)"));
-    FRegexPattern GetTeamByIdPattern(TEXT(R"(GET\s+/api/team/(\d+)$)"));
-    FRegexPattern DeleteTeamByIdPattern(TEXT(R"(DELETE\s+/api/team/(\d+)$)"));
-    FRegexPattern GetTeamByManagerPattern(TEXT(R"(GET\s+/api/team/manager$)"));
-    FRegexPattern PostTeamByMemberPattern(TEXT(R"(POST\s+/api/team/member$)"));
-    FRegexPattern DeleteTeamByMemberPattern(TEXT(R"(DELETE\s+/api/team/member$)"));
-    FRegexPattern GetTeamByMembersSearchPattern(TEXT(R"(GET\s+/api/team/members/search$)"));
+    UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
 
-    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support$)"));
-    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support$)"));
-    FRegexPattern GetProjectSupportPattern(TEXT(R"(GET\s+/api/support/project/(\d+)$)"));
-    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+)$)"));
+    FRegexPattern CreateTeamPattern(TEXT(R"(POST\s+/api/team$)"));
+    FRegexPattern GetTeamPattern(TEXT(R"(GET\s+/api/team/(\d+)$)"));
+    FRegexPattern UpdateTeamPattern(TEXT(R"(PATCH\s+/api/team/(\d+)$)"));
+    FRegexPattern GetTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist$)"));
+    FRegexPattern GetUserTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist/user/(\d+)$)"));
+    FRegexPattern ApplyTeamPattern(TEXT(R"(GET\s+/api/team/apply/(\d+)$)"));
 
-    // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
+    UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
 
-    if (FRegexMatcher(PostTeamPattern, UrlToMatch).FindNext())
+    if (FRegexMatcher(CreateTeamPattern, UrlToMatch).FindNext())
     {
-        TeamPostCallBack(req, res);
+        TeamCreateCallBack(req, res);
     }
-    else if (FRegexMatcher(PatchTeamPattern, UrlToMatch).FindNext())
-    {
-        TeamPatchCallBack(req, res);
-    }
-    else if (FRegexMatcher(GetTeamByIdPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetTeamPattern, UrlToMatch).FindNext())
     {
         TeamGetCallBack(req, res);
     }
-    else if (FRegexMatcher(DeleteTeamByIdPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(UpdateTeamPattern, UrlToMatch).FindNext())
     {
-        TeamDeleteCallBack(req, res);
+        TeamUpdateCallBack(req, res);
     }
-    else if (FRegexMatcher(GetTeamByManagerPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetTeamListPattern, UrlToMatch).FindNext())
     {
-        TeamManagerGetCallBack(req, res);
+        TeamListGetCallBack(req, res);
     }
-    else if (FRegexMatcher(PostTeamByMemberPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetUserTeamListPattern, UrlToMatch).FindNext())
     {
-        TeamMemberPostCallBack(req, res);
+        TeamListByUserIdGetCallBack(req, res);
     }
-    else if (FRegexMatcher(DeleteTeamByMemberPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(ApplyTeamPattern, UrlToMatch).FindNext())
     {
-        TeamMemberDeleteCallBack(req, res);
-    }
-    else if (FRegexMatcher(GetTeamByMembersSearchPattern, UrlToMatch).FindNext())
-    {
-        TeamMemberSearchGetCallBack(req, res);
-    }
-    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
-    {
-        ProjectSupportPostCallBack(req, res);
-    }
-    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
-    {
-        ProjectSupportDeleteCallBack(req, res);
-    }
-    else if (FRegexMatcher(GetProjectSupportPattern, UrlToMatch).FindNext())
-    {
-        ProjectSupportGetCallBack(req, res);
-    }
-    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
-    {
-        ProjectSupportTeamGetCallBack(req, res);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No matching endpoint found for URL: %s"), *UrlToMatch);
-        // Handle 404 case
+        TeamApplyCallBack(req, res);
     }
 }
 
 void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FRegexPattern PostTeamPattern(TEXT(R"(POST\s+/api/team$)"));
-    FRegexPattern PatchTeamPattern(TEXT(R"(PATCH\s+/api/team$)"));
-    FRegexPattern GetTeamByIdPattern(TEXT(R"(GET\s+/api/team/(\d+)$)"));
-    FRegexPattern DeleteTeamByIdPattern(TEXT(R"(DELETE\s+/api/team/(\d+)$)"));
-    FRegexPattern GetTeamByManagerPattern(TEXT(R"(GET\s+/api/team/manager$)"));
-    FRegexPattern PostTeamByMemberPattern(TEXT(R"(POST\s+/api/team/member$)"));
-    FRegexPattern DeleteTeamByMemberPattern(TEXT(R"(DELETE\s+/api/team/member$)"));
-    FRegexPattern GetTeamByMembersSearchPattern(TEXT(R"(GET\s+/api/team/members/search$)"));
-
-    FRegexPattern PostProjectSupportPattern(TEXT(R"(POST\s+/api/support$)"));
-    FRegexPattern DeleteProjectSupportPattern(TEXT(R"(DELETE\s+/api/support$)"));
-    FRegexPattern GetProjectSupportPattern(TEXT(R"(GET\s+/api/support/project/(\d+)$)"));
-    FRegexPattern GetProjectSupportTeamPattern(TEXT(R"(GET\s+/api/support/team/(\d+)$)"));
-
-    // Implementation of routing logic
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
 
-    if (FRegexMatcher(PostTeamPattern, UrlToMatch).FindNext())
+    FRegexPattern CreateTeamPattern(TEXT(R"(POST\s+/api/team$)"));
+    FRegexPattern GetTeamPattern(TEXT(R"(GET\s+/api/team/(\d+)$)"));
+    FRegexPattern UpdateTeamPattern(TEXT(R"(PATCH\s+/api/team/(\d+)$)"));
+    FRegexPattern GetTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist$)"));
+    FRegexPattern GetUserTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist/user/(\d+)$)"));
+    FRegexPattern ApplyTeamPattern(TEXT(R"(GET\s+/api/team/apply/(\d+)$)"));
+
+    FString ErrorMessage;
+    if (res->GetResponseCode() == 400)
     {
-        OnFailTeamPostCallBack();
+        // Parse error message from response
+        FString JsonString = res->GetContentAsString();
+        TSharedPtr<FJsonObject> JsonObject;
+        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+        if (FJsonSerializer::Deserialize(Reader, JsonObject))
+        {
+            ErrorMessage = JsonObject->GetStringField(TEXT("message"));
+        }
     }
-    else if (FRegexMatcher(PatchTeamPattern, UrlToMatch).FindNext())
+
+    if (FRegexMatcher(CreateTeamPattern, UrlToMatch).FindNext())
     {
-        OnFailTeamPatchCallBack();
+        OnFailTeamCreateCallBack();
     }
-    else if (FRegexMatcher(GetTeamByIdPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetTeamPattern, UrlToMatch).FindNext())
     {
         OnFailTeamGetCallBack();
     }
-    else if (FRegexMatcher(DeleteTeamByIdPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(UpdateTeamPattern, UrlToMatch).FindNext())
     {
-        OnFailTeamDeleteCallBack();
+        OnFailTeamUpdateCallBack();
     }
-    else if (FRegexMatcher(GetTeamByManagerPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetTeamListPattern, UrlToMatch).FindNext())
     {
-        OnFailTeamManagerGetCallBack();
+        OnFailTeamListGetCallBack();
     }
-    else if (FRegexMatcher(PostTeamByMemberPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(GetUserTeamListPattern, UrlToMatch).FindNext())
     {
-        OnFailTeamMemberPostCallBack();
+        OnFailTeamListByUserIdGetCallBack();
     }
-    else if (FRegexMatcher(DeleteTeamByMemberPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(ApplyTeamPattern, UrlToMatch).FindNext())
     {
-        OnFailTeamMemberDeleteCallBack();
+        OnFailTeamApplyCallBack(ErrorMessage);
     }
-    else if (FRegexMatcher(GetTeamByMembersSearchPattern, UrlToMatch).FindNext())
+}
+
+// Implementation of all the Call and Callback functions...
+void UCWGTeamAPI::TeamCreateCall(const FTeamInfo& TeamInfo)
+{
+    this->API = TEXT("api/team");
+    HttpPostCall<FTeamInfo>(TeamInfo);
+}
+
+void UCWGTeamAPI::TeamCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
+
+    if (ParsedResponse.status == "success")
     {
-        OnFailTeamMemberSearchGetCallBack();
-    }
-    else if (FRegexMatcher(PostProjectSupportPattern, UrlToMatch).FindNext())
-    {
-        OnFailProjectSupportPostCallBack();
-    }
-    else if (FRegexMatcher(DeleteProjectSupportPattern, UrlToMatch).FindNext())
-    {
-        OnFailProjectSupportDeleteCallBack();
-    }
-    else if (FRegexMatcher(GetProjectSupportPattern, UrlToMatch).FindNext())
-    {
-        OnFailProjectSupportGetCallBack();
-    }
-    else if (FRegexMatcher(GetProjectSupportTeamPattern, UrlToMatch).FindNext())
-    {
-        OnFailProjectSupportTeamGetCallBack();
+        OnTeamCreateCallBack(ParsedResponse.data);
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("No matching endpoint found for URL: %s"), *UrlToMatch);
-        // Handle 404 case
+        OnFailTeamCreateCallBack();
     }
 }
 
-void UCWGTeamAPI::TeamPostCall(FTeamInfoAPI teamInfo)
+void UCWGTeamAPI::TeamGetCall(const FString& TeamId)
 {
-    this->API = "api/team";
-
-    HttpPostCall<FTeamInfoAPI>(teamInfo);
-}
-
-void UCWGTeamAPI::TeamPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FTeamDetailInfoDataAPI ParseData;
-    ParseData = JsonPerse<FTeamDetailInfoDataAPI>(jsonString);
-    OnTeamPostCallBack(ParseData.data);
-}
-
-void UCWGTeamAPI::TeamPatchCall(FTeamInfoAPI teamInfo)
-{
-    this->API = "api/team";
-
-    HttpPatchCall<FTeamInfoAPI>(teamInfo);
-}
-
-void UCWGTeamAPI::TeamPatchCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FTeamDetailInfoDataAPI ParseData;
-    ParseData = JsonPerse<FTeamDetailInfoDataAPI>(jsonString);
-    OnTeamPatchCallBack(ParseData.data);
-}
-
-void UCWGTeamAPI::TeamGetCall(int32 TeamId)
-{
-    this->API = "api/team/" + FString::FromInt( TeamId);
-
+    this->API = FString::Printf(TEXT("api/team/%s"), *TeamId);
     HttpGetCall();
 }
 
 void UCWGTeamAPI::TeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FTeamDetailInfoDataAPI ParseData;
-    ParseData = JsonPerse<FTeamDetailInfoDataAPI>(jsonString);
-    OnTeamGetCallBack(ParseData.data);
+    FString JsonString = res->GetContentAsString();
+    FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
+
+    if (ParsedResponse.status == "success")
+    {
+        OnTeamGetCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailTeamGetCallBack();
+    }
 }
 
-void UCWGTeamAPI::TeamDeleteCall(int32 TeamId)
+void UCWGTeamAPI::TeamUpdateCall(const FString& TeamId, const FTeamInfo& TeamInfo)
 {
-    this->API = "api/team/" + FString::FromInt(TeamId);
-
-    HttpDeleteCall();
+    this->API = FString::Printf(TEXT("api/team/%s"), *TeamId);
+    HttpPatchCall<FTeamInfo>(TeamInfo);
 }
 
-void UCWGTeamAPI::TeamDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGTeamAPI::TeamUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    OnTeamDeleteCallBack();
+    FString JsonString = res->GetContentAsString();
+    FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
+
+    if (ParsedResponse.status == "success")
+    {
+        OnTeamUpdateCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailTeamUpdateCallBack();
+    }
 }
 
-void UCWGTeamAPI::TeamManagerGetCall()
+void UCWGTeamAPI::TeamListGetCall()
 {
-    this->API = "api/team/manager";
-
+    this->API = TEXT("api/team/teamlist");
     HttpGetCall();
 }
 
-void UCWGTeamAPI::TeamManagerGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGTeamAPI::TeamListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FTeamInfoDataArrayAPI ParseData;
-    ParseData = JsonPerse<FTeamInfoDataArrayAPI>(jsonString);
-    OnTeamManagerGetCallBack(ParseData);
+    FString JsonString = res->GetContentAsString();
+    FTeamListResponse ParsedResponse = JsonPerse<FTeamListResponse>(JsonString);
+
+    if (ParsedResponse.status == "success")
+    {
+        OnTeamListGetCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailTeamListGetCallBack();
+    }
 }
 
-void UCWGTeamAPI::TeamMemberPostCall(FTeamIdAPI TeamId)
+void UCWGTeamAPI::TeamListByUserIdGetCall(const FString& UserId)
 {
-    this->API = "api/team/member";
-
-    HttpPostCall<FTeamIdAPI>(TeamId);
-}
-
-void UCWGTeamAPI::TeamMemberPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FTeamDetailInfoDataAPI ParseData;
-    ParseData = JsonPerse<FTeamDetailInfoDataAPI>(jsonString);
-    OnTeamMemberPostCallBack(ParseData.data);
-}
-
-void UCWGTeamAPI::TeamMemberDeleteCall(FTeamIdAPI TeamId)
-{
-    this->API = "api/team/member";
-
-    HttpDeleteCall<FTeamIdAPI>(TeamId);
-}
-
-void UCWGTeamAPI::TeamMemberDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FTeamDetailInfoDataAPI ParseData;
-    ParseData = JsonPerse<FTeamDetailInfoDataAPI>(jsonString);
-    OnTeamMemberDeleteCallBack(ParseData.data);
-}
-
-void UCWGTeamAPI::TeamMemberSearchGetCall()
-{
-    this->API = "api/team/manager/search";
-
+    this->API = FString::Printf(TEXT("api/team/teamlist/user/%s"), *UserId);
     HttpGetCall();
 }
 
-void UCWGTeamAPI::TeamMemberSearchGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGTeamAPI::TeamListByUserIdGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FTeamInfoDataArrayAPI ParseData;
-    ParseData = JsonPerse<FTeamInfoDataArrayAPI>(jsonString);
-    OnTeamMemberSearchGetCallBack(ParseData);
+    FString JsonString = res->GetContentAsString();
+    FTeamListResponse ParsedResponse = JsonPerse<FTeamListResponse>(JsonString);
+
+    if (ParsedResponse.status == "success")
+    {
+        OnTeamListByUserIdGetCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailTeamListByUserIdGetCallBack();
+    }
 }
 
-
-void UCWGTeamAPI::ProjectSupportPostCall(FProjectSupportAPI supportInfo)
+void UCWGTeamAPI::TeamApplyCall(const FString& TeamId)
 {
-    this->API = "api/support";
-
-    HttpPostCall<FProjectSupportAPI>(supportInfo);
-}
-
-void UCWGTeamAPI::ProjectSupportPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportPostCallBack(ParseData);
-}
-void UCWGTeamAPI::ProjectSupportDeleteCall(int32 supportId)
-{
-    this->API = "api/support" + FString::FromInt(supportId);
-
-    HttpDeleteCall();
-}
-
-void UCWGTeamAPI::ProjectSupportDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportDeleteCallBack(ParseData);
-}
-
-void UCWGTeamAPI::ProjectSupportGetCall(int32 supportId)
-{
-    this->API = "api/support/project/" + FString::FromInt(supportId);
-
+    this->API = FString::Printf(TEXT("api/team/apply/%s"), *TeamId);
     HttpGetCall();
 }
 
-void UCWGTeamAPI::ProjectSupportGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGTeamAPI::TeamApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportGetCallBack(ParseData);
-}
-void UCWGTeamAPI::ProjectSupportTeamGetCall(int32 teamId)
-{
-    this->API = "api/support/team/" + FString::FromInt(teamId);
+    // 특별한 에러 처리 (400 에러의 경우 중복 지원 등)
+    if (res->GetResponseCode() == 400)
+    {
+        FString JsonString = res->GetContentAsString();
+        TSharedPtr<FJsonObject> JsonObject;
+        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
 
-    HttpGetCall();
-}
+        FString ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다.");
+        if (FJsonSerializer::Deserialize(Reader, JsonObject))
+        {
+            ErrorMessage = JsonObject->GetStringField(TEXT("message"));
+        }
 
-void UCWGTeamAPI::ProjectSupportTeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-    FString jsonString = res->GetContentAsString();
-    FProjectAllDataAPI ParseData;
-    ParseData = JsonPerse<FProjectAllDataAPI>(jsonString);
-    OnProjectSupportTeamGetCallBack(ParseData);
+        OnFailTeamApplyCallBack(ErrorMessage);
+        return;
+    }
+
+    FString JsonString = res->GetContentAsString();
+    FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
+
+    if (ParsedResponse.status == "success")
+    {
+        OnTeamApplyCallBack(ParsedResponse.data);
+    }
+    else
+    {
+        OnFailTeamApplyCallBack(TEXT("API 호출에 실패했습니다."));
+    }
 }
