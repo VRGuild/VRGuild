@@ -24,12 +24,6 @@ ACABasePoster::ACABasePoster()
 	this->FrontSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	this->FrontSideComp->SetDrawSize(this->WidgetDrawSize);
 	this->FrontSideComp->SetRelativeScale3D(FVector(0.1));
-	ConstructorHelpers::FClassFinder<UUserWidget> tempFrontSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeFrontSide.WBP_ProjectNoticeFrontSide_C'"));
-
-	if (tempFrontSide.Succeeded())
-	{
-		this->FrontSideComp->SetWidgetClass(tempFrontSide.Class);
-	}
 
 	FrontSideComp->SetCollisionProfileName("Interactable");
 
@@ -40,11 +34,6 @@ ACABasePoster::ACABasePoster()
 	this->BackSideComp->SetDrawSize(this->WidgetDrawSize);
 	this->BackSideComp->SetTwoSided(true);
 	this->BackSideComp->SetRelativeScale3D(FVector(0.1));
-	ConstructorHelpers::FClassFinder<UUserWidget> tempBackSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeBackSide.WBP_ProjectNoticeBackSide_C'"));
-	if (tempBackSide.Succeeded())
-	{
-		this->BackSideComp->SetWidgetClass(tempBackSide.Class);
-	}
 
 	BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -77,6 +66,32 @@ bool ACABasePoster::CanTrace(ACharacter* player) const
 	bool bcanTrace = Super::CanTrace(player);
 
 	return bcanTrace && CheckCanTrace(player);
+}
+
+void ACABasePoster::BindOnCompletedDelegate(ACABasePoster* posterToBind)
+{
+	OnCompleted.BindUObject(posterToBind, &ACABasePoster::OnCompletedCallback);
+}
+
+void ACABasePoster::ExecuteOnCompletedDelegate()
+{
+	ServerExecuteOnCompletedDelegate();
+}
+
+void ACABasePoster::OnCompletedCallback()
+{
+	//
+}
+
+void ACABasePoster::ServerExecuteOnCompletedDelegate_Implementation()
+{	
+	OnCompleted.ExecuteIfBound();	
+}
+
+void ACABasePoster::Destroyed()
+{
+	OnCompleted.Unbind();
+	Super::Destroyed();
 }
 
 void ACABasePoster::OnRep_bEnabled()

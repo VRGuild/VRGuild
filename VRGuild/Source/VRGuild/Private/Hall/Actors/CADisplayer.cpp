@@ -281,7 +281,7 @@ void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPass
 		{
 			if (ActorDisplayed)
 			{
-				carryComp->StartDrop();
+				carryComp->StartDrop(true);
 			}
 			//else Spawn ActorDisplayed in players hand. carryComp->StartCarry(ECarriedType::NONE,  );
 		}

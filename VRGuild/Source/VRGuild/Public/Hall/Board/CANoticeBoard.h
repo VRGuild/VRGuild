@@ -6,6 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "CANoticeBoard.generated.h"
 
+UENUM(Blueprintable)
+enum class EPosterType : uint8
+{
+	PROJECT UMETA(DisplayName = "Project"),
+	REVIEW UMETA(DisplayName = "Review"),
+	NONE UMETA(DisplayName = "None")
+};
+
 struct FProjectNotice;
 
 UCLASS()
@@ -27,10 +35,21 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMesh* BoardMesh;
-	
+
+protected:
 	UFUNCTION(BlueprintCallable)
 	void PostProjectNotice(FVector position, FProjectNotice projectNotice);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UFUNCTION(BlueprintCallable)
+	void PostReviewNotice(FVector position, FProjectNotice reviewNotice); /*Change to FReviewNotice*/ 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Notices)
 	TSubclassOf<class ACAProjectNotice> ProjectNoticeClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class ACAReviewNotice> ReviewNoticeClass;
+
+private:
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess), Category="Settings")
+	EPosterType PosterType;
 };

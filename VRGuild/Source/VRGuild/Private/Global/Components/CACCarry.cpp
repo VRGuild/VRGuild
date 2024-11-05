@@ -9,6 +9,7 @@
 #include "Global/Widgets/CWScrollBase.h"
 #include "Global/CACarryInteractable.h"
 #include "Global/Actors/CABasePoster.h"
+#include "Global/CACarryInteractable.h"
 
 UCACCarry::UCACCarry()
 {
@@ -64,11 +65,27 @@ void UCACCarry::StartCarry(ACACarryInteractable* actorToHold)
 	ServerHold(actorToHold);
 }
 
-void UCACCarry::StartDrop()
+void UCACCarry::StartDrop(bool bDoServerRPC)
 {
 	if (/*ScrollBaseWidget && */ActorInHand)
 	{
-		ServerDrop();
+		if (IsValid(ScrollBaseWidget))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.1, remove %s from parent"), *GetNameSafe(ScrollBaseWidget));
+			ScrollBaseWidget->RemoveFromParent();
+			ScrollBaseWidget = nullptr;
+		}
+
+		if (IsValid(ActorInHand))
+		{
+			ActorInHand->Destroy();
+			ActorInHand = nullptr;
+		}
+
+		if (bDoServerRPC)
+		{
+			ServerDrop();
+		}
 	}
 }
 
@@ -134,7 +151,7 @@ ECarriedType UCACCarry::GetCarryType() const
 	return ECarriedType::NONE;
 }
 
-AActor* UCACCarry::GetCarriedActor() const
+ACACarryInteractable* UCACCarry::GetCarriedActor() const
 {
 	return ActorInHand;
 }
@@ -192,6 +209,12 @@ void UCACCarry::ServerHold_Implementation(ACACarryInteractable* actorToHold)
 		if (ActorInHand)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s Success %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"), *GetNameSafe(ActorInHand));
+
+			if (ActorInHand->IsA<ACABasePoster>())
+			{
+				auto posterHeld = Cast<ACABasePoster>(ActorInHand);
+				posterHeld->BindOnCompletedDelegate(Cast<ACABasePoster>(actorToHold));
+			}
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("%s Failed"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 

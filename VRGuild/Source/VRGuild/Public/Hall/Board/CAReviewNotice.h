@@ -2,24 +2,23 @@
 
 #pragma once
 
-#include "Global/Project/CBPLProjectOld.h"
+#include "Global/Project/CBPLProject.h"
 
 #include "CoreMinimal.h"
 #include "Global/Actors/CABasePoster.h"
-#include "CAProjectNotice.generated.h"
+#include "CAReviewNotice.generated.h"
 
 UCLASS()
-class VRGUILD_API ACAProjectNotice : public ACABasePoster
+class VRGUILD_API ACAReviewNotice : public ACABasePoster
 {
 	GENERATED_BODY()
-public:
-	ACAProjectNotice();
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
-	void Init(const FProjectNotice& newData);
+	void Init(const FProjectNotice& newData); /*Change to FReviewNotice*/
 
 	virtual void OnCompletedCallback() override;
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
@@ -27,7 +26,8 @@ public:
 
 protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	FProjectNotice NoticeData;
+	FProjectNotice NoticeData; 
 
 	virtual bool CheckCanTrace(ACharacter* player) const override;
+	virtual void ServerExecuteOnCompletedDelegate_Implementation() override;
 };
