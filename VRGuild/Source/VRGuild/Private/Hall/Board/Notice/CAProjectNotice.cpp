@@ -10,21 +10,39 @@
 #include "Global/Components/CACCarry.h"
 #include "Global/Components/CACCharacterAnimMontage.h"
 
+ACAProjectNotice::ACAProjectNotice()
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> tempBackSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeBackSide.WBP_ProjectNoticeBackSide_C'"));
+	if (tempBackSide.Succeeded())
+	{
+		this->BackSideComp->SetWidgetClass(tempBackSide.Class);
+	}
+}
+
 void ACAProjectNotice::BeginPlay()
 {
 	Super::BeginPlay();
 
+	auto* FrontSideWidget = CreateWidget<UCWGProjectNotice>(GetWorld(), WidgetFrontSide);
+
+	if (ensure(FrontSideWidget))
+		FrontSideWidget->SetProjectInfo(NoticeData);
+
 	if (this->WidgetFrontSide)
 	{
-		auto widget = CreateWidget<UCWGProjectNotice>(GetWorld(), this->WidgetFrontSide);
-		if (widget) widget->SetProjectInfo(this->NoticeData);
-		this->FrontSideComp->SetWidget(widget);
+		this->FrontSideComp->SetWidget(FrontSideWidget);
 	}
 	if (this->WidgetBackSide)
 	{
 		this->BackSideComp->SetWidgetClass(this->WidgetBackSide);
-		BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+
+void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACAProjectNotice, NoticeData);
 }
 
 void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
@@ -33,8 +51,16 @@ void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOw
 
 	if (auto notice = Cast<ACAProjectNotice>(actorInteracted))
 	{
-		NoticeData = notice->NoticeData;
+		Init(notice->NoticeData);
 	}
+}
+
+void ACAProjectNotice::Init(const FProjectNotice& newData)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ProjectNotice SetNoticeData success"));
+
+	if (newData.ProjectNoticeId != -1)
+		NoticeData = newData;
 }
 
 UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
@@ -47,19 +73,6 @@ UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
 		return ProjectAPIWidget;
 	}
 	return nullptr;
-}
-
-void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ACAProjectNotice, NoticeData);
-}
-
-void ACAProjectNotice::SetNoticeData(const FProjectNotice& newData)
-{
-	if(newData.ProjectNoticeId != -1)
-		NoticeData = newData;
 }
 
 bool ACAProjectNotice::CheckCanTrace(ACharacter* player) const

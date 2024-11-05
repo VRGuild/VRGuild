@@ -6,27 +6,26 @@
 
 #include "CoreMinimal.h"
 #include "Global/Actors/CABasePoster.h"
-#include "CAProjectNotice.generated.h"
+#include "CAReviewNotice.generated.h"
 
 UCLASS()
-class VRGUILD_API ACAProjectNotice : public ACABasePoster
+class VRGUILD_API ACAReviewNotice : public ACABasePoster
 {
 	GENERATED_BODY()
-public:
-	ACAProjectNotice();
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
-	void Init(const FProjectNotice& newData);
+	void Init(const FProjectNotice& newData); /*Change to FReviewNotice*/
 
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
 	
 
 protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	FProjectNotice NoticeData;
+	FProjectNotice NoticeData; 
 
 	virtual bool CheckCanTrace(ACharacter* player) const override;
 };

@@ -7,7 +7,7 @@
 #include "CABasePoster.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class VRGUILD_API ACABasePoster : public ACACarryInteractable
@@ -17,7 +17,7 @@ class VRGUILD_API ACABasePoster : public ACACarryInteractable
 public:
 	// Sets default values for this actor's properties
 	ACABasePoster();
-	
+
 	virtual void BeginInteract(ACharacter* Initiator) override;
 
 	virtual UUserWidget* GetPosterDisplayWidget() const;
@@ -32,7 +32,7 @@ protected:
 	virtual bool CheckCanTrace(ACharacter* player) const PURE_VIRTUAL(ACABasePoster::CheckCanTrace, return false;);
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|On Board Actor")
 	FVector2D WidgetDrawSize = { 400,440 };
 
 	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -44,15 +44,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UWidgetComponent* BackSideComp;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|On Board Actor")
 	TSubclassOf<UUserWidget> WidgetFrontSide;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|On Board Actor")
 	TSubclassOf<UUserWidget> WidgetBackSide;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Player")
 	TSubclassOf<UUserWidget> PosterWidgetToDisplayClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Player")
 	FString PlayerCarryingMessage;
 };

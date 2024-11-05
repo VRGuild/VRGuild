@@ -4,6 +4,7 @@
 #include "Hall/Board/CANoticeBoard.h"
 #include "Global/Project/CBPLProject.h"
 #include "Hall/Board/Notice/CAProjectNotice.h"
+#include "Hall/Board/CAReviewNotice.h"
 #include "Components/WidgetComponent.h"
 #include "Hall/Board/Notice/UI/CWGProjectNotice.h"
 
@@ -18,8 +19,6 @@ ACANoticeBoard::ACANoticeBoard()
 		this->BoardMeshComp->SetStaticMesh(BoardMesh);
 	}
 	SetRootComponent(this->BoardMeshComp);
-
-
 }
 
 // Called when the game starts or when spawned
@@ -31,15 +30,28 @@ void ACANoticeBoard::BeginPlay()
 
 void ACANoticeBoard::PostProjectNotice(FVector position, FProjectNotice projectNotice)
 {
-	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActor<ACAProjectNotice>(this->ProjectNoticeClass);
+	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(this->ProjectNoticeClass, FTransform::Identity);
+	if (ensure(newProjectNotice))
+	{
+		newProjectNotice->Init(projectNotice);
 
-	newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	newProjectNotice->SetActorRelativeLocation(position);
-	
-	newProjectNotice->SetNoticeData(projectNotice);
+		newProjectNotice->FinishSpawning(FTransform::Identity);
 
-	if (UCWGProjectNotice* FrontSideWidget = Cast<UCWGProjectNotice>(newProjectNotice->FrontSideComp->GetWidget()))
-		FrontSideWidget->SetProjectInfo(projectNotice);
-	
+		newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		newProjectNotice->SetActorRelativeLocation(position);
+	}	
+}
+
+void ACANoticeBoard::PostReviewNotice(FVector position, FProjectNotice reviewNotice) /*Change to FReviewNotice*/ 
+{
+	ACAReviewNotice* newReviewNotice = GetWorld()->SpawnActorDeferred<ACAReviewNotice>(this->ReviewNoticeClass, FTransform::Identity);
+	if (ensure(newReviewNotice))
+	{
+		newReviewNotice->Init(reviewNotice);
+		newReviewNotice->FinishSpawning(FTransform::Identity);
+		
+		newReviewNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		newReviewNotice->SetActorRelativeLocation(position);	
+	}
 }
 
