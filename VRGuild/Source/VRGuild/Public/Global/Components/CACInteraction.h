@@ -56,14 +56,14 @@ private:
 
 	void BeginInteract();
 	void EndInteract();
-	void UpdateTrace(AActor*& actorTraced);
+	void UpdateTrace(ICIInteractionInterface*& interfaceTraced);
 
 	bool CanTrace() const;
 
-	ICIInteractionInterface* GetInterface(AActor* actor) const;
+	//ICIInteractionInterface* GetInterface(AActor* actor) const;
 	TObjectPtr<ACharacter> Owner;
 	
-	AActor* ActorOnFocus;
+	ICIInteractionInterface* InterfaceOnFocus;
 
 	bool bIsTracing;
 	bool bEnabled;
