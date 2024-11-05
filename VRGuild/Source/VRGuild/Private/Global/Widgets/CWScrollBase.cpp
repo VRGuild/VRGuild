@@ -58,10 +58,13 @@ void UCWScrollBase::NativeDestruct()
 	{		
 		EnhancedInputSubsystem->RemoveMappingContext(ScrollingInputContext);
 		EnhancedInputSubsystem->RemoveMappingContext(UIModeContext);
+		EnhancedInputSubsystem->AddMappingContext(DefaultInputContext, 0);
 	}
 
 	Super::NativeDestruct();
 }
+
+
 
 void UCWScrollBase::OnScrollActive(const FInputActionValue& Action)
 {

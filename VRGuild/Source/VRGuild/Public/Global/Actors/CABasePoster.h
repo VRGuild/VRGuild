@@ -9,6 +9,9 @@
 /**
  *
  */
+
+DECLARE_DELEGATE(CompletedDelegate);
+
 UCLASS()
 class VRGUILD_API ACABasePoster : public ACACarryInteractable
 {
@@ -24,7 +27,17 @@ public:
 
 	virtual bool CanTrace(ACharacter* player) const override;
 
+	virtual void BindOnCompletedDelegate(ACABasePoster* posterToBind);
+	UFUNCTION(BlueprintCallable)
+	void ExecuteOnCompletedDelegate();
+
 protected:
+	CompletedDelegate OnCompleted;
+	virtual void OnCompletedCallback();
+	UFUNCTION(Server, Reliable)
+	virtual void ServerExecuteOnCompletedDelegate();
+
+	virtual void Destroyed() override;
 	virtual void OnRep_bEnabled() override;
 
 	virtual FString GetTraceMessage(ACharacter* player) const override;

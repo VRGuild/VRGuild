@@ -4,6 +4,8 @@
 #include "Hall/Board/CAReviewNotice.h"
 #include "Components/WidgetComponent.h"
 #include "Hall/Board/Notice/UI/CWGReviewNotice.h"
+#include "GameFramework/Character.h"
+#include "Global/Components/CACCarry.h"
 
 void ACAReviewNotice::BeginPlay()
 {
@@ -48,6 +50,16 @@ void ACAReviewNotice::Init(const FProjectNotice& newData) /*Change to FReviewNot
 		NoticeData = newData;
 }
 
+void ACAReviewNotice::OnCompletedCallback()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnCompletedCallback done in ACAReviewNotice [%s]"), GetWorld()->GetNetMode() == NM_Client ? 
+	TEXT("CLIENT") : TEXT("SerVER"));
+
+	
+
+	Destroy();
+}
+
 UUserWidget* ACAReviewNotice::GetPosterDisplayWidget() const
 {
 	return Super::GetPosterDisplayWidget();
@@ -55,5 +67,26 @@ UUserWidget* ACAReviewNotice::GetPosterDisplayWidget() const
 
 bool ACAReviewNotice::CheckCanTrace(ACharacter* player) const
 {
+	if (auto carryComp = player->GetComponentByClass<UCACCarry>())
+	{
+		if (auto carriedNotice = Cast<ACAReviewNotice>(carryComp->GetCarriedActor()))
+		{
+			return NoticeData.ProjectTitle != carriedNotice->NoticeData.ProjectTitle;
+		}
+	}
+
 	return true;
+}
+
+void ACAReviewNotice::ServerExecuteOnCompletedDelegate_Implementation()
+{	
+	Super::ServerExecuteOnCompletedDelegate_Implementation();
+
+	if (auto owner = GetOwner())
+	{
+		if (auto carryComp = owner->GetComponentByClass<UCACCarry>())
+		{
+			carryComp->StartDrop(true);
+		}
+	}
 }

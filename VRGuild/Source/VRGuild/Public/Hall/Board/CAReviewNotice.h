@@ -20,6 +20,7 @@ public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
 	void Init(const FProjectNotice& newData); /*Change to FReviewNotice*/
 
+	virtual void OnCompletedCallback() override;
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
 	
 
@@ -28,4 +29,5 @@ protected:
 	FProjectNotice NoticeData; 
 
 	virtual bool CheckCanTrace(ACharacter* player) const override;
+	virtual void ServerExecuteOnCompletedDelegate_Implementation() override;
 };

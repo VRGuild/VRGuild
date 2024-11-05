@@ -21,6 +21,7 @@ public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
 	void Init(const FProjectNotice& newData);
 
+	virtual void OnCompletedCallback() override;
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
 	
 

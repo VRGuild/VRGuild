@@ -15,6 +15,7 @@ enum class ECarriedType : uint8
 {
 	COMMISSION UMETA(DisplayName = "Commission"),
 	REGISTRATION UMETA(DisplayName = "Registration"),
+	REVIEW UMETA(DisplayName = "Review"),
 	NONE UMETA(DisplayName = "None")
 };
 

@@ -139,7 +139,7 @@ void ACACarryInteractable::EndInteract(ACharacter* Initiator)
 	{
 		if (auto carryComponent = Initiator->GetComponentByClass<UCACCarry>())
 		{
-			carryComponent->StartDrop();
+			carryComponent->StartDrop(true);
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("ACACarryInteractable EndInteract"));

@@ -30,7 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartCarry(ACACarryInteractable* ActorToHold);
 	UFUNCTION(BlueprintCallable)
-	void StartDrop();
+	void StartDrop(bool bDoServerRPC = true);
 
 	UFUNCTION(BlueprintCallable)
 	void HideCarryWidget();
@@ -43,7 +43,8 @@ public:
 
 	ECarriedType GetCarryType() const;
 
-	AActor* GetCarriedActor() const;
+	UFUNCTION(BlueprintCallable)
+	ACACarryInteractable* GetCarriedActor() const;
 private:
 	TObjectPtr<ACharacter> Owner;
 	UPROPERTY()

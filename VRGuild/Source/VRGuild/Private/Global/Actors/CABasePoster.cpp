@@ -68,6 +68,32 @@ bool ACABasePoster::CanTrace(ACharacter* player) const
 	return bcanTrace && CheckCanTrace(player);
 }
 
+void ACABasePoster::BindOnCompletedDelegate(ACABasePoster* posterToBind)
+{
+	OnCompleted.BindUObject(posterToBind, &ACABasePoster::OnCompletedCallback);
+}
+
+void ACABasePoster::ExecuteOnCompletedDelegate()
+{
+	ServerExecuteOnCompletedDelegate();
+}
+
+void ACABasePoster::OnCompletedCallback()
+{
+	//
+}
+
+void ACABasePoster::ServerExecuteOnCompletedDelegate_Implementation()
+{	
+	OnCompleted.ExecuteIfBound();	
+}
+
+void ACABasePoster::Destroyed()
+{
+	OnCompleted.Unbind();
+	Super::Destroyed();
+}
+
 void ACABasePoster::OnRep_bEnabled()
 {
 	Super::OnRep_bEnabled();

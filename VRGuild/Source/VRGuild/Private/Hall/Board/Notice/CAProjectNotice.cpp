@@ -63,6 +63,11 @@ void ACAProjectNotice::Init(const FProjectNotice& newData)
 		NoticeData = newData;
 }
 
+void ACAProjectNotice::OnCompletedCallback()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnCompletedCallback done in ACAProjectNotice"));
+}
+
 UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
 {
 	auto widget = Super::GetPosterDisplayWidget();
@@ -87,3 +92,4 @@ bool ACAProjectNotice::CheckCanTrace(ACharacter* player) const
 
 	return true;
 }
+
