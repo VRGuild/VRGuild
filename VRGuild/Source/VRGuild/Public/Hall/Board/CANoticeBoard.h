@@ -6,6 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Global/Interfaces/CIInteractionInterface.h"
 #include "CANoticeBoard.generated.h"
 
 UENUM(Blueprintable)
@@ -16,28 +17,37 @@ enum class EPosterType : uint8
 	NONE UMETA(DisplayName = "None")
 };
 
+struct FProjectNotice;
+class UTestWidgetComp;
+
 UCLASS()
-class VRGUILD_API ACANoticeBoard : public AActor
+class VRGUILD_API ACANoticeBoard : public AActor, public ICIInteractionInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	ACANoticeBoard();
+	virtual bool CanTrace(ACharacter* Initiator) const override;
+	virtual bool CanInteract(ACharacter* Initiator) const override;
 
+	virtual void BeginTrace(ACharacter* Initiator) override;
+	virtual void EndTrace(ACharacter* Initiator) override;
+	virtual void BeginInteract(ACharacter* Initiator) override;
+	virtual void EndInteract(ACharacter* Initiator) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	UStaticMeshComponent* BoardMeshComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMesh* BoardMesh;
 
-
 protected:
+	UPROPERTY(EditDefaultsOnly, Category="Settings|Components")
+	TObjectPtr<UTestWidgetComp> WidgetCompCancelButton;
 
 	UFUNCTION(BlueprintCallable)
 	void PostAllProjectNotice(FProjectListResponse projectNoticeList);

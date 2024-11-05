@@ -7,7 +7,7 @@
 #include "Hall/Board/CAReviewNotice.h"
 #include "Components/WidgetComponent.h"
 #include "Hall/Board/Notice/UI/CWGProjectNotice.h"
-
+#include "Global/Widgets/TestWidgetComp.h"
 // Sets default values
 ACANoticeBoard::ACANoticeBoard()
 {
@@ -19,6 +19,36 @@ ACANoticeBoard::ACANoticeBoard()
 		this->BoardMeshComp->SetStaticMesh(BoardMesh);
 	}
 	SetRootComponent(this->BoardMeshComp);
+
+	WidgetCompCancelButton = CreateDefaultSubobject<UTestWidgetComp>("WidgetCompCancelButton");
+	WidgetCompCancelButton->SetupAttachment(RootComponent);
+	WidgetCompCancelButton->SetCollisionProfileName("Interactable");
+}
+
+bool ACANoticeBoard::CanTrace(ACharacter* Initiator) const
+{
+	return true;
+}
+
+bool ACANoticeBoard::CanInteract(ACharacter* Initiator) const
+{
+	return true;
+}
+
+void ACANoticeBoard::BeginTrace(ACharacter* Initiator)
+{
+}
+
+void ACANoticeBoard::EndTrace(ACharacter* Initiator)
+{
+}
+
+void ACANoticeBoard::BeginInteract(ACharacter* Initiator)
+{
+}
+
+void ACANoticeBoard::EndInteract(ACharacter* Initiator)
+{
 }
 
 // Called when the game starts or when spawned
