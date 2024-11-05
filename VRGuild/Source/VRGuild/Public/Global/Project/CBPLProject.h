@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Global/API/BPL/CBPLBusiness.h"
 #include "CBPLProject.generated.h"
 
 USTRUCT(BlueprintType, Atomic)
@@ -294,26 +295,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	int32		projectId;
 };
-
-USTRUCT(BlueprintType, Atomic)
-struct FComment
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	FComment() {};
-
-	UPROPERTY(BlueprintReadWrite)
-	int32		commentId;
-	UPROPERTY(BlueprintReadWrite)
-	FString		content;
-	UPROPERTY(BlueprintReadWrite)
-	FString		accountId;
-	UPROPERTY(BlueprintReadWrite)
-	FDateTime	createdAt;
-	UPROPERTY(BlueprintReadWrite)
-	FDateTime	modifiedAt;
-};
-
 
 USTRUCT(BlueprintType, Atomic)
 struct FProjectDetailAPI
