@@ -1,23 +1,11 @@
-﻿#include "Global/API/CACCharacterAPI.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Global/UI/API/CWGCharacterAPI.h"
 #include "Global/API/BPL/CBPLCharacter.h"
 
-UCACCharacterAPI::UCACCharacterAPI()
-{
-    PrimaryComponentTick.bCanEverTick = false;
-    bWantsInitializeComponent = true;
-}
 
-void UCACCharacterAPI::BeginPlay()
-{
-    Super::BeginPlay();
-}
-
-void UCACCharacterAPI::InitializeComponent()
-{
-    Super::InitializeComponent();
-}
-
-void UCACCharacterAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
 
@@ -53,7 +41,7 @@ void UCACCharacterAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACCharacterAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
 
@@ -84,13 +72,13 @@ void UCACCharacterAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACCharacterAPI::CharacterGetCall()
+void UCWGCharacterAPI::CharacterGetCall()
 {
     this->API = FString::Printf(TEXT("api/character"));
     HttpGetCall();
 }
 
-void UCACCharacterAPI::CharacterGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterAPI::CharacterGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
@@ -105,14 +93,14 @@ void UCACCharacterAPI::CharacterGetCallBack(FHttpRequestPtr req, FHttpResponsePt
     }
 }
 
-void UCACCharacterAPI::CharacterCreateCall(const FCharacterInfo& CharacterInfo)
+void UCWGCharacterAPI::CharacterCreateCall(const FCharacterInfo& CharacterInfo)
 {
     this->API = TEXT("api/character");
     HttpPostCall<FCharacterInfo>(CharacterInfo);
 }
 
 
-void UCACCharacterAPI::CharacterCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterAPI::CharacterCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
@@ -127,13 +115,13 @@ void UCACCharacterAPI::CharacterCreateCallBack(FHttpRequestPtr req, FHttpRespons
     }
 }
 
-void UCACCharacterAPI::CharacterUpdateCall(const FString& CharacterId, const FCharacterInfo& CharacterInfo)
+void UCWGCharacterAPI::CharacterUpdateCall(const FString& CharacterId, const FCharacterInfo& CharacterInfo)
 {
     this->API = FString::Printf(TEXT("api/character/%s"), *CharacterId);
     HttpPatchCall<FCharacterInfo>(CharacterInfo);
 }
 
-void UCACCharacterAPI::CharacterUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterAPI::CharacterUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
@@ -148,13 +136,13 @@ void UCACCharacterAPI::CharacterUpdateCallBack(FHttpRequestPtr req, FHttpRespons
     }
 }
 
-void UCACCharacterAPI::CharacterGetByUserIdCall(const FString& UserId)
+void UCWGCharacterAPI::CharacterGetByUserIdCall(const FString& UserId)
 {
     this->API = FString::Printf(TEXT("api/character/user/%s"), *UserId);
     HttpGetCall();
 }
 
-void UCACCharacterAPI::CharacterGetByUserIdCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterAPI::CharacterGetByUserIdCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
@@ -169,13 +157,13 @@ void UCACCharacterAPI::CharacterGetByUserIdCallBack(FHttpRequestPtr req, FHttpRe
     }
 }
 
-void UCACCharacterAPI::CharacterGetByNicknameCall(const FString& Nickname)
+void UCWGCharacterAPI::CharacterGetByNicknameCall(const FString& Nickname)
 {
     this->API = FString::Printf(TEXT("api/character/nickname/%s"), *Nickname);
     HttpGetCall();
 }
 
-void UCACCharacterAPI::CharacterGetByNicknameCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGCharacterAPI::CharacterGetByNicknameCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);

@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Global/CGIGameInstance.h"
-#include "Global/UI/API/CWGCharacterCustomAPI.h"
+#include "Global/UI/API/CWGCharacterAPI.h"
 #include "CWCharacterCustom.generated.h"
 
 /**
  *
  */
 UCLASS()
-class VRGUILD_API UCWCharacterCustom : public UCWGCharacterCustomAPI
+class VRGUILD_API UCWCharacterCustom : public UCWGCharacterAPI
 {
 	GENERATED_BODY()
 
