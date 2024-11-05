@@ -19,6 +19,8 @@ void ACAReceptionist::BeginPlay()
 void ACAReceptionist::BeginTrace(ACharacter* Initiator)
 {
 	Super::BeginTrace(Initiator);
+
+
 }
 
 void ACAReceptionist::EndTrace(ACharacter* Initiator)
