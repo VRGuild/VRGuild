@@ -59,8 +59,14 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	void SetHideMesh(bool bHide);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void TraceBegin();
+	UFUNCTION(BlueprintImplementableEvent)
+	void TraceEnd();
 
 private:
+
 	TObjectPtr<UCGIGameInstance> GameInstance;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings", meta = (AllowPrivateAccess))
 	bool bHideMesh;
