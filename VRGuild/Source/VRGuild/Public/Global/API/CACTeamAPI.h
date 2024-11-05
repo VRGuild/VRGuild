@@ -1,93 +1,78 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
-
-#include "Global/API/BPL/CBPLTeam.h"
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Global/API/CACBaseAPI.h"
 #include "CACTeamAPI.generated.h"
 
-/**
- * 
- */
-UCLASS()
+struct FTeamDetailResponse;
+struct FTeamListResponse;
+struct FTeamInfo;
+
+UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VRGUILD_API UCACTeamAPI : public UCACBaseAPI
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	UCACTeamAPI();
+public:
+    UCACTeamAPI();
 
 protected:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
+    virtual void InitializeComponent() override;
+    virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+    virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
-	virtual void InitializeComponent() override;
+    // Create Team
+    UFUNCTION(BlueprintCallable, Category = "Team API")
+    void TeamCreateCall(const FTeamInfo& TeamInfo);
+    void TeamCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnTeamCreateCallBack(const FTeamInfo& TeamInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnFailTeamCreateCallBack();
 
-	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
-	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+    // Get Team
+    UFUNCTION(BlueprintCallable, Category = "Team API")
+    void TeamGetCall(const FString& TeamId);
+    void TeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnTeamGetCallBack(const FTeamInfo& TeamInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnFailTeamGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void TeamPostCall(FTeamInfoAPI teamInfo);
-	void TeamPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamPostCallBack(FTeamDetailInfoAPI ParseData);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamPostCallBack();
+    // Update Team
+    UFUNCTION(BlueprintCallable, Category = "Team API")
+    void TeamUpdateCall(const FString& TeamId, const FTeamInfo& TeamInfo);
+    void TeamUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnTeamUpdateCallBack(const FTeamInfo& TeamInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnFailTeamUpdateCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void TeamPatchCall(FTeamInfoAPI ss);
-	void TeamPatchCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamPatchCallBack(FTeamDetailInfoAPI ParseData);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamPatchCallBack();
+    // Get Team List
+    UFUNCTION(BlueprintCallable, Category = "Team API")
+    void TeamListGetCall();
+    void TeamListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnTeamListGetCallBack(const TArray<FTeamInfo>& TeamList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnFailTeamListGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void TeamGetCall(int32 TeamId);
-	void TeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamGetCallBack(FTeamDetailInfoAPI ParseData);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamGetCallBack();
+    // Get User Team List
+    UFUNCTION(BlueprintCallable, Category = "Team API")
+    void TeamListByUserIdGetCall(const FString& UserId);
+    void TeamListByUserIdGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnTeamListByUserIdGetCallBack(const TArray<FTeamInfo>& TeamList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnFailTeamListByUserIdGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void TeamDeleteCall(int32 TeamId);
-	void TeamDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamDeleteCallBack();
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamDeleteCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void TeamManagerGetCall();
-	void TeamManagerGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamManagerGetCallBack(FTeamInfoDataArrayAPI ParseData);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamManagerGetCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void TeamMemberPostCall(FTeamIdAPI TeamId);
-	void TeamMemberPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamMemberPostCallBack(FTeamDetailInfoAPI ParseData);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamMemberPostCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void TeamMemberDeleteCall(FTeamIdAPI TeamId);
-	void TeamMemberDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamMemberDeleteCallBack(FTeamDetailInfoAPI ParseData);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamMemberDeleteCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void TeamMemberSearchGetCall();
-	void TeamMemberSearchGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeamMemberSearchGetCallBack(FTeamInfoDataArrayAPI ParseData);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailTeamMemberSearchGetCallBack();
-
+    // Apply To Team
+    UFUNCTION(BlueprintCallable, Category = "Team API")
+    void TeamApplyCall(const FString& TeamId);
+    void TeamApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnTeamApplyCallBack(const FTeamInfo& TeamInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnFailTeamApplyCallBack(const FString& ErrorMessage);
 };

@@ -1,98 +1,32 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Global/API/BPL/CBPLBase.h"
 #include "CBPLTeam.generated.h"
 
-USTRUCT(BlueprintType, Atomic)
-struct FTeamInfoAPI
+// Team Response Structure for Single Team
+USTRUCT(BlueprintType)
+struct FTeamDetailResponse : public FBaseResponse
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 public:
-	FTeamInfoAPI() {};
-
-	UPROPERTY(BlueprintReadWrite)
-	FString teamName;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString introduction;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FString> memberList;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    FTeamInfo data;
 };
 
-USTRUCT(BlueprintType, Atomic)
-struct FTeamDetailInfoAPI
+// Team Response Structure for Team List
+USTRUCT(BlueprintType)
+struct FTeamListResponse : public FBaseResponse
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 public:
-	FTeamDetailInfoAPI() {};
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 teamId;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString pmId;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString teamName;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString introduction;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FString> memberList;
-
-	UPROPERTY(BlueprintReadWrite)
-	FDateTime	createdAt;
-
-	UPROPERTY(BlueprintReadWrite)
-	FDateTime	modifiedAt;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FTeamInfo> data;
 };
 
-USTRUCT(BlueprintType, Atomic)
-struct FTeamDetailInfoDataAPI
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	FTeamDetailInfoDataAPI() {};
-
-	UPROPERTY(BlueprintReadWrite)
-	FTeamDetailInfoAPI data;
-};
-
-USTRUCT(BlueprintType, Atomic)
-struct FTeamInfoDataArrayAPI
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	FTeamInfoDataArrayAPI() {};
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FTeamDetailInfoAPI> data;
-};
-USTRUCT(BlueprintType, Atomic)
-struct FTeamIdAPI
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	FTeamIdAPI() {};
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 teamId;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FString> newMemberList;
-};
-
-/**
- * 
- */
 UCLASS()
 class VRGUILD_API UCBPLTeam : public UBlueprintFunctionLibrary
 {
-	GENERATED_BODY()
-
+    GENERATED_BODY()
 };
