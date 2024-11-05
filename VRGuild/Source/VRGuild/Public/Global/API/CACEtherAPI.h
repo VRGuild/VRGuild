@@ -1,54 +1,61 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Global/API/CACBaseAPI.h"
 #include "CACEtherAPI.generated.h"
 
-USTRUCT(BlueprintType, Atomic)
-struct FJsonEther
-{
-	GENERATED_USTRUCT_BODY()
+struct FEtherResponse;
+struct FEtherListResponse;
+struct FEtherBalanceResponse;
+struct FEther;
 
-public:
-	FJsonEther() : Amount(0), Reason("") {};
-
-	FJsonEther(int32 amount ,FString reason) : Amount(amount), Reason(reason) { };
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 Amount;
-
-	UPROPERTY(BlueprintReadOnly)
-	FString Reason;
-};
-
-/**
- * 
- */
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VRGUILD_API UCACEtherAPI : public UCACBaseAPI
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
+
 public:
-	UCACEtherAPI();
+    UCACEtherAPI();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
+    virtual void InitializeComponent() override;
+    virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+    virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
-	virtual void InitializeComponent() override;
+    // Create Ether Record
+    UFUNCTION(BlueprintCallable, Category = "Ether API")
+    void EtherCreateCall(const FEther& Ether);
+    void EtherCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnEtherCreateCallBack(const FEther& Ether);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnFailEtherCreateCallBack(const FString& ErrorMessage);
 
-	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
-	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+    // Get Ether Record
+    UFUNCTION(BlueprintCallable, Category = "Ether API")
+    void EtherGetCall(const FString& EtherId);
+    void EtherGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnEtherGetCallBack(const FEther& Ether);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnFailEtherGetCallBack(const FString& ErrorMessage);
 
-	class ACPCBasePlayerController* OwnerPlayerController;
+    // Get Ether List
+    UFUNCTION(BlueprintCallable, Category = "Ether API")
+    void EtherListGetCall();
+    void EtherListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnEtherListGetCallBack(const TArray<FEther>& EtherList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnFailEtherListGetCallBack();
 
-	UFUNCTION(BlueprintCallable)
-	void EtherPostCall();
-
-	UFUNCTION(BlueprintImplementableEvent)
-
-	void OnEtherComple();
-
+    // Get User Ether History
+    UFUNCTION(BlueprintCallable, Category = "Ether API")
+    void EtherHistoryGetCall(const FString& UserId);
+    void EtherHistoryGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnEtherHistoryGetCallBack(const FEther& EtherBalance);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Ether API")
+    void OnFailEtherHistoryGetCallBack();
 };
