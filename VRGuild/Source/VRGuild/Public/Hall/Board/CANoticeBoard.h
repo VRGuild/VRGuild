@@ -17,14 +17,24 @@ enum class EPosterType : uint8
 	NONE UMETA(DisplayName = "None")
 };
 
+UENUM()
+enum class EFeatureType : uint8
+{
+	REFRESH UMETA(DisplayName = "Refresh"),
+	NONE UMETA(DisplayName = "None")
+};
+
 struct FProjectNotice;
 class UTestWidgetComp;
+class ACABasePoster;
 
 UCLASS()
 class VRGUILD_API ACANoticeBoard : public AActor, public ICIInteractionInterface
 {
 	GENERATED_BODY()
 	
+	friend class UTestWidgetComp;
+
 public:	
 	// Sets default values for this actor's properties
 	ACANoticeBoard();
@@ -68,6 +78,14 @@ protected:
 	TArray<FProjectDetailInfo> ProjectDetailInfoList;
 
 private:
+	virtual void OnRep_Owner() override;
+	void RefreshBoard(ACharacter* initiator);
+	UFUNCTION(Server, Reliable)
+	void ServerRefreshBoard();
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess), Category="Settings")
 	EPosterType PosterType;
+
+	TArray<ACABasePoster*> Posters;
+
+	EFeatureType FeatureType;
 };

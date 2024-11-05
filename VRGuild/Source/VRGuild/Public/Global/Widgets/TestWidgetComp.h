@@ -10,12 +10,17 @@
 /**
  * 
  */
+
+class ACANoticeBoard;
+
 UCLASS()
 class VRGUILD_API UTestWidgetComp : public UWidgetComponent, public ICIInteractionInterface
 {
 	GENERATED_BODY()
+public: 
+	UTestWidgetComp();
 protected:
-
+	virtual void InitializeComponent() override;
 	virtual bool CanTrace(ACharacter* Initiator) const override;
 	virtual bool CanInteract(ACharacter* Initiator) const override;
 
@@ -23,4 +28,6 @@ protected:
 	virtual void EndTrace(ACharacter* Initiator) override;
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
+private:
+	TObjectPtr<ACANoticeBoard> NoticeBoard;
 };

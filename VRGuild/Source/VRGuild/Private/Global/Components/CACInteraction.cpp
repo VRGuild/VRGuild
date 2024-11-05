@@ -236,12 +236,16 @@ void UCACInteraction::UpdateTrace(ICIInteractionInterface*& interfaceTraced)
 		float LargestDotValue = -100.f;
 		for (int i = Hits.Num() - 1; i >= 0; --i)
 		{
-			if (auto temp = Cast<ICIInteractionInterface>(Hits[i].GetActor()))
+			if (auto tempInterface = Cast<ICIInteractionInterface>(Hits[i].GetActor()))
 			{
-				if (!temp->CanTrace(Owner)) continue;
+				if (auto componentInterface = Cast<ICIInteractionInterface>(Hits[i].GetComponent()))
+				{
+					tempInterface = componentInterface;
+				}
+
+				if (!tempInterface->CanTrace(Owner)) continue;
 			}
 			else continue;
-
 
 			if (bDebugDraw)
 			{
@@ -261,6 +265,10 @@ void UCACInteraction::UpdateTrace(ICIInteractionInterface*& interfaceTraced)
 			if (DotResult > LargestDotValue)
 			{
 				interfaceTraced = Cast<ICIInteractionInterface>(Hits[i].GetActor());
+				if (auto temp = Cast<ICIInteractionInterface>(Hits[i].GetComponent()))
+				{
+					interfaceTraced = temp;
+				}
 				LargestDotValue = DotResult;
 			}
 		}

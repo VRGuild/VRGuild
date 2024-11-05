@@ -8,6 +8,10 @@
 #include "Components/WidgetComponent.h"
 #include "Hall/Board/Notice/UI/CWGProjectNotice.h"
 #include "Global/Widgets/TestWidgetComp.h"
+#include "Global/Actors/CABasePoster.h"
+#include "../../../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "GameFramework/Character.h"
+
 // Sets default values
 ACANoticeBoard::ACANoticeBoard()
 {
@@ -20,9 +24,13 @@ ACANoticeBoard::ACANoticeBoard()
 	}
 	SetRootComponent(this->BoardMeshComp);
 
+	bReplicates = true;
+
 	WidgetCompCancelButton = CreateDefaultSubobject<UTestWidgetComp>("WidgetCompCancelButton");
 	WidgetCompCancelButton->SetupAttachment(RootComponent);
 	WidgetCompCancelButton->SetCollisionProfileName("Interactable");
+
+	FeatureType = EFeatureType::NONE;
 }
 
 bool ACANoticeBoard::CanTrace(ACharacter* Initiator) const
@@ -79,6 +87,8 @@ void ACANoticeBoard::PostProjectNotice(FVector position, FProjectDetailInfo proj
 
 		newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		newProjectNotice->SetActorRelativeLocation(position);
+
+		Posters.Add(newProjectNotice);
 	}	
 }
 
@@ -92,6 +102,36 @@ void ACANoticeBoard::PostReviewNotice(FVector position, FEvaluation reviewNotice
 		
 		newReviewNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		newReviewNotice->SetActorRelativeLocation(position);	
+		
+		Posters.Add(newReviewNotice);
+	}
+}
+
+void ACANoticeBoard::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+
+	switch (FeatureType)
+	{
+	case EFeatureType::REFRESH:
+	{
+		ServerRefreshBoard();
+		break;
+	}
+	}
+}
+
+void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
+{
+	FeatureType = EFeatureType::REFRESH;
+	ATP_ThirdPersonCharacter::SetOwnerFor(this, initiator);
+}
+
+void ACANoticeBoard::ServerRefreshBoard_Implementation()
+{
+	for (auto poster : Posters)
+	{
+		poster->Destroy();
 	}
 }
 

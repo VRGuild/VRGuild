@@ -3,6 +3,20 @@
 
 #include "Global/Widgets/TestWidgetComp.h"
 #include "Global/Widgets/CWBaseWorld.h"
+#include "GameFramework/Character.h"
+#include "Hall/Board/CANoticeBoard.h"
+
+UTestWidgetComp::UTestWidgetComp()
+{
+	bWantsInitializeComponent = true;
+}
+
+void UTestWidgetComp::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	NoticeBoard = GetOwner<ACANoticeBoard>();
+}
 
 bool UTestWidgetComp::CanTrace(ACharacter* Initiator) const
 {
@@ -16,6 +30,8 @@ bool UTestWidgetComp::CanInteract(ACharacter* Initiator) const
 
 void UTestWidgetComp::BeginTrace(ACharacter* Initiator)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Inside BeginTrace Stuff YEAH Actor %s"),
+		*GetNameSafe(Initiator));
 	auto widget = GetWidget();
 	auto button = Cast<UCWBaseWorld>(widget);
 	if (button)
@@ -30,6 +46,10 @@ void UTestWidgetComp::EndTrace(ACharacter* Initiator)
 
 void UTestWidgetComp::BeginInteract(ACharacter* Initiator)
 {
+	if (NoticeBoard)
+	{
+		NoticeBoard->RefreshBoard(Initiator);
+	}
 }
 
 void UTestWidgetComp::EndInteract(ACharacter* Initiator)
