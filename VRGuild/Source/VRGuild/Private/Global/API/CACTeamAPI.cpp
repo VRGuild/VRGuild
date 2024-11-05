@@ -77,7 +77,8 @@ void UCACTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
         TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
         if (FJsonSerializer::Deserialize(Reader, JsonObject))
         {
-            ErrorMessage = JsonObject->GetStringField("message");
+            ErrorMessage = JsonObject->GetStringField(TEXT("message"));
+
         }
     }
 
@@ -231,7 +232,7 @@ void UCACTeamAPI::TeamApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
         FString ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다.");
         if (FJsonSerializer::Deserialize(Reader, JsonObject))
         {
-            ErrorMessage = JsonObject->GetStringField("message");
+            ErrorMessage = JsonObject->GetStringField(TEXT("message"));
         }
 
         OnFailTeamApplyCallBack(ErrorMessage);
