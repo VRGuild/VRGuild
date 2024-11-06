@@ -115,7 +115,6 @@ void ACANoticeBoard::OnRep_Owner()
 	{
 	case EFeatureType::REFRESH:
 	{
-		ServerRefreshBoard();
 		break;
 	}
 	}
@@ -124,7 +123,24 @@ void ACANoticeBoard::OnRep_Owner()
 void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
 {
 	FeatureType = EFeatureType::REFRESH;
-	ATP_ThirdPersonCharacter::SetOwnerFor(this, initiator);
+
+	switch (PosterType)
+	{
+	case EPosterType::PROJECT:
+	{
+		ATP_ThirdPersonCharacter::SetOwnerFor(this, initiator);
+		break;
+	}
+	case EPosterType::REVIEW:
+	{
+		for (auto poster : Posters)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("What %s"), *GetNameSafe(poster));
+			poster->Destroy();
+		}
+		break;
+	}
+	}	
 }
 
 void ACANoticeBoard::ServerRefreshBoard_Implementation()
