@@ -15,6 +15,8 @@
 
 #include "Global/Components/CACCarry.h"
 #include "Global/Components/CACInteraction.h"
+#include "Components/WidgetInteractionComponent.h"
+#include "Components/WidgetComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -57,6 +59,11 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	WidgetInteractionComp = CreateDefaultSubobject<UWidgetInteractionComponent>("WidgetInteractionComp");
+	WidgetInteractionComp->SetupAttachment(FollowCamera);
+
+	WidgetInteractionComp->InteractionSource = EWidgetInteractionSource::World;
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -140,6 +147,8 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	
+	WidgetInteractionComp->OnHoveredWidgetChanged.AddDynamic(this, &ATP_ThirdPersonCharacter::OnWidgetHoveredChanged);
 }
 
 void ATP_ThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -164,6 +173,14 @@ void ATP_ThirdPersonCharacter::SetCustomValue(FCharacterCustomData data)
 	CustomValues = data;
 	if(GetController() && GetController()->IsLocalPlayerController()) 
 		OnRep_CustomValues();
+}
+
+void ATP_ThirdPersonCharacter::OnWidgetHoveredChanged(UWidgetComponent* WidgetComponent, UWidgetComponent* PreviousWidgetComponent)
+{
+	UE_LOG(LogTemp, Warning, TEXT("WidgetComp hover. Current %s, Prev %s [%s]"), 
+		*GetNameSafe(WidgetComponent), *GetNameSafe(WidgetComponent),
+		GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER")
+	);
 }
 
 void ATP_ThirdPersonCharacter::OnRep_CustomValues()

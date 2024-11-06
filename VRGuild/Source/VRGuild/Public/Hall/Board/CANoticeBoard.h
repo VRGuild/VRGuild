@@ -6,6 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Global/Interfaces/CIInteractionInterface.h"
 #include "CANoticeBoard.generated.h"
 
 UENUM(Blueprintable)
@@ -16,29 +17,39 @@ enum class EPosterType : uint8
 	NONE UMETA(DisplayName = "None")
 };
 
+UENUM()
+enum class EFeatureType : uint8
+{
+	REFRESH UMETA(DisplayName = "Refresh"),
+	NONE UMETA(DisplayName = "None")
+};
+
+struct FProjectNotice;
+class UTestWidgetComp;
+class ACABasePoster;
+
 UCLASS()
 class VRGUILD_API ACANoticeBoard : public AActor
 {
 	GENERATED_BODY()
 	
+	friend class UTestWidgetComp;
+
 public:	
 	// Sets default values for this actor's properties
 	ACANoticeBoard();
-
-protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
+protected:
 	// Called every frame
 	UStaticMeshComponent* BoardMeshComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMesh* BoardMesh;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Components")
+	TObjectPtr<UTestWidgetComp> WidgetCompCancelButton;
 
 protected:
-
 	UFUNCTION(BlueprintCallable)
 	void PostAllProjectNotice(FProjectListResponse projectNoticeList);
 
@@ -48,16 +59,27 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void PostReviewNotice(FVector position, FEvaluation reviewNotice); /*Change to FReviewNotice*/
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Notices)
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	TSubclassOf<class ACAProjectNotice> ProjectNoticeClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings")
 	TSubclassOf<class ACAReviewNotice> ReviewNoticeClass;
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FProjectDetailInfo> ProjectDetailInfoList;
 
-private:
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess), Category="Settings")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Settings")
 	EPosterType PosterType;
+
+private:
+	void RefreshBoard(ACharacter* initiator);
+	
+	void ResetFeatureType();
+
+	EFeatureType FeatureType;
+	TArray<ACABasePoster*> Posters;
+	
+	UPROPERTY(EditInstanceOnly, meta = (AllowPrivateAccess), Category = "Settings|Interactions")
+	bool bDisplayRefreshButton;
 };

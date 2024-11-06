@@ -11,6 +11,9 @@
 class USpringArmComponent;
 class UCameraComponent;
 
+class UWidgetInteractionComponent;
+class UWidgetComponent;
+
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
@@ -92,6 +95,11 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Settings)
 	TObjectPtr<UCACCarry> CarryComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Settings)
+	TObjectPtr<UWidgetInteractionComponent> WidgetInteractionComp;
+
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -119,6 +127,9 @@ public:
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerSetOwnerFor(AActor* actorToSet);
+
+	UFUNCTION()
+	void OnWidgetHoveredChanged(UWidgetComponent* WidgetComponent, UWidgetComponent* PreviousWidgetComponent);
 
 	bool bIsInteracting;
 	FVector2D MousePos;
