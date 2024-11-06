@@ -10,6 +10,9 @@
 /**
  * 
  */
+
+class UButton;
+
 UCLASS()
 class VRGUILD_API UCWBaseWorld : public UUserWidget
 {
@@ -18,4 +21,7 @@ class VRGUILD_API UCWBaseWorld : public UUserWidget
 public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayHoverAnim();
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Button;
 };

@@ -5,53 +5,45 @@
 #include "Global/Widgets/CWBaseWorld.h"
 #include "GameFramework/Character.h"
 #include "Hall/Board/CANoticeBoard.h"
+#include "Components/Button.h"
 
 UTestWidgetComp::UTestWidgetComp()
 {
 	bWantsInitializeComponent = true;
+
+	FeatureType = EFeatureType::NONE;
+}
+
+void UTestWidgetComp::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ensure(NoticeBoard = GetOwner<ACANoticeBoard>());
+
+	ensureMsgf(FeatureType != EFeatureType::NONE, TEXT("make sure to initialize FeatureType"));
+
+	auto what = GetUserWidgetObject();
+	if (auto widget = Cast<UCWBaseWorld>(what))
+	{
+		widget->Button->OnReleased.AddDynamic(this, &UTestWidgetComp::OnButtonReleased);
+	}
 }
 
 void UTestWidgetComp::InitializeComponent()
 {
 	Super::InitializeComponent();
-
-	NoticeBoard = GetOwner<ACANoticeBoard>();
 }
 
-bool UTestWidgetComp::CanTrace(ACharacter* Initiator) const
+void UTestWidgetComp::OnButtonReleased()
 {
-	return true;
-}
+	if (!NoticeBoard) return;
 
-bool UTestWidgetComp::CanInteract(ACharacter* Initiator) const
-{
-	return true;
-}
-
-void UTestWidgetComp::BeginTrace(ACharacter* Initiator)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Inside BeginTrace Stuff YEAH Actor %s"),
-		*GetNameSafe(Initiator));
-	auto widget = GetWidget();
-	auto button = Cast<UCWBaseWorld>(widget);
-	if (button)
+	switch (FeatureType)
 	{
-		button->PlayHoverAnim();
-	}
-}
-
-void UTestWidgetComp::EndTrace(ACharacter* Initiator)
-{
-}
-
-void UTestWidgetComp::BeginInteract(ACharacter* Initiator)
-{
-	if (NoticeBoard)
+	case EFeatureType::REFRESH:
 	{
-		NoticeBoard->RefreshBoard(Initiator);
+		NoticeBoard->RefreshBoard(nullptr);
+		break;
 	}
-}
-
-void UTestWidgetComp::EndInteract(ACharacter* Initiator)
-{
+	}
 }

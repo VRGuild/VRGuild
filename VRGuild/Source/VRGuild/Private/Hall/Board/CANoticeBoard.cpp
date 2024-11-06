@@ -31,39 +31,19 @@ ACANoticeBoard::ACANoticeBoard()
 	WidgetCompCancelButton->SetCollisionProfileName("Interactable");
 
 	FeatureType = EFeatureType::NONE;
+	bDisplayRefreshButton = false;
 }
 
-bool ACANoticeBoard::CanTrace(ACharacter* Initiator) const
-{
-	return true;
-}
-
-bool ACANoticeBoard::CanInteract(ACharacter* Initiator) const
-{
-	return true;
-}
-
-void ACANoticeBoard::BeginTrace(ACharacter* Initiator)
-{
-}
-
-void ACANoticeBoard::EndTrace(ACharacter* Initiator)
-{
-}
-
-void ACANoticeBoard::BeginInteract(ACharacter* Initiator)
-{
-}
-
-void ACANoticeBoard::EndInteract(ACharacter* Initiator)
-{
-}
-
-// Called when the game starts or when spawned
 void ACANoticeBoard::BeginPlay()
 {
 	Super::BeginPlay();
-	FProjectNotice test = FProjectNotice();
+
+	if (!bDisplayRefreshButton)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[%s] Notice board buttons disabled and not visible"), *GetNameSafe(this));
+		WidgetCompCancelButton->SetHiddenInGame(true, true);
+		//WidgetCompCancelButton->Trace
+	}
 }
 
 void ACANoticeBoard::PostAllProjectNotice(FProjectListResponse projectNoticeList)
@@ -72,7 +52,7 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectListResponse projectNoticeList
 	this->ProjectDetailInfoList.Append(projectNoticeList.data);
 	for (int32 i = 0; i < projectNoticeList.data.Num() ;  i++ )
 	{
-		PostProjectNotice(FVector(0, -120 * i, 0), projectNoticeList.data[i]);
+		PostProjectNotice(FVector(0, -120 * i, 0), projectNoticeList.data[i]); 
 	}
 }
 
@@ -107,30 +87,12 @@ void ACANoticeBoard::PostReviewNotice(FVector position, FEvaluation reviewNotice
 	}
 }
 
-void ACANoticeBoard::OnRep_Owner()
-{
-	Super::OnRep_Owner();
-
-	switch (FeatureType)
-	{
-	case EFeatureType::REFRESH:
-	{
-		break;
-	}
-	}
-}
-
 void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
 {
 	FeatureType = EFeatureType::REFRESH;
 
 	switch (PosterType)
 	{
-	case EPosterType::PROJECT:
-	{
-		ATP_ThirdPersonCharacter::SetOwnerFor(this, initiator);
-		break;
-	}
 	case EPosterType::REVIEW:
 	{
 		for (auto poster : Posters)
@@ -140,14 +102,10 @@ void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
 		}
 		break;
 	}
-	}	
-}
-
-void ACANoticeBoard::ServerRefreshBoard_Implementation()
-{
-	for (auto poster : Posters)
-	{
-		poster->Destroy();
 	}
 }
 
+void ACANoticeBoard::ResetFeatureType()
+{
+	FeatureType = EFeatureType::NONE;
+}

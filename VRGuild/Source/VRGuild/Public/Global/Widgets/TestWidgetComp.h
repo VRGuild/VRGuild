@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
-#include "Global/Interfaces/CIInteractionInterface.h"
 #include "TestWidgetComp.generated.h"
 
 /**
@@ -13,21 +12,25 @@
 
 class ACANoticeBoard;
 
+enum class EFeatureType : uint8;
+
 UCLASS()
-class VRGUILD_API UTestWidgetComp : public UWidgetComponent, public ICIInteractionInterface
+class VRGUILD_API UTestWidgetComp : public UWidgetComponent
 {
 	GENERATED_BODY()
-public: 
+public:
 	UTestWidgetComp();
-protected:
-	virtual void InitializeComponent() override;
-	virtual bool CanTrace(ACharacter* Initiator) const override;
-	virtual bool CanInteract(ACharacter* Initiator) const override;
 
-	virtual void BeginTrace(ACharacter* Initiator) override;
-	virtual void EndTrace(ACharacter* Initiator) override;
-	virtual void BeginInteract(ACharacter* Initiator) override;
-	virtual void EndInteract(ACharacter* Initiator) override;
-private:
+protected:
+	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
+
+	UFUNCTION()
+	void OnButtonReleased();
+
+	UPROPERTY(EditDefaultsOnly, Category="Settings|Notice|Feature")
+	EFeatureType FeatureType;
+	
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Notice")
 	TObjectPtr<ACANoticeBoard> NoticeBoard;
 };
