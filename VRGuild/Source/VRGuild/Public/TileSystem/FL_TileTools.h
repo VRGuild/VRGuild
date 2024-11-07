@@ -6,6 +6,15 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "FL_TileTools.generated.h"
 
+
+UENUM(BlueprintType)
+enum class ESpaceType : uint8
+{
+	None = 0 UMETA(DisplayName = "None"),
+	Floor = 1 UMETA(DisplayName = "Floor"),
+	Wall = 2 UMETA(DisplayName = "Wall"),
+};
+
 /**
  * 
  */

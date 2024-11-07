@@ -131,9 +131,9 @@ void UCACTileInteraction::AddTile()
 		return;
 
 	ACATileSpace* target = Cast<ACATileSpace>(HitResult.GetActor());
-	
+
 	if (target)
-		target->AttachSpace(HitResult.Normal + target->GetPosition(), target);
+		target->AttachSpace(HitResult, target);
 }
 
 void UCACTileInteraction::DeleteTile()

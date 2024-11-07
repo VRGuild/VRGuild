@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include "FL_TileTools.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CATileZone.generated.h"
-
-enum class ESpaceType : uint8;
 
 USTRUCT()
 struct FTileSpaceData
@@ -33,12 +33,16 @@ public:
 	// Sets default values for this actor's properties
 	ACATileZone();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
 	int32 TileSize = 1;
 
 	int32 MaxTilePostion = TileSize;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
+	ESpaceType SpaceType = ESpaceType::None;
+
 	bool bRPCWait = false;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -50,17 +54,15 @@ protected:
 
 	TMap<FVector, class ACATileSpace*> TileSpacesMap;
 
-	UPROPERTY(ReplicatedUsing = OnRep_TileSpaces)
-	TArray<FTileSpaceData> TileSpacesArray;
-
-	UFUNCTION()
-	void OnRep_TileSpaces();
-
 	virtual void OnRep_Owner() override;
 
 	FVector SendDataPosition;
 
-	class ACATileSpace* nSendDataNewTile;
+	class ACATileSpace* SendDataNewTile;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class ACATileFloor> TileFloorClass;
+
 public:
 
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -73,6 +75,7 @@ public:
 	void MRPCOnAppendSpace_Implementation(bool successed, class ACATileSpace* tileSpace);
 	UFUNCTION(Client, Reliable)
 	void CRPCOnAppendSpace(bool successed, class ACATileSpace* tileSpace);
+	void CRPCOnAppendSpace_Implementation(bool successed, class ACATileSpace* tileSpace);
 
 
 	UFUNCTION(Server, Reliable)
@@ -83,6 +86,7 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPCOnRemoveSpace(bool successed);
 
+	void TileToZone(FVector position, class ACATileSpace* tileSpace);
 	void CloneTileToZone(FVector position, class ACATileSpace* tileSpace);
 	void DeleteTileToZone(FVector position);
 
@@ -105,4 +109,6 @@ public:
 
 	virtual bool HasTypeNearByTile(FVector position, ESpaceType spaceType);
 
+	UFUNCTION(BlueprintCallable, Category = "Tile System")
+	ACATileSpace* GetTileAtPosition(const FVector& Position);
 };
