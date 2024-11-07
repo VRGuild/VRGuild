@@ -6,6 +6,7 @@
 #include "TileSystem/FL_TileTools.h"
 #include "TileSystem/CATileSpace.h"
 #include "TileSystem/CWGTileCost.h"
+#include "TileSystem/CATileCube.h"
 #include "Net/UnrealNetwork.h"
 
 ACATileFloor::ACATileFloor()
@@ -39,6 +40,7 @@ ACATileFloor::ACATileFloor()
 
 	this->NorthWallComp->SetRelativeRotation(FRotator(0, 90, 0));
 	this->SouthWallComp->SetRelativeRotation(FRotator(0, -90, 0));
+
 }
 
 void ACATileFloor::BeginPlay()
@@ -77,18 +79,13 @@ void ACATileFloor::OnConstruction(const FTransform& Transform)
 void ACATileFloor::CreateDefualtSpace()
 {
 	// 기본 Floor 타일 생성
-	ACATileFloor* templateFloor = GetWorld()->SpawnActor<ACATileFloor>();
- 	if (templateFloor)
-	{
 		// 3x3 그리드 생성 (-3 ~ 3)
-		for (int y = -1; y <= 1; y++)
+	for (int y = -1; y <= 1; y++)
+	{
+		for (int x = -1; x <= 1; x++)
 		{
-			for (int x = -1; x <= 1; x++)
-			{
-			}
+			this->ParentZone->SRPCAppendSpace(FVector(x, y, 0), this);
 		}
-		// 템플릿으로 사용한 Floor 제거
-		templateFloor->Destroy();
 	}
 }
 
@@ -146,9 +143,9 @@ ACATileSpace* ACATileFloor::Clone()
 	return nullptr;
 }
 
-void ACATileFloor::AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace)
+void ACATileFloor::AttachSpace(FHitResult hitResult, ACATileSpace* newTileSpace)
 {
-	FString HitCompName = HitResult.GetComponent()->GetName();
+	FString HitCompName = hitResult.GetComponent()->GetName();
 	UE_LOG(LogTemp, Display, TEXT("Hit Comp : %s"), *HitCompName);
 	if (HitCompName == "NorthWallComp")
 	{
@@ -165,6 +162,9 @@ void ACATileFloor::AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace)
 	else if(HitCompName == "WestWallComp")
 	{
 		this->ParentZone->AttachTile(this->Position + FVector(0, -1, 0), newTileSpace);
+	}
+	else if (HitCompName == "BaseFloorComp")
+	{
 	}
 	else
 	{
@@ -224,7 +224,6 @@ void ACATileFloor::UpdateWallVisible()
 			}
 		}
 	}
-
 	// 상태가 변경되었다면 모든 클라이언트에 전파
 	if (NewFlags != WallVisibilityFlags)
 	{

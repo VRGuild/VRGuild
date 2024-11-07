@@ -32,6 +32,10 @@ protected:
 
 	UPROPERTY(Replicated)
 	class ACATileZone* ParentZone;
+
+	UPROPERTY(Replicated)
+	class ACATileZone* ChildZone;
+
 	UPROPERTY(Replicated)
 	FVector Position = FVector(0);
 	UPROPERTY(Replicated)
@@ -49,6 +53,7 @@ public:
 
 	virtual void AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace);
 	virtual void AttachPostision(FVector position, ACATileSpace* newTileSpace);
+	virtual void SpawnSpace(FHitResult HitResult, TSubclassOf<ACATileSpace> newTileSpace);
 
 	virtual void Delete();
 

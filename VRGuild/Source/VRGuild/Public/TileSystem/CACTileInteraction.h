@@ -33,16 +33,15 @@ protected:
 
 	FHitResult HitResult;
 
+	TSubclassOf<class ACATileCube> SelectedTileCube;
+
 public:	
 	bool DebugMode = false;
 
 	virtual void InitializeComponent() override;
 
-	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	//UFUNCTION(Server, Reliable,)
-	//void SRPCAddTile(FVector relativePosition, class ACATileSpace* tileSpace);
-	//void SRPCAddTile_Implementation(FVector relativePosition, class ACATileSpace* tileSpace);
+	UFUNCTION(BlueprintCallable)
+	bool SetSelectedTileCube(TSubclassOf<class ACATileCube> tileCube);
 
 	AActor* TileLineTrace();
 

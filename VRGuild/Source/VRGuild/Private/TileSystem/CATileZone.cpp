@@ -4,6 +4,7 @@
 #include "TileSystem/CATileZone.h"
 #include "TileSystem/CATileSpace.h"
 #include "TileSystem/CATileFloor.h"
+#include "TileSystem/CATileCube.h"
 #include "TileSystem/FL_TileTools.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Blueprint/UserWidget.h"
@@ -30,7 +31,6 @@ void ACATileZone::BeginPlay()
 
 	bReplicates = true;
 	bAlwaysRelevant = true;
-	CreateDefualtSpace();
 }
 
 void ACATileZone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -55,7 +55,10 @@ void ACATileZone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 void ACATileZone::OnRep_Owner()
 {
 	Super::OnRep_Owner();
-	SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
+	if (this->SendDataNewTile)
+		SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
+	else if (this->SendDataNewTileClass)
+		SRPCSpawnSpace(this->SendDataPosition, this->SendDataNewTileClass);
 }
 
 
@@ -234,8 +237,24 @@ void ACATileZone::AttachTile(FVector position, ACATileSpace* newTile)
 
 	this->SendDataPosition = position;
 	this->SendDataNewTile = newTile;
+	this->SendDataNewTileClass = nullptr;
 	if (GetOwner())
 		SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
+	else
+		ATP_ThirdPersonCharacter::SetOwnerFor(this, GetWorld()->GetFirstPlayerController()->GetCharacter());
+}
+
+void ACATileZone::SpawnTile(FVector position, TSubclassOf<class ACATileSpace> newTile)
+{
+	if (!newTile)
+		return;
+	bRPCWait = true;
+
+	this->SendDataPosition = position;
+	this->SendDataNewTile = nullptr;
+	this->SendDataNewTileClass = newTile;
+	if (GetOwner())
+		SRPCSpawnSpace(this->SendDataPosition, this->SendDataNewTileClass);
 	else
 		ATP_ThirdPersonCharacter::SetOwnerFor(this, GetWorld()->GetFirstPlayerController()->GetCharacter());
 }
@@ -278,3 +297,14 @@ ACATileSpace* ACATileZone::GetTileAtPosition(const FVector& position)
 	return nullptr;
 }
 
+void ACATileZone::SRPCSpawnSpace_Implementation(FVector position, TSubclassOf<ACATileSpace> tileSpace)
+{
+	UE_LOG(LogTemp, Display, TEXT("SRPCAppendSpace"));
+
+	ACATileSpace* newtile = this->GetWorld()->SpawnActor<ACATileSpace>(tileSpace);
+	if (!newtile)
+		return;
+	newtile->SetActorLocation(position);
+
+	CRPCOnAppendSpace(true, newtile);
+}
