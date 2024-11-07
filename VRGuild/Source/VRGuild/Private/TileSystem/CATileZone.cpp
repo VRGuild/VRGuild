@@ -3,6 +3,7 @@
 
 #include "TileSystem/CATileZone.h"
 #include "TileSystem/CATileSpace.h"
+#include "TileSystem/CATileFloor.h"
 #include "TileSystem/FL_TileTools.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Blueprint/UserWidget.h"
@@ -29,49 +30,63 @@ void ACATileZone::BeginPlay()
 
 	bReplicates = true;
 	bAlwaysRelevant = true;
-
-	this->TileSize = 128;
 	CreateDefualtSpace();
 }
 
 void ACATileZone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-
-	DOREPLIFETIME(ACATileZone, TileSpacesArray);
 }
 
-void ACATileZone::OnRep_TileSpaces()
-{
-	UE_LOG(LogTemp, Display, TEXT("OnRep_TileSpaces"));
-	// TArray가 업데이트될 때마다 TMap 재구성
-	TileSpacesMap.Empty();
-	for (const FTileSpaceData& TileData : TileSpacesArray)
-	{
-		if (TileData.TileSpace)
-		{
-			TileSpacesMap.Add(TileData.Position, TileData.TileSpace);
-		}
-	}
-}
+//void ACATileZone::OnRep_TileSpaces()
+//{
+//	UE_LOG(LogTemp, Display, TEXT("OnRep_TileSpaces"));
+//	// TArray가 업데이트될 때마다 TMap 재구성
+//	TileSpacesMap.Empty();
+//	for (const FTileSpaceData& TileData : TileSpacesArray)
+//	{
+//		if (TileData.TileSpace)
+//		{
+//			TileSpacesMap.Add(TileData.Position, TileData.TileSpace);
+//		}
+//	}
+//}
 
 void ACATileZone::OnRep_Owner()
 {
 	Super::OnRep_Owner();
-	SRPCAppendSpace(this->SendDataPosition, this->nSendDataNewTile);
+	SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
 }
 
 
 void ACATileZone::CreateDefualtSpace()
 {
-	if (this->HasAuthority())
+	UE_LOG(LogTemp, Display, TEXT("netmode : %d"), GetWorld()->GetNetMode());
+	if (!this->HasAuthority())
+		return;
+
+	ACATileSpace* tempTile;
+	if (this->SpaceType == ESpaceType::Floor)
 	{
-		ACATileSpace* tempTile = GetWorld()->SpawnActor<ACATileSpace>();
-		tempTile->SetActorScale3D(FVector(this->TileSize));
-		SRPCAppendSpace(FVector(0,0,0), tempTile);
-		tempTile->Destroy();
+		if (!TileFloorClass)
+			return;
+		tempTile = GetWorld()->SpawnActor<ACATileFloor>(TileFloorClass);
+		SRPCAppendSpace(FVector(0, 0, 0), tempTile);
+		// 3x3 그리드 생성 (-3 ~ 3)
+		for (int y = -1; y <= 1; y++)
+		{
+			for (int x = -1; x <= 1; x++)
+			{
+				SRPCAppendSpace(FVector(x,y,0), tempTile);
+			}
+		}
 	}
+	else
+	{ 
+		tempTile= GetWorld()->SpawnActor<ACATileSpace>();
+		SRPCAppendSpace(this->GetActorLocation(), tempTile);
+	}
+	tempTile->Destroy();
 }
 
 void ACATileZone::SRPCAppendSpace_Implementation(FVector relativePosition, ACATileSpace* tileSpace)
@@ -80,6 +95,7 @@ void ACATileZone::SRPCAppendSpace_Implementation(FVector relativePosition, ACATi
 	
 	FVector gridPosition = UFL_TileTools::SnapGridVector(relativePosition, 1);
 
+	UE_LOG(LogTemp, Display, TEXT("grid position %f %f %f"), gridPosition.X, gridPosition.Y, gridPosition.Z);
 	if (this->TileSpacesMap.Contains(gridPosition))
 		return CRPCOnAppendSpace(false, tileSpace);
 	CloneTileToZone(gridPosition, tileSpace);
@@ -126,27 +142,55 @@ void ACATileZone::CRPCOnRemoveSpace_Implementation(bool successed)
 	bRPCWait = false;
 }
 
+void ACATileZone::TileToZone(FVector position, ACATileSpace* tileSpace)
+{
+	if (!HasAuthority() || !tileSpace)
+		return;
+
+	if (tileSpace)
+	{
+		// 위치 및 부모 설정
+		tileSpace->SetParentZone(this);
+		tileSpace->SetPosition(position);
+		tileSpace->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+		tileSpace->SetActorRelativeLocation(position * TileSize);
+		// 로컬 맵에도 추가
+		TileSpacesMap.Add(position, tileSpace);
+	}
+}
 
 void ACATileZone::CloneTileToZone(FVector position, ACATileSpace* tileSpace)
 {
 	if (!HasAuthority() || !tileSpace)
 		return;
-
-	ACATileSpace* newTileSpace = tileSpace->Clone();
-
+	ACATileSpace* newTileSpace = nullptr;
+	if (tileSpace->GetSpaceType() == ESpaceType::Floor)
+	{
+		newTileSpace = Cast<ACATileFloor>(tileSpace)->Clone();
+	}
+	else
+	{
+		newTileSpace = tileSpace->Clone();
+	}
 	if (newTileSpace)
 	{
 		// 위치 및 부모 설정
+		newTileSpace->TileSize = tileSpace->TileSize;
 		newTileSpace->SetParentZone(this);
 		newTileSpace->SetPosition(position);
 		newTileSpace->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-		newTileSpace->SetActorRelativeLocation(position * TileSize);
+		newTileSpace->SetActorRelativeLocation(position * newTileSpace->TileSize * this->TileSize);
 		newTileSpace->SetActorScale3D(FVector(this->TileSize));
 
-		// TArray에 추가
-		TileSpacesArray.Add(FTileSpaceData(position, newTileSpace));
 		// 로컬 맵에도 추가
 		TileSpacesMap.Add(position, newTileSpace);
+
+		// Floor 타일인 경우 벽 업데이트
+		if (ACATileFloor* newFloor = Cast<ACATileFloor>(newTileSpace))
+		{
+			// 새로 생성된 타일의 벽 업데이트
+			newFloor->UpdateWallVisible();
+		}
 	}
 }
 
@@ -154,20 +198,6 @@ void ACATileZone::DeleteTileToZone(FVector position)
 {
 	if (!HasAuthority()) return;
 
-	for (int32 i = TileSpacesArray.Num() - 1; i >= 0; --i)
-	{
-		if (TileSpacesArray[i].Position == position)
-		{
-			if (TileSpacesArray[i].TileSpace)
-			{
-				TileSpacesArray[i].TileSpace->Destroy();
-			}
-			TileSpacesArray.RemoveAt(i);
-			break;
-		}
-	}
-
-	// 로컬 맵에서도 제거
 	ACATileSpace* targetTileSpace = this->TileSpacesMap[position];
 	
 	this->TileSpacesMap.Remove(position);
@@ -203,10 +233,11 @@ void ACATileZone::AttachTile(FVector position, ACATileSpace* newTile)
 	bRPCWait = true;
 
 	this->SendDataPosition = position;
-	this->nSendDataNewTile = newTile;
-	SRPCAppendSpace(position, newTile);
-	ATP_ThirdPersonCharacter::SetOwnerFor(this, GetWorld()->GetFirstPlayerController()->GetCharacter());
-
+	this->SendDataNewTile = newTile;
+	if (GetOwner())
+		SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
+	else
+		ATP_ThirdPersonCharacter::SetOwnerFor(this, GetWorld()->GetFirstPlayerController()->GetCharacter());
 }
 
 void ACATileZone::DeleteTile(ACATileSpace* targetTile)
@@ -235,5 +266,15 @@ bool ACATileZone::HasTypeNearByTile(FVector position, ESpaceType spaceType)
 		}
 	}
 	return false;
+}
+
+ACATileSpace* ACATileZone::GetTileAtPosition(const FVector& position)
+{
+	FVector gridPosition = UFL_TileTools::SnapGridVector(position, 1);
+	if (this->TileSpacesMap.Contains(gridPosition))
+	{
+		return this->TileSpacesMap[gridPosition];
+	}
+	return nullptr;
 }
 
