@@ -48,6 +48,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
 	virtual void CreateDefualtSpace();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -59,6 +60,8 @@ protected:
 	FVector SendDataPosition;
 
 	class ACATileSpace* SendDataNewTile;
+
+	TSubclassOf<class ACATileSpace> SendDataNewTileClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class ACATileFloor> TileFloorClass;
@@ -86,6 +89,10 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPCOnRemoveSpace(bool successed);
 
+	UFUNCTION(Server, Reliable)
+	void SRPCSpawnSpace(FVector relativePosition, TSubclassOf<class ACATileSpace> tileSpace);
+	void SRPCSpawnSpace_Implementation(FVector relativePosition, TSubclassOf<class ACATileSpace> tileSpace);
+
 	void TileToZone(FVector position, class ACATileSpace* tileSpace);
 	void CloneTileToZone(FVector position, class ACATileSpace* tileSpace);
 	void DeleteTileToZone(FVector position);
@@ -104,8 +111,9 @@ public:
 	UFUNCTION()
 	void AttachTile(FVector position, class ACATileSpace* newTile);
 	UFUNCTION()
+	void SpawnTile(FVector position, TSubclassOf<class ACATileSpace> newTile);
+	UFUNCTION()
 	void DeleteTile(class ACATileSpace* targetTile);
-
 
 	virtual bool HasTypeNearByTile(FVector position, ESpaceType spaceType);
 

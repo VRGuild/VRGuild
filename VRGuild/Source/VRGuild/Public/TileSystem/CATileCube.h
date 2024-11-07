@@ -10,17 +10,17 @@
  * 
  */
 UCLASS()
-class VRGUILD_API ACATileCube : public AActor
+class VRGUILD_API ACATileCube : public ACATileSpace
 {
 	GENERATED_BODY()
 
-
+public:
+	ACATileCube();
 
 protected:
-	/*UStaticMeshComponent* TileSpaceMesh;
 
-	UMaterialInstance* TileBaseMat;
-	UMaterialInstance* TileOpacityMat;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UStaticMeshComponent* TileMesh;
 
 	virtual void BeginPlay() override;
 
@@ -29,18 +29,11 @@ protected:
 	virtual void CreateDefualtSpace() override;
 
 public:
-
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE UStaticMeshComponent* GetTileSpaceMesh() const { return TileSpaceMesh; }
-
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE UMaterialInstance* GetTileBaseMat() const { return TileBaseMat; }
-
 	virtual ACATileSpace* Clone() override;
 
-	virtual void AttachSpace(FVector relativeVector, ACATileSpace* newTileSpace) override;
+	virtual void AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace) override;
+	virtual void AttachPostision(FVector position, ACATileSpace* newTileSpace) override;
 
-	virtual void Delete() override*/
-
+	virtual void Delete() override;
 
 };

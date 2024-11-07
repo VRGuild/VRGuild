@@ -71,13 +71,10 @@ protected:
     void MulticastUpdateWallVisibility(uint8 NewFlags);
     void MulticastUpdateWallVisibility_Implementation(uint8 NewFlags);
 
-
 public:
     virtual ACATileSpace* Clone() override;
     virtual void AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace) override;
     virtual void AttachPostision(FVector position, ACATileSpace* newTileSpace) override;
-
-
 
     void UpdateWallVisible();
 

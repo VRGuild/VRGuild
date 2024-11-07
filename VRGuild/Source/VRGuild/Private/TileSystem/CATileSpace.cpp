@@ -15,11 +15,6 @@ ACATileSpace::ACATileSpace()
 	bReplicates = true;
 	bAlwaysRelevant = true;
 
-	if (GetWorld() && GetWorld()->GetFirstPlayerController())
-	{
-		SetOwner(GetWorld()->GetFirstPlayerController());
-	}
-
 }
 
 
@@ -42,12 +37,11 @@ ACATileSpace* ACATileSpace::Clone()
 }
 
 
-
-
 // Called when the game starts or when spawned
 void ACATileSpace::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 	if (GetWorld() && GetWorld()->GetFirstPlayerController())
 	{
@@ -58,6 +52,16 @@ void ACATileSpace::BeginPlay()
         SetReplicates(true);
         SetReplicateMovement(true);
     }
+
+	if (!ChildZone && GetWorld())
+	{
+		ChildZone = GetWorld()->SpawnActor<ACATileZone>(ACATileZone::StaticClass(), GetActorLocation(), GetActorRotation());
+		if (ChildZone)
+		{
+			ChildZone->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+			ChildZone->TileSize = TileSize / 5;
+		}
+	}
 }
 
 
@@ -91,8 +95,10 @@ void ACATileSpace::AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace)
 		ACATileFloor* floorTarget = Cast<ACATileFloor>(HitResult.GetActor());
 		floorTarget->AttachSpace(HitResult, newTileSpace);
 	}
-	else
+	else if (target->SpaceType == ESpaceType::Cube)
 	{
+	}
+	else {
 		this->ParentZone->AttachTile(this->Position + HitResult.Normal, newTileSpace);
 	}
 }
@@ -100,6 +106,12 @@ void ACATileSpace::AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace)
 void ACATileSpace::AttachPostision(FVector position, ACATileSpace* newTileSpace)
 {
 	this->ParentZone->AttachTile(this->Position + position, newTileSpace);
+}
+
+void ACATileSpace::SpawnSpace(FHitResult HitResult, TSubclassOf<ACATileSpace> newTileSpace)
+{
+	this->ParentZone->SpawnTile(HitResult.ImpactPoint, newTileSpace);
+
 }
 
 void ACATileSpace::Delete()

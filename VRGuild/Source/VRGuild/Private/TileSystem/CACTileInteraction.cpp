@@ -5,6 +5,9 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "TileSystem/CATileSpace.h"
+#include "TileSystem/CATileFloor.h"
+#include "TileSystem/CATileCube.h"
+#include "TileSystem/FL_TileTools.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -58,6 +61,14 @@ void UCACTileInteraction::InitializeComponent()
 		ATP_ThirdPersonCharacter* character = Cast<ATP_ThirdPersonCharacter>(Owner);
 		OwnerCamera = character->GetFollowCamera();
 	}
+}
+
+bool UCACTileInteraction::SetSelectedTileCube(TSubclassOf<ACATileCube> tileCube)
+{
+	if (!tileCube)
+		return false;
+	this->SelectedTileCube = tileCube;
+	return true;
 }
 
 AActor* UCACTileInteraction::TileLineTrace()
@@ -126,14 +137,32 @@ void UCACTileInteraction::OnReleased(const FInputActionValue& Value)
 void UCACTileInteraction::AddTile()
 {
 	UE_LOG(LogTemp, Display, TEXT("AddTile Called"));
-	
+
 	if (!HitResult.GetActor() || !HitResult.GetActor()->IsA<ACATileSpace>())
 		return;
 
 	ACATileSpace* target = Cast<ACATileSpace>(HitResult.GetActor());
+	if (!target)
+		return;
 
-	if (target)
+	if (target->GetSpaceType() == ESpaceType::Floor)
+	{
+		if (HitResult.GetComponent()->GetName() == "BaseFloorComp")
+		{
+			if (this->SelectedTileCube)
+			{
+				target->SpawnSpace(HitResult, this->SelectedTileCube);
+			}
+		}
+		else
+		{
+			target->AttachSpace(HitResult, target);
+		}
+	}
+	else
+	{
 		target->AttachSpace(HitResult, target);
+	}
 }
 
 void UCACTileInteraction::DeleteTile()
