@@ -25,6 +25,15 @@ protected:
 
     // User Basic Info
     UFUNCTION(BlueprintCallable, Category = "User API")
+    void UserOwnInfoGetCall();
+    void UserOwnInfoGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "User API")
+    void OnUserOwnInfoGetCallBack(const FUserInfo& UserInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "User API")
+    void OnFailUserOwnInfoGetCallBack();
+
+    // User Basic Info
+    UFUNCTION(BlueprintCallable, Category = "User API")
     void UserInfoGetCall(const FString& UserId);
     void UserInfoGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "User API")

@@ -12,6 +12,7 @@ void UCWGBaseAPI::SetOAuthToken()
 	{
 		IOnlineIdentityPtr Identity = Subsystem->GetIdentityInterface();
 		this->OAuthToken = Identity->GetAuthToken(0);
+		UE_LOG(LogTemp, Display, TEXT("token : %s"), *this->OAuthToken);
 	}
 }
 
