@@ -44,7 +44,7 @@ protected:
 
 	virtual bool CheckCanTrace(ACharacter* player) const PURE_VIRTUAL(ACABasePoster::CheckCanTrace, return false;);
 
-public:
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|On Board Actor")
 	FVector2D WidgetDrawSize = { 400,440 };
 
@@ -56,6 +56,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UWidgetComponent* BackSideComp;
+
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> TopSize;
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> BottomSize;
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> LeftSize;
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> RightSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|On Board Actor")
 	TSubclassOf<UUserWidget> WidgetFrontSide;
