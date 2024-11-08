@@ -22,14 +22,19 @@ void UCACUserAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
 
     // Define regex patterns for each endpoint
+    FRegexPattern GetUserOwnInfoPattern(TEXT(R"(GET\s+/api/user/epic$)"));
     FRegexPattern GetUserInfoPattern(TEXT(R"(GET\s+/api/user/(\d+)$)"));
-    FRegexPattern GetUserMemberPattern(TEXT(R"(GET\s+/api/user/member/(\d+))"));
+    FRegexPattern GetUserMemberPattern(TEXT(R"(GET\s+/api/user/(\d+)/member$)"));
 
     // Create URL string to match against patterns
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
-
-    if (FRegexMatcher(GetUserInfoPattern, UrlToMatch).FindNext())
+    if (FRegexMatcher(GetUserOwnInfoPattern, UrlToMatch).FindNext())
+    {
+        UE_LOG(LogTemp, Display, TEXT("GET User Own Info"));
+        UserOwnInfoGetCallBack(req, res);
+    }
+    else if (FRegexMatcher(GetUserInfoPattern, UrlToMatch).FindNext())
     {
         FRegexMatcher Matcher(GetUserInfoPattern, UrlToMatch);
         Matcher.FindNext();
@@ -50,12 +55,18 @@ void UCACUserAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 void UCACUserAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     // Similar pattern matching as OnSuccessAPI
+    FRegexPattern GetUserOwnInfoPattern(TEXT(R"(GET\s+/api/user/epic$)"));
     FRegexPattern GetUserInfoPattern(TEXT(R"(GET\s+/api/user/(\d+)$)"));
-    FRegexPattern GetUserMemberPattern(TEXT(R"(GET\s+/api/user/(\d+)/member)"));
+    FRegexPattern GetUserMemberPattern(TEXT(R"(GET\s+/api/user/(\d+)/member$)"));
 
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     
-    if (FRegexMatcher(GetUserInfoPattern, UrlToMatch).FindNext())
+    if (FRegexMatcher(GetUserOwnInfoPattern, UrlToMatch).FindNext())
+    {
+        UE_LOG(LogTemp, Display, TEXT("GET User Own Info"));
+        OnFailUserOwnInfoGetCallBack();
+    }
+    else if (FRegexMatcher(GetUserInfoPattern, UrlToMatch).FindNext())
     {
         OnFailUserInfoGetCallBack();
     }
@@ -63,6 +74,20 @@ void UCACUserAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     {
         OnFailUserMemberInfoGetCallBack();
     }
+}
+
+void UCACUserAPI::UserOwnInfoGetCall()
+{
+    this->API = FString::Printf(TEXT("api/user/epic"));
+    HttpGetCall();
+}
+
+void UCACUserAPI::UserOwnInfoGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FUserInfoResponse ParsedResponse = JsonPerse<FUserInfoResponse>(JsonString);
+
+    OnUserOwnInfoGetCallBack(ParsedResponse.data);
 }
 
 void UCACUserAPI::UserInfoGetCall(const FString& UserId)
@@ -76,14 +101,7 @@ void UCACUserAPI::UserInfoGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     FString JsonString = res->GetContentAsString();
     FUserInfoResponse ParsedResponse = JsonPerse<FUserInfoResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnUserInfoGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailUserInfoGetCallBack();
-    }
+    OnUserInfoGetCallBack(ParsedResponse.data);
 }
 
 void UCACUserAPI::UserMemberInfoGetCall(const FString& UserId)
@@ -97,12 +115,5 @@ void UCACUserAPI::UserMemberInfoGetCallBack(FHttpRequestPtr req, FHttpResponsePt
     FString JsonString = res->GetContentAsString();
     FUserMemberInfoResponse ParsedResponse = JsonPerse<FUserMemberInfoResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnUserMemberInfoGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailUserMemberInfoGetCallBack();
-    }
+    OnUserMemberInfoGetCallBack(ParsedResponse.data);
 }

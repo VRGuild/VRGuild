@@ -95,14 +95,7 @@ void UCACCharacterAPI::CharacterGetCallBack(FHttpRequestPtr req, FHttpResponsePt
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnCharacterGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailCharacterGetCallBack();
-    }
+    OnCharacterGetCallBack(ParsedResponse.data);
 }
 
 void UCACCharacterAPI::CharacterCreateCall(const FCharacterInfo& CharacterInfo)
@@ -117,14 +110,7 @@ void UCACCharacterAPI::CharacterCreateCallBack(FHttpRequestPtr req, FHttpRespons
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnCharacterCreateCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailCharacterCreateCallBack();
-    }
+    OnCharacterCreateCallBack(ParsedResponse.data);
 }
 
 void UCACCharacterAPI::CharacterUpdateCall(const FString& CharacterId, const FCharacterInfo& CharacterInfo)
@@ -138,14 +124,7 @@ void UCACCharacterAPI::CharacterUpdateCallBack(FHttpRequestPtr req, FHttpRespons
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnCharacterUpdateCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailCharacterUpdateCallBack();
-    }
+    OnCharacterUpdateCallBack(ParsedResponse.data);
 }
 
 void UCACCharacterAPI::CharacterGetByUserIdCall(const FString& UserId)
@@ -159,14 +138,7 @@ void UCACCharacterAPI::CharacterGetByUserIdCallBack(FHttpRequestPtr req, FHttpRe
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnCharacterGetByUserIdCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailCharacterGetByUserIdCallBack();
-    }
+    OnCharacterGetByUserIdCallBack(ParsedResponse.data);
 }
 
 void UCACCharacterAPI::CharacterGetByNicknameCall(const FString& Nickname)
@@ -180,12 +152,5 @@ void UCACCharacterAPI::CharacterGetByNicknameCallBack(FHttpRequestPtr req, FHttp
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnCharacterGetByNicknameCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailCharacterGetByNicknameCallBack();
-    }
+    OnCharacterGetByNicknameCallBack(ParsedResponse.data);
 }
