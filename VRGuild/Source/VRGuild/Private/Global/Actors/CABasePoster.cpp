@@ -37,6 +37,22 @@ ACABasePoster::ACABasePoster()
 
 	BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	TopSize = CreateDefaultSubobject<USceneComponent>("TopSize");
+	TopSize->SetupAttachment(RootComp);
+	TopSize->SetRelativeLocation(FVector(0.f, 0.f, 20.f));
+	
+	BottomSize = CreateDefaultSubobject<USceneComponent>("BottomSize");
+	BottomSize->SetRelativeLocation(FVector(0.f, 0.f, -20.f));
+	BottomSize->SetupAttachment(RootComp);
+	
+	RightSize = CreateDefaultSubobject<USceneComponent>("RightSize");
+	RightSize->SetRelativeLocation(FVector(0.f, 20.f, 0.f));
+	RightSize->SetupAttachment(RootComp);
+	
+	LeftSize = CreateDefaultSubobject<USceneComponent>("LeftSize");
+	LeftSize->SetRelativeLocation(FVector(0.f, -20.f, 0.f));
+	LeftSize->SetupAttachment(RootComp);
+
 	SetHideMesh(true);
 
 	HeldScale = FVector(.2f);

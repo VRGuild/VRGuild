@@ -49,6 +49,22 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings|Components")
 	TObjectPtr<UTestWidgetComp> WidgetCompCancelButton;
 
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> TopSize;
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> BottomSize;
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> LeftSize;
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	TObjectPtr<USceneComponent> RightSize;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta=(MakeEditWidget))
+	FVector SpacerBase;
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
+	FVector SpacerWidth;
+	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
+	FVector SpacerHeight;
+
 protected:
 	UFUNCTION(BlueprintCallable)
 	void PostAllProjectNotice(FProjectPagedResponse projectNoticeList);
@@ -81,10 +97,15 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Settings")
 	EPosterType PosterType;
 
+	UPROPERTY(EditInstanceOnly, Category = "Settings")
+	float SpawnedActorScale;
+
 private:
 	void RefreshBoard(ACharacter* initiator);
 	
 	void ResetFeatureType();
+
+	void ScaleSpawnedActor(AActor* actorSpawned);
 
 	EFeatureType FeatureType;
 	TArray<ACABasePoster*> Posters;
