@@ -1,23 +1,9 @@
-﻿#include "Global/API/CACDeveloperAPI.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#include "Global/UI/API/CWGDeveloperAPI.h"
 #include "Global/API/BPL/CBPLDeveloper.h"
 
-UCACDeveloperAPI::UCACDeveloperAPI()
-{
-    PrimaryComponentTick.bCanEverTick = false;
-    bWantsInitializeComponent = true;
-}
-
-void UCACDeveloperAPI::BeginPlay()
-{
-    Super::BeginPlay();
-}
-
-void UCACDeveloperAPI::InitializeComponent()
-{
-    Super::InitializeComponent();
-}
-
-void UCACDeveloperAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGDeveloperAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
 
@@ -52,7 +38,7 @@ void UCACDeveloperAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACDeveloperAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGDeveloperAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FRegexPattern CreateDeveloperPattern(TEXT(R"(POST\s+/api/epic/developer$)"));
     FRegexPattern GetDeveloperPattern(TEXT(R"(GET\s+/api/epic/developer$)"));
@@ -79,13 +65,13 @@ void UCACDeveloperAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACDeveloperAPI::DeveloperCreateCall(const FDeveloperRequest& Request)
+void UCWGDeveloperAPI::DeveloperCreateCall(const FDeveloperRequest& Request)
 {
     this->API = TEXT("api/epic/developer");
     HttpPostCall<FDeveloperRequest>(Request);
 }
 
-void UCACDeveloperAPI::DeveloperCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGDeveloperAPI::DeveloperCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FDeveloperResponse ParsedResponse = JsonPerse<FDeveloperResponse>(JsonString);
@@ -93,13 +79,13 @@ void UCACDeveloperAPI::DeveloperCreateCallBack(FHttpRequestPtr req, FHttpRespons
     OnDeveloperCreateCallBack(ParsedResponse.data);
 }
 
-void UCACDeveloperAPI::DeveloperGetCall()
+void UCWGDeveloperAPI::DeveloperGetCall()
 {
     this->API = TEXT("api/epic/developer");
     HttpGetCall();
 }
 
-void UCACDeveloperAPI::DeveloperGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGDeveloperAPI::DeveloperGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FDeveloperResponse ParsedResponse = JsonPerse<FDeveloperResponse>(JsonString);
@@ -107,13 +93,13 @@ void UCACDeveloperAPI::DeveloperGetCallBack(FHttpRequestPtr req, FHttpResponsePt
     OnDeveloperGetCallBack(ParsedResponse.data);
 }
 
-void UCACDeveloperAPI::DeveloperUpdateCall(const FDeveloperRequest& Request)
+void UCWGDeveloperAPI::DeveloperUpdateCall(const FDeveloperRequest& Request)
 {
     this->API = TEXT("api/epic/developer");
     HttpPatchCall<FDeveloperRequest>(Request);
 }
 
-void UCACDeveloperAPI::DeveloperUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGDeveloperAPI::DeveloperUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FDeveloperResponse ParsedResponse = JsonPerse<FDeveloperResponse>(JsonString);
@@ -121,13 +107,13 @@ void UCACDeveloperAPI::DeveloperUpdateCallBack(FHttpRequestPtr req, FHttpRespons
     OnDeveloperUpdateCallBack(ParsedResponse.data);
 }
 
-void UCACDeveloperAPI::DeveloperGetByUserIdCall(const FString& UserId)
+void UCWGDeveloperAPI::DeveloperGetByUserIdCall(const FString& UserId)
 {
     this->API = FString::Printf(TEXT("api/epic/developer/users/%s"), *UserId);
     HttpGetCall();
 }
 
-void UCACDeveloperAPI::DeveloperGetByUserIdCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGDeveloperAPI::DeveloperGetByUserIdCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FDeveloperResponse ParsedResponse = JsonPerse<FDeveloperResponse>(JsonString);
