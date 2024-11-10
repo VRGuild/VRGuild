@@ -39,9 +39,9 @@ struct FEvaluation
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Skill|Evaluation")
-    int64 evaluationId = -1;
+    int64 evaluationId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Skill|Evaluation")
-    int64 userId;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Skill|Evaluation")
     FString cause;
     UPROPERTY(BlueprintReadWrite, Category = "Skill|Evaluation")
@@ -57,7 +57,7 @@ struct FSkillCategoryInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Skill")
-    int64 categoryInfoId;
+    int64 categoryInfoId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Skill")
     FString categoryName;
     UPROPERTY(BlueprintReadWrite, Category = "Skill")
@@ -75,7 +75,7 @@ struct FDevInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
-    int64 devId;
+    int64 devId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FString devName;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
@@ -107,7 +107,7 @@ struct FBusinessInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Business")
-    int64 businessId;
+    int64 businessId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Business")
     FString businessName;
     UPROPERTY(BlueprintReadWrite, Category = "Business")
@@ -129,13 +129,13 @@ struct FGuildInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Guild")
-    int64 guildId;
+    int64 guildId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Guild")
     FString guildName;
     UPROPERTY(BlueprintReadWrite, Category = "Guild")
     FString guildIntroduction;
     UPROPERTY(BlueprintReadWrite, Category = "Guild")
-    int64 masterUserId;
+    int64 masterUserId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Guild")
     TArray<int64> guildMemberList;
 };
@@ -147,11 +147,11 @@ struct FTeamInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Team")
-    int64 teamId;
+    int64 teamId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Team")
     FString teamIntroduction;
     UPROPERTY(BlueprintReadWrite, Category = "Team")
-    int64 leaderUserId;
+    int64 leaderUserId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Team")
     TArray<int64> teamMemberList;
 };
@@ -163,13 +163,13 @@ struct FMemberInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Member")
-    int64 memberId;
+    int64 memberId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Member")
     FString type;
     UPROPERTY(BlueprintReadWrite, Category = "Member")
-    int64 assigneesId;
+    int64 assigneesId= 0;
     UPROPERTY(BlueprintReadWrite, Category = "Member")
-    int64 userId;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Member")
     FString motive;
     UPROPERTY(BlueprintReadWrite, Category = "Member")
@@ -183,11 +183,11 @@ struct FCharacterInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Character")
-    int64 characterId;
+    int64 characterId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
-    int64 userId;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
-    int64 guildId;
+    int64 guildId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
     TArray<int64> teamIdList;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
@@ -219,9 +219,9 @@ struct FComment
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Project|Comment")
-    int64 commentId;
+    int64 commentId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Project|Comment")
-    int64 userId;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Project|Comment")
     FString content;
     UPROPERTY(BlueprintReadWrite, Category = "Project|Comment")
@@ -237,9 +237,9 @@ struct FProjectInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Project")
-    int64 projectId = -1;
+    int64 projectId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Project")
-    int64 userId;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Project")
     FString title;
     UPROPERTY(BlueprintReadWrite, Category = "Project")
@@ -271,7 +271,7 @@ struct FSupportInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Support")
-    int64 supportId = -1;
+    int64 supportId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Support")
     int64 teamId;
     UPROPERTY(BlueprintReadWrite, Category = "Support")
@@ -285,9 +285,9 @@ struct FExperience
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "User|Experience")
-    int64 expId = -1;
+    int64 expId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User|Experience")
-    int64 userId;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User|Experience")
     FString cause;
     UPROPERTY(BlueprintReadWrite, Category = "User|Experience")
@@ -303,9 +303,9 @@ struct FEther
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
-    int64 etherId;
+    int64 etherId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
-    int64 userId;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
     FString cause;
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
@@ -323,17 +323,17 @@ struct FUserInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "User")
-    int32 userId;
+    int32 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User")
     FString epicAccountID;
     UPROPERTY(BlueprintReadWrite, Category = "User")
     FString steamAccountID;
     UPROPERTY(BlueprintReadWrite, Category = "User")
-    int64 characterId;
+    int64 characterId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User")
-    int64 devId;
+    int64 devId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User")
-    int64 businessId;
+    int64 businessId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User")
     TArray<int64> channelList;
     UPROPERTY(BlueprintReadWrite, Category = "User")
