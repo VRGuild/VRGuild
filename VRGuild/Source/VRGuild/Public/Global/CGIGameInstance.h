@@ -43,10 +43,16 @@ public:
 	FString TokenID;
 
 
-	UPROPERTY(BlueprintReadOnly);
+	UPROPERTY(BlueprintReadWrite);
 	FString NickName;
+	
+	UPROPERTY(BlueprintReadWrite);
+	int64 UserId;
 
-	void SetEpicNickNameInstance(FString nickname);
+	UFUNCTION(BlueprintCallable)
+	void SetEpicNickNameInstance(FString userNickname);
+	UFUNCTION(BlueprintCallable)
+	void SetEpicUserIdInstance(int64 EpicUserId);
 
 	FCharacterCustomData CustomData;
 

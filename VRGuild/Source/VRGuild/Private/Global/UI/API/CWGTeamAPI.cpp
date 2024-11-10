@@ -106,14 +106,7 @@ void UCWGTeamAPI::TeamCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     FString JsonString = res->GetContentAsString();
     FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnTeamCreateCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailTeamCreateCallBack();
-    }
+    OnTeamCreateCallBack(ParsedResponse.data);
 }
 
 void UCWGTeamAPI::TeamGetCall(const int64& TeamId)
@@ -127,14 +120,7 @@ void UCWGTeamAPI::TeamGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     FString JsonString = res->GetContentAsString();
     FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnTeamGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailTeamGetCallBack();
-    }
+    OnTeamGetCallBack(ParsedResponse.data);
 }
 
 void UCWGTeamAPI::TeamUpdateCall(const int64& TeamId, const FTeamInfo& TeamInfo)
@@ -148,14 +134,7 @@ void UCWGTeamAPI::TeamUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     FString JsonString = res->GetContentAsString();
     FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnTeamUpdateCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailTeamUpdateCallBack();
-    }
+    OnTeamUpdateCallBack(ParsedResponse.data);
 }
 
 void UCWGTeamAPI::TeamListGetCall()
@@ -169,14 +148,7 @@ void UCWGTeamAPI::TeamListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     FString JsonString = res->GetContentAsString();
     FTeamListResponse ParsedResponse = JsonPerse<FTeamListResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnTeamListGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailTeamListGetCallBack();
-    }
+    OnTeamListGetCallBack(ParsedResponse.data);
 }
 
 void UCWGTeamAPI::TeamListByUserIdGetCall(const FString& UserId)
@@ -190,14 +162,7 @@ void UCWGTeamAPI::TeamListByUserIdGetCallBack(FHttpRequestPtr req, FHttpResponse
     FString JsonString = res->GetContentAsString();
     FTeamListResponse ParsedResponse = JsonPerse<FTeamListResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnTeamListByUserIdGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailTeamListByUserIdGetCallBack();
-    }
+    OnTeamListByUserIdGetCallBack(ParsedResponse.data);
 }
 
 void UCWGTeamAPI::TeamApplyCall(const FString& TeamId)
@@ -208,32 +173,8 @@ void UCWGTeamAPI::TeamApplyCall(const FString& TeamId)
 
 void UCWGTeamAPI::TeamApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-    // 특별한 에러 처리 (400 에러의 경우 중복 지원 등)
-    if (res->GetResponseCode() == 400)
-    {
-        FString JsonString = res->GetContentAsString();
-        TSharedPtr<FJsonObject> JsonObject;
-        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
-
-        FString ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다.");
-        if (FJsonSerializer::Deserialize(Reader, JsonObject))
-        {
-            ErrorMessage = JsonObject->GetStringField(TEXT("message"));
-        }
-
-        OnFailTeamApplyCallBack(ErrorMessage);
-        return;
-    }
-
     FString JsonString = res->GetContentAsString();
     FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == "success")
-    {
-        OnTeamApplyCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailTeamApplyCallBack(TEXT("API 호출에 실패했습니다."));
-    }
+    OnTeamApplyCallBack(ParsedResponse.data);
 }

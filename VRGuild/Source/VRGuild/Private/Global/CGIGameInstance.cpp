@@ -69,9 +69,14 @@ void UCGIGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSucc
     DestroySessionDelegateHandle.Reset();   
 }
 
-void UCGIGameInstance::SetEpicNickNameInstance(FString nickname)
+void UCGIGameInstance::SetEpicNickNameInstance(FString userNickname)
 {
-    this->NickName = nickname;
+    this->NickName = userNickname;
+}
+
+void UCGIGameInstance::SetEpicUserIdInstance(int64 EpicUserId)
+{
+    this->UserId = EpicUserId;
 }
 
 void UCGIGameInstance::AttachCustomSelections(ACharacter* NewCharacter)

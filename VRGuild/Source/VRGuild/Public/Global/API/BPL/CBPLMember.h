@@ -5,6 +5,15 @@
 #include "Global/API/BPL/CBPLBase.h"
 #include "CBPLMember.generated.h"
 
+UENUM(BlueprintType)
+enum class EMemberStatus : uint8
+{
+    None     UMETA(DisplayName = "None"),
+    Pending  UMETA(DisplayName = "Pending"),
+    Success  UMETA(DisplayName = "Success"),
+    Fail     UMETA(DisplayName = "Fail")
+};
+
 // Member Response Structure
 USTRUCT(BlueprintType)
 struct FMemberDetailResponse : public FBaseResponse

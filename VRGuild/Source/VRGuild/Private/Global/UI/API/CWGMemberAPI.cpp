@@ -1,25 +1,14 @@
-﻿#include "Global/API/CACMemberAPI.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Global/UI/API/CWGMemberAPI.h"
 #include "Global/API/BPL/CBPLMember.h"
 
-UCACMemberAPI::UCACMemberAPI()
-{
-    PrimaryComponentTick.bCanEverTick = false;
-    bWantsInitializeComponent = true;
-}
-
-void UCACMemberAPI::BeginPlay()
-{
-    Super::BeginPlay();
-}
-
-void UCACMemberAPI::InitializeComponent()
-{
-    Super::InitializeComponent();
-}
-
-void UCACMemberAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGMemberAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
+
+    Super::OnSuccessAPI(req, res);
 
     FRegexPattern GetMemberPattern(TEXT(R"(GET\s+/api/member/(\d+)$)"));
     FRegexPattern AcceptMemberPattern(TEXT(R"(GET\s+/api/member/apply/(\d+)$)"));
@@ -47,9 +36,11 @@ void UCACMemberAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACMemberAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGMemberAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
+
+    Super::OnFailAPI(req, res);
 
     FRegexPattern GetMemberPattern(TEXT(R"(GET\s+/api/member/(\d+)$)"));
     FRegexPattern AcceptMemberPattern(TEXT(R"(GET\s+/api/member/apply/(\d+)$)"));
@@ -85,13 +76,13 @@ void UCACMemberAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACMemberAPI::MemberGetCall(const FString& MemberId)
+void UCWGMemberAPI::MemberGetCall(const FString& MemberId)
 {
     this->API = FString::Printf(TEXT("api/member/%s"), *MemberId);
     HttpGetCall();
 }
 
-void UCACMemberAPI::MemberGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGMemberAPI::MemberGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FMemberDetailResponse ParsedResponse = JsonPerse<FMemberDetailResponse>(JsonString);
@@ -99,13 +90,13 @@ void UCACMemberAPI::MemberGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     OnMemberGetCallBack(ParsedResponse.data);
 }
 
-void UCACMemberAPI::MemberAcceptCall(const FString& MemberId)
+void UCWGMemberAPI::MemberAcceptCall(const FString& MemberId)
 {
     this->API = FString::Printf(TEXT("api/member/apply/%s"), *MemberId);
     HttpGetCall();
 }
 
-void UCACMemberAPI::MemberAcceptCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGMemberAPI::MemberAcceptCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FMemberDetailResponse ParsedResponse = JsonPerse<FMemberDetailResponse>(JsonString);
@@ -113,13 +104,13 @@ void UCACMemberAPI::MemberAcceptCallBack(FHttpRequestPtr req, FHttpResponsePtr r
     OnMemberAcceptCallBack(ParsedResponse.data);
 }
 
-void UCACMemberAPI::MemberRejectCall(const FString& MemberId)
+void UCWGMemberAPI::MemberRejectCall(const FString& MemberId)
 {
     this->API = FString::Printf(TEXT("api/member/except/%s"), *MemberId);
     HttpGetCall();
 }
 
-void UCACMemberAPI::MemberRejectCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGMemberAPI::MemberRejectCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FMemberDetailResponse ParsedResponse = JsonPerse<FMemberDetailResponse>(JsonString);
@@ -127,13 +118,13 @@ void UCACMemberAPI::MemberRejectCallBack(FHttpRequestPtr req, FHttpResponsePtr r
     OnMemberRejectCallBack(ParsedResponse.data);
 }
 
-void UCACMemberAPI::MemberDeleteCall(const FString& MemberId)
+void UCWGMemberAPI::MemberDeleteCall(const FString& MemberId)
 {
     this->API = FString::Printf(TEXT("api/member/delete/%s"), *MemberId);
     HttpDeleteCall();
 }
 
-void UCACMemberAPI::MemberDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGMemberAPI::MemberDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     OnMemberDeleteCallBack();
 }
