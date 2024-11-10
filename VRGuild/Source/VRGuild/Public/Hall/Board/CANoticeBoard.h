@@ -59,7 +59,7 @@ protected:
 	TObjectPtr<USceneComponent> RightSize;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta=(MakeEditWidget))
-	FVector SpacerBase;
+	FVector StartLocation;
 	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
 	FVector SpacerWidth;
 	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
@@ -106,6 +106,8 @@ private:
 	void ResetFeatureType();
 
 	void ScaleSpawnedActor(AActor* actorSpawned);
+
+	FVector GetPostLocation(int32 index);
 
 	EFeatureType FeatureType;
 	TArray<ACABasePoster*> Posters;

@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ExecuteOnCompletedDelegate();
 
+	virtual float GetRightLength() const;
+	virtual float GetTopLength() const;
+
 protected:
 	CompletedDelegate OnCompleted;
 	virtual void OnCompletedCallback();
