@@ -19,14 +19,24 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
-	void Init(const FProjectDetailInfo& newData);
+	void Init(const FProjectWithSupport& newData);
+	void InitDetail(const FProjectWithDetail& newData);
 
 	virtual void OnCompletedCallback() override;
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
-
+	
+	UPROPERTY()
+	TSubclassOf<class UCWGProjectNotice> s;
 protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	FProjectDetailInfo NoticeData;
+	FProjectWithSupport NoticeData;
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FProjectWithDetail NoticeDetailData;
 
 	virtual bool CheckCanTrace(ACharacter* player) const override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSetInfoPost(FProjectWithSupport data);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSetInfoDetailPost(FProjectWithDetail data);
 };

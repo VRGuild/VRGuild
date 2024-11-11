@@ -51,10 +51,16 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void PostAllProjectNotice(FProjectListResponse projectNoticeList);
+	void PostAllProjectNotice(FProjectPagedResponse projectNoticeList);
 
 	UFUNCTION(BlueprintCallable)
-	void PostProjectNotice(FVector position, FProjectDetailInfo projectNotice);
+	void PostProjectNotice(FVector position, FProjectWithSupport projectNotice);
+
+	UFUNCTION(BlueprintCallable)
+	void PostAllProjectDetailNotice(FProjectDetailPagedResponse projectNoticeList);
+
+	UFUNCTION(BlueprintCallable)
+	void PostProjectDetailNotice(FVector position, FProjectWithDetail projectNotice);
 
 	UFUNCTION(BlueprintCallable)
 	void PostReviewNotice(FVector position, FEvaluation reviewNotice); /*Change to FReviewNotice*/
@@ -67,7 +73,10 @@ protected:
 	TSubclassOf<class ACAReviewNotice> ReviewNoticeClass;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<FProjectDetailInfo> ProjectDetailInfoList;
+	TArray<FProjectWithSupport> ProjectInfoList;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FProjectWithDetail> ProjectDetailInfoList;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Settings")
 	EPosterType PosterType;

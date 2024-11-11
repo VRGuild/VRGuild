@@ -26,6 +26,7 @@ void UCACProjectAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
     FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
     FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
+    FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
     FRegexPattern GetProjectCommentPattern(TEXT(R"(GET\s+/api/project/comment/(\d+)$)"));
     FRegexPattern ApplyProjectPattern(TEXT(R"(GET\s+/api/project/apply/(\d+)$)"));
@@ -53,6 +54,10 @@ void UCACProjectAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     {
         ProjectListGetCallBack(req, res);
     }
+    else if (FRegexMatcher(GetProjectDetailListPattern, UrlToMatch).FindNext())
+    {
+        ProjectDetailListGetCallBack(req, res);
+    }
     else if (FRegexMatcher(GetProjectTeamPattern, UrlToMatch).FindNext())
     {
         ProjectTeamListGetCallBack(req, res);
@@ -76,6 +81,7 @@ void UCACProjectAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
     FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
     FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
+    FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
     FRegexPattern GetProjectCommentPattern(TEXT(R"(GET\s+/api/project/comment/(\d+)$)"));
     FRegexPattern ApplyProjectPattern(TEXT(R"(GET\s+/api/project/apply/(\d+)$)"));
@@ -99,6 +105,10 @@ void UCACProjectAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     else if (FRegexMatcher(GetProjectListPattern, UrlToMatch).FindNext())
     {
         OnFailProjectListGetCallBack();
+    }
+    else if (FRegexMatcher(GetProjectDetailListPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectDetailListGetCallBack();
     }
     else if (FRegexMatcher(GetProjectTeamPattern, UrlToMatch).FindNext())
     {
@@ -135,14 +145,7 @@ void UCACProjectAPI::ProjectCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr
     FString JsonString = res->GetContentAsString();
     FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectCreateCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailProjectCreateCallBack();
-    }
+    OnProjectCreateCallBack(ParsedResponse.data);
 }
 
 void UCACProjectAPI::ProjectGetCall(const int64 ProjectId)
@@ -156,14 +159,7 @@ void UCACProjectAPI::ProjectGetCallBack(FHttpRequestPtr req, FHttpResponsePtr re
     FString JsonString = res->GetContentAsString();
     FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailProjectGetCallBack();
-    }
+    OnProjectGetCallBack(ParsedResponse.data);
 }
 
 void UCACProjectAPI::ProjectUpdateCall(const int64 ProjectId, const FProjectInfo& ProjectInfo)
@@ -177,19 +173,12 @@ void UCACProjectAPI::ProjectUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr
     FString JsonString = res->GetContentAsString();
     FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectUpdateCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailProjectUpdateCallBack();
-    }
+    OnProjectUpdateCallBack(ParsedResponse.data);
 }
 
 void UCACProjectAPI::ProjectDetailGetCall(const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/detail/%d"), ProjectId);
+    this->API = FString::Printf(TEXT("api/project/detail/list/%d"), ProjectId);
     HttpGetCall();
 }
 
@@ -198,14 +187,7 @@ void UCACProjectAPI::ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponse
     FString JsonString = res->GetContentAsString();
     FProjectDetailResponse ParsedResponse = JsonPerse<FProjectDetailResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectDetailGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailProjectDetailGetCallBack();
-    }
+    OnProjectDetailGetCallBack(ParsedResponse.data);
 }
 
 void UCACProjectAPI::ProjectListGetCall(const int64 Number)
@@ -217,16 +199,24 @@ void UCACProjectAPI::ProjectListGetCall(const int64 Number)
 void UCACProjectAPI::ProjectListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
-    FProjectListResponse ParsedResponse = JsonPerse<FProjectListResponse>(JsonString);
+    FProjectPagedResponse ParsedResponse = JsonPerse<FProjectPagedResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectListGetCallBack(ParsedResponse);
-    }
-    else
-    {
-        OnFailProjectListGetCallBack();
-    }
+    OnProjectListGetCallBack(ParsedResponse);
+
+}
+
+void UCACProjectAPI::ProjectDetailListGetCall(const int64 Number)
+{
+    this->API = FString::Printf(TEXT("api/project/detail/list/%d"), Number);
+    HttpGetCall();
+}
+
+void UCACProjectAPI::ProjectDetailListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FProjectDetailPagedResponse ParsedResponse = JsonPerse<FProjectDetailPagedResponse>(JsonString);
+
+    OnProjectDetailListGetCallBack(ParsedResponse);
 }
 
 void UCACProjectAPI::ProjectTeamListGetCall(const int64 ProjectId)
@@ -240,14 +230,7 @@ void UCACProjectAPI::ProjectTeamListGetCallBack(FHttpRequestPtr req, FHttpRespon
     FString JsonString = res->GetContentAsString();
     FProjectTeamListResponse ParsedResponse = JsonPerse<FProjectTeamListResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectTeamListGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailProjectTeamListGetCallBack();
-    }
+    OnProjectTeamListGetCallBack(ParsedResponse.data);
 }
 
 void UCACProjectAPI::ProjectCommentListGetCall(const int64 ProjectId)
@@ -261,14 +244,7 @@ void UCACProjectAPI::ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpRes
     FString JsonString = res->GetContentAsString();
     FProjectResponse ParsedResponse = JsonPerse<FProjectResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectCommentListGetCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        OnFailProjectCommentListGetCallBack();
-    }
+    OnProjectCommentListGetCallBack(ParsedResponse.data);
 }
 
 void UCACProjectAPI::ProjectApplyCall(const int64 ProjectId)

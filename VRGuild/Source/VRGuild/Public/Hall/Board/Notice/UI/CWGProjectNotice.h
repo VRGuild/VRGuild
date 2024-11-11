@@ -19,8 +19,8 @@ class VRGUILD_API UCWGProjectNotice : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetProjectInfo(FProjectDetailInfo projectInfo);
+	void OnSetProjectInfo(FProjectWithDetail projectInfo);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FProjectDetailInfo ProjectInfo;
+	FProjectWithDetail ProjectInfo;
 };
