@@ -193,6 +193,7 @@ void UCACProjectAPI::ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponse
 void UCACProjectAPI::ProjectListGetCall(const int64 Number)
 {
     this->API = FString::Printf(TEXT("api/project/list/%d"), Number);
+    
     HttpGetCall();
 }
 

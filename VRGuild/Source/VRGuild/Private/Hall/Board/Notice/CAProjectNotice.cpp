@@ -26,7 +26,7 @@ void ACAProjectNotice::BeginPlay()
 	auto* FrontSideWidget = CreateWidget<UCWGProjectNotice>(GetWorld(), WidgetFrontSide);
 
 	if (ensure(FrontSideWidget))
-		FrontSideWidget->OnSetProjectInfo(NoticeDetailData);
+		FrontSideWidget->OnSetProjectInfo(NoticeData);
 
 	if (this->WidgetFrontSide)
 	{
@@ -42,7 +42,7 @@ void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACAProjectNotice, NoticeDetailData);
+	DOREPLIFETIME(ACAProjectNotice, NoticeData);
 }
 
 void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
@@ -55,7 +55,7 @@ void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOw
 	}
 }
 
-void ACAProjectNotice::Init(const FProjectWithSupport& newData)
+void ACAProjectNotice::Init(const FProjectWithDetail& newData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ProjectNotice SetNoticeData success"));
 
@@ -63,16 +63,6 @@ void ACAProjectNotice::Init(const FProjectWithSupport& newData)
 		NoticeData = newData;
 
 	OnSetInfoPost(NoticeData);
-}
-
-void ACAProjectNotice::InitDetail(const FProjectWithDetail& newData)
-{
-	UE_LOG(LogTemp, Warning, TEXT("ProjectNotice SetNoticeData success"));
-
-	if (newData.projectInfo.projectId)
-		NoticeDetailData = newData;
-
-	OnSetInfoDetailPost(NoticeDetailData);
 }
 
 void ACAProjectNotice::OnCompletedCallback()
@@ -86,7 +76,7 @@ UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
 	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(widget);
 	if (ensure(ProjectAPIWidget))
 	{
-		ProjectAPIWidget->OnSetDetailInfo(this->NoticeDetailData);
+		ProjectAPIWidget->OnSetDetailInfo(this->NoticeData);
 		return ProjectAPIWidget;
 	}
 	return nullptr;
