@@ -70,16 +70,8 @@ protected:
 	void PostAllProjectNotice(FProjectPagedResponse projectNoticeList);
 
 	UFUNCTION(BlueprintCallable)
-	void PostProjectNotice(FVector position, FProjectWithSupport projectNotice);
-
-	UFUNCTION(BlueprintCallable)
-	void PostAllProjectDetailNotice(FProjectDetailPagedResponse projectNoticeList);
-
-	UFUNCTION(BlueprintCallable)
-	void PostProjectDetailNotice(FVector position, FProjectWithDetail projectNotice);
-
-	UFUNCTION(BlueprintCallable)
-	void PostReviewNotice(FVector position, FEvaluation reviewNotice); /*Change to FReviewNotice*/
+	void PostAllReviewNotice(FProjectListResponse projectNoticeList);
+	
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
@@ -105,9 +97,8 @@ private:
 	
 	void ResetFeatureType();
 
-	void ScaleSpawnedActor(AActor* actorSpawned);
-
-	FVector GetPostLocation(int32 index);
+	void SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNoticeClass, const FTransform& trans, FProjectWithDetail projectInfo);
+	void SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FEvaluation evaluation);
 
 	EFeatureType FeatureType;
 	TArray<ACABasePoster*> Posters;

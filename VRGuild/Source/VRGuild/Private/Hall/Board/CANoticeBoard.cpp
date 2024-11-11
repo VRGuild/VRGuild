@@ -65,11 +65,7 @@ void ACANoticeBoard::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[%s] Notice board buttons disabled and not visible"), *GetNameSafe(this));
 		WidgetCompCancelButton->SetHiddenInGame(true, true);
-		//WidgetCompCancelButton->Trace
 	}
-
-	/*if(HasAuthority() && PosterType == EPosterType::PROJECT)
-		PostAllProjectNotice(FProjectListResponse());*/
 }
 
 void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeList)
@@ -78,6 +74,7 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeLis
 	this->ProjectInfoList.Append(projectNoticeList.data);
 
 	auto defaultObj = ProjectNoticeClass->GetDefaultObject<ACABasePoster>();
+	check(defaultObj);
 
 	float horiLength = SpawnedActorScale * defaultObj->GetRightLength();
 	float vertiLength = SpawnedActorScale * defaultObj->GetTopLength();
@@ -92,24 +89,24 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeLis
 
 	FVector startLoc = GetActorLocation() + StartLocation;
 
-	int horiCount = 0;
+	int horizontalCount = 0;
 	FVector leftSize = LeftSize->GetComponentLocation();
 	leftSize.Z = GetActorLocation().Z + StartLocation.Z;
 	FVector widthDir = (leftSize - startLoc);
 	float maxWidth = widthDir.Length();
 	widthDir.Normalize();
-	
+
 	DrawDebugLine(GetWorld(), startLoc, startLoc + widthDir * 200.f, FColor::Blue, true, 10.f, 0, 2.f);
 
-	float test = FMath::Abs((horiLength + spacerWidth) * horiCount);
+	float test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
 	float testHuh = FMath::Abs(maxWidth);
 	while (test < testHuh)
 	{
-		horiCount++;
-		test = FMath::Abs((horiLength + spacerWidth) * horiCount);
+		horizontalCount++;
+		test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
 	}
 
-	int vertiCount = 1;
+	int verticalCount = 1;
 	FVector bottomSize = BottomSize->GetComponentLocation();
 	bottomSize.Y = GetActorLocation().Y + StartLocation.Y;
 	FVector heightDir = (bottomSize - startLoc);
@@ -118,20 +115,24 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeLis
 
 	DrawDebugLine(GetWorld(), startLoc, startLoc + heightDir * 200.f, FColor::Red, true, 10.f, 0, 2.f);
 
-	float test1 = FMath::Abs((vertiLength + spacerHeight) * vertiCount);
+	float test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
 	float testHuh1 = FMath::Abs(maxHeight);
 	while (test1 < testHuh1)
 	{
-		vertiCount++;
-		test1 = FMath::Abs((vertiLength + spacerHeight) * vertiCount);
+		verticalCount++;
+		test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("HoriCount: %d, VertiCount: %d"), horiCount, vertiCount);
+	UE_LOG(LogTemp, Warning, TEXT("horizontalCount: %d, verticalCount: %d"), horizontalCount, verticalCount);
 
-	for (int i = 0; i < vertiCount; ++i)
+	for (int i = 0; i < verticalCount; ++i)
 	{
-		for (int j = 0; j < horiCount; ++j)
+		for (int j = 0; j < horizontalCount; ++j)
 		{
+			int32 index = horizontalCount * i + j;
+
+			if (!ProjectDetailInfoList.IsValidIndex(index)) return; // can't post anymore posters 
+
 			FTransform trans;
 			FVector widthVector = widthDir * FMath::Abs(horiLength + spacerWidth) * j;
 			FVector heigthVector = heightDir * FMath::Abs(vertiLength + spacerHeight) * i;
@@ -140,85 +141,36 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeLis
 			trans.SetScale3D(FVector(SpawnedActorScale));
 			trans.SetRotation(GetActorRotation().Quaternion());
 
-			FActorSpawnParameters param;
-			param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			auto spawned = GetWorld()->SpawnActor(ProjectNoticeClass, &trans, param);
+			SpawnProjectPoster(ProjectNoticeClass, trans, ProjectDetailInfoList[index]);
 		}
 	}
-
-
-	//Store location
-	//nice.Add(FVector(StartLocation.X, (boardWidth + spacerWidth + boardWidth) * horiCount + StartLocation.Y, StartLocation.Z));
-	//nice.Add(FVector(StartLocation.X, StartLocation.Y, (boardHeight + spacerHeight + boardHeight) * vertiCount + StartLocation.Z));
-
-	/*for (int32 i = 0; i < 30; i++)
-	{
-		PostProjectNotice(GetPostLocation(i), FProjectDetailInfo());
-	}*/
 }
 
-void ACANoticeBoard::PostAllProjectDetailNotice(FProjectDetailPagedResponse projectNoticeList)
+void ACANoticeBoard::PostAllReviewNotice(FProjectListResponse projectNoticeList)
 {
-	this->ProjectDetailInfoList.Empty();
-	this->ProjectDetailInfoList.Append(projectNoticeList.data);
-	for (int32 i = 0; i < projectNoticeList.data.Num(); i++)
-	{
-		PostProjectDetailNotice(FVector(0, -120 * i, 0), projectNoticeList.data[i]);
-	}
+	//
 }
 
-void ACANoticeBoard::PostProjectDetailNotice(FVector position, FProjectWithDetail projectNotice)
+void ACANoticeBoard::SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNoticeClass, const FTransform& trans, FProjectWithDetail projectInfo)
 {
-	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(this->ProjectNoticeClass, FTransform::Identity);
-	if (ensure(newProjectNotice))
-	{
-		newProjectNotice->InitDetail(projectNotice);
+	FActorSpawnParameters param;
+	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		newProjectNotice->FinishSpawning(FTransform::Identity);
-
-		newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		newProjectNotice->SetActorRelativeLocation(position);
-
-		Posters.Add(newProjectNotice);
-	}
+	auto spawned = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(projectNoticeClass, trans, nullptr, nullptr,
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	spawned->Init(projectInfo);
+	spawned->FinishSpawning(trans);
 }
 
-void ACANoticeBoard::PostProjectNotice(FVector position, FProjectWithSupport projectNotice)
+void ACANoticeBoard::SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FEvaluation evaluation)
 {
-	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(this->ProjectNoticeClass, FTransform::Identity);
-	if (ensure(newProjectNotice))
-	{
-		ScaleSpawnedActor(newProjectNotice);
+	FActorSpawnParameters param;
+	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		newProjectNotice->Init(projectNotice);
-
-		newProjectNotice->FinishSpawning(FTransform::Identity);
-
-		newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		newProjectNotice->SetActorRelativeLocation(position);
-
-		Posters.Add(newProjectNotice);
-	}
-}
-
-void ACANoticeBoard::PostReviewNotice(FVector position, FEvaluation reviewNotice) /*Change to FReviewNotice*/
-{
-	ACAReviewNotice* newReviewNotice = GetWorld()->SpawnActorDeferred<ACAReviewNotice>(this->ReviewNoticeClass, FTransform::Identity);
-	if (ensure(newReviewNotice))
-	{
-		ScaleSpawnedActor(newReviewNotice);
-
-		newReviewNotice->Init(reviewNotice);
-		newReviewNotice->FinishSpawning(FTransform::Identity);
-
-		newReviewNotice->SetActorLocation(position);
-
-		/*newReviewNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		newReviewNotice->SetActorRelativeLocation(position);*/
-
-		Posters.Add(newReviewNotice);
-	}
+	auto spawned = GetWorld()->SpawnActorDeferred<ACAReviewNotice>(reviewNoticeClass, trans, nullptr, nullptr,
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	spawned->Init(evaluation);
+	spawned->FinishSpawning(trans);
 }
 
 void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
@@ -242,18 +194,4 @@ void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
 void ACANoticeBoard::ResetFeatureType()
 {
 	FeatureType = EFeatureType::NONE;
-}
-
-void ACANoticeBoard::ScaleSpawnedActor(AActor* actorSpawned)
-{
-	if (!actorSpawned) return;
-	actorSpawned->SetActorScale3D(FVector(SpawnedActorScale));
-}
-
-FVector ACANoticeBoard::GetPostLocation(int32 index)
-{
-	//if (!actorToSpawn) return FVector();
-	return FVector();
-
-	//StartLocation *= index * StartLocation.RightVector *
 }

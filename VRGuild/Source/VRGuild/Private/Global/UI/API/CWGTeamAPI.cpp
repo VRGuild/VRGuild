@@ -56,7 +56,7 @@ void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern ApplyTeamPattern(TEXT(R"(GET\s+/api/team/apply/(\d+)$)"));
 
     FString ErrorMessage;
-    if (res->GetResponseCode() == 400)
+    if (res && res->GetResponseCode() == 400)
     {
         // Parse error message from response
         FString JsonString = res->GetContentAsString();
