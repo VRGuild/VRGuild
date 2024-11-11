@@ -18,5 +18,5 @@ class VRGUILD_API UCWGProjectNoticeFull : public UCWGProjectAPI
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnSetDetailInfo(FProjectDetailInfo ProjectInfo);
+	void OnSetDetailInfo(FProjectWithDetail ProjectInfo);
 };

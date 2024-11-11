@@ -12,9 +12,38 @@ struct FProjectUserInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Project|User")
+    int64 userId;
+    UPROPERTY(BlueprintReadWrite, Category = "Project|User")
     FBusinessInfo businessInfo;
     UPROPERTY(BlueprintReadWrite, Category = "Project|User")
     FString nickname;
+};
+
+// Project with Support Teams Structure
+USTRUCT(BlueprintType)
+struct FProjectWithSupport
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "Project")
+    FProjectInfo projectInfo;
+
+    UPROPERTY(BlueprintReadWrite, Category = "Project")
+    TArray<int64> supportTeamIdList;
+};
+
+// Paged Project List Response Structure
+USTRUCT(BlueprintType)
+struct FProjectPagedResponse : public FBaseResponse
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FProjectWithSupport> data;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    int32 totalPages;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    int32 totalProjectCnt;
 };
 
 // Project Detail Structure
@@ -25,6 +54,32 @@ struct FProjectDetailInfo : public FProjectInfo
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Project|Detail")
     FProjectUserInfo userInfo;
+};
+
+USTRUCT(BlueprintType)
+struct FProjectWithDetail
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "Project")
+    FProjectInfo projectInfo;
+    UPROPERTY(BlueprintReadWrite, Category = "Project")
+    FProjectUserInfo userInfo;
+    UPROPERTY(BlueprintReadWrite, Category = "Project")
+    TArray<int64> supportTeamIdList;
+};
+
+USTRUCT(BlueprintType)
+struct FProjectDetailPagedResponse : public FBaseResponse
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FProjectWithDetail> data;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    int32 totalPages;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    int32 totalProjectCnt;
 };
 
 // Project List Response Structure

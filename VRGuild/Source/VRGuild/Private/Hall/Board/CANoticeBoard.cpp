@@ -46,17 +46,43 @@ void ACANoticeBoard::BeginPlay()
 	}
 }
 
-void ACANoticeBoard::PostAllProjectNotice(FProjectListResponse projectNoticeList)
+void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeList)
 {
-	this->ProjectDetailInfoList.Empty();
-	this->ProjectDetailInfoList.Append(projectNoticeList.data);
+	this->ProjectInfoList.Empty();
+	this->ProjectInfoList.Append(projectNoticeList.data);
 	for (int32 i = 0; i < projectNoticeList.data.Num() ;  i++ )
 	{
 		PostProjectNotice(FVector(0, -120 * i, 0), projectNoticeList.data[i]); 
 	}
 }
 
-void ACANoticeBoard::PostProjectNotice(FVector position, FProjectDetailInfo projectNotice)
+void ACANoticeBoard::PostAllProjectDetailNotice(FProjectDetailPagedResponse projectNoticeList)
+{
+	this->ProjectDetailInfoList.Empty();
+	this->ProjectDetailInfoList.Append(projectNoticeList.data);
+	for (int32 i = 0; i < projectNoticeList.data.Num(); i++)
+	{
+		PostProjectDetailNotice(FVector(0, -120 * i, 0), projectNoticeList.data[i]);
+	}
+}
+
+void ACANoticeBoard::PostProjectDetailNotice(FVector position, FProjectWithDetail projectNotice)
+{
+	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(this->ProjectNoticeClass, FTransform::Identity);
+	if (ensure(newProjectNotice))
+	{
+		newProjectNotice->InitDetail(projectNotice);
+
+		newProjectNotice->FinishSpawning(FTransform::Identity);
+
+		newProjectNotice->AttachToComponent(this->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		newProjectNotice->SetActorRelativeLocation(position);
+
+		Posters.Add(newProjectNotice);
+	}
+}
+
+void ACANoticeBoard::PostProjectNotice(FVector position, FProjectWithSupport projectNotice)
 {
 	ACAProjectNotice* newProjectNotice = GetWorld()->SpawnActorDeferred<ACAProjectNotice>(this->ProjectNoticeClass, FTransform::Identity);
 	if (ensure(newProjectNotice))

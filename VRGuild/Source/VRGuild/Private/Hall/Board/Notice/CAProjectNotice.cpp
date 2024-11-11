@@ -26,7 +26,7 @@ void ACAProjectNotice::BeginPlay()
 	auto* FrontSideWidget = CreateWidget<UCWGProjectNotice>(GetWorld(), WidgetFrontSide);
 
 	if (ensure(FrontSideWidget))
-		FrontSideWidget->SetProjectInfo(NoticeData);
+		FrontSideWidget->OnSetProjectInfo(NoticeDetailData);
 
 	if (this->WidgetFrontSide)
 	{
@@ -42,7 +42,7 @@ void ACAProjectNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACAProjectNotice, NoticeData);
+	DOREPLIFETIME(ACAProjectNotice, NoticeDetailData);
 }
 
 void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorInteracted)
@@ -55,12 +55,24 @@ void ACAProjectNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOw
 	}
 }
 
-void ACAProjectNotice::Init(const FProjectDetailInfo& newData)
+void ACAProjectNotice::Init(const FProjectWithSupport& newData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ProjectNotice SetNoticeData success"));
 
-	if (newData.projectId != -1)
+	if (newData.projectInfo.projectId)
 		NoticeData = newData;
+
+	OnSetInfoPost(NoticeData);
+}
+
+void ACAProjectNotice::InitDetail(const FProjectWithDetail& newData)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ProjectNotice SetNoticeData success"));
+
+	if (newData.projectInfo.projectId)
+		NoticeDetailData = newData;
+
+	OnSetInfoDetailPost(NoticeDetailData);
 }
 
 void ACAProjectNotice::OnCompletedCallback()
@@ -74,7 +86,7 @@ UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
 	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(widget);
 	if (ensure(ProjectAPIWidget))
 	{
-		ProjectAPIWidget->OnSetDetailInfo(this->NoticeData);
+		ProjectAPIWidget->OnSetDetailInfo(this->NoticeDetailData);
 		return ProjectAPIWidget;
 	}
 	return nullptr;
@@ -86,7 +98,7 @@ bool ACAProjectNotice::CheckCanTrace(ACharacter* player) const
 	{
 		if (auto carriedNotice = Cast<ACAProjectNotice>(carryComp->GetCarriedActor()))
 		{
-			return NoticeData.projectId != carriedNotice->NoticeData.projectId;
+			return NoticeData.projectInfo.projectId != carriedNotice->NoticeData.projectInfo.projectId;
 		}
 	}
 

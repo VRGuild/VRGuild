@@ -64,10 +64,19 @@ protected:
     void ProjectListGetCall(const int64 Number);
     void ProjectListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
-    void OnProjectListGetCallBack(const FProjectListResponse& ProjectList);
+    void OnProjectListGetCallBack(FProjectPagedResponse ParsedResponse);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnFailProjectListGetCallBack();
 
+    // Get Project Detail List
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectDetailListGetCall(const int64 Number);
+    void ProjectDetailListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectDetailListGetCallBack(FProjectDetailPagedResponse ParsedResponse);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectDetailListGetCallBack();
+    
     // Get Project Team List
     UFUNCTION(BlueprintCallable, Category = "Project API")
     void ProjectTeamListGetCall(const int64 ProjectId);
