@@ -68,7 +68,7 @@ void ACANoticeBoard::BeginPlay()
 	}
 }
 
-void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeList)
+void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNoticeList)
 {
 	this->ProjectInfoList.Empty();
 	this->ProjectInfoList.Append(projectNoticeList.data);
@@ -131,7 +131,7 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeLis
 		{
 			int32 index = horizontalCount * i + j;
 
-			if (!ProjectDetailInfoList.IsValidIndex(index)) return; // can't post anymore posters 
+			if (!ProjectInfoList.IsValidIndex(index)) return; // can't post anymore posters 
 
 			FTransform trans;
 			FVector widthVector = widthDir * FMath::Abs(horiLength + spacerWidth) * j;
@@ -141,7 +141,7 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectPagedResponse projectNoticeLis
 			trans.SetScale3D(FVector(SpawnedActorScale));
 			trans.SetRotation(GetActorRotation().Quaternion());
 
-			SpawnProjectPoster(ProjectNoticeClass, trans, ProjectDetailInfoList[index]);
+			SpawnProjectPoster(ProjectNoticeClass, trans, ProjectInfoList[index]);
 		}
 	}
 }
