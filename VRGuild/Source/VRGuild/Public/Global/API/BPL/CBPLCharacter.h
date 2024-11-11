@@ -25,6 +25,6 @@ public:
     static FCharacterInfo SetCharacterCustom(FCharacterInfo target, TArray<FCustomInfo> CustomInfoList);
 
     UFUNCTION(BlueprintCallable, Category = "Character")
-    static FCharacterInfo SetCharacterPicture(FCharacterInfo target, TArray<FLinearColor> CustomCharacterPicture);
+    static FCharacterInfo SetCharacterPicture(FCharacterInfo target, TArray<uint8> CustomCharacterPicture);
 
 };
