@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Global/CGIGameInstance.h"
 #include "Global/UI/API/CWGCharacterAPI.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "CWCharacterCustom.generated.h"
 
 /**
@@ -53,4 +54,11 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnPlayerComponentLoaded();
+
+	// Render Target texture 저장 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UTextureRenderTarget2D* CharacterRenderTarget;
+
+	UFUNCTION(BlueprintCallable, Category = "RenderTarget")
+	static TArray<uint8> CompressedRenderTargerToPNG(UTextureRenderTarget2D* RenderTarget);
 };

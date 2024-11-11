@@ -10,6 +10,7 @@
 #include "Character/Customize/CACCharacterBody.h"
 #include "Character/Customize/CACCharacterLower.h"
 #include "Character/Customize/CACCustomInteraction.h"
+#include "ImageUtils.h"
 
 
 void UCWCharacterCustom::NativeConstruct()
@@ -65,4 +66,25 @@ void UCWCharacterCustom::CustomEnd()
 		CharacterCustomComponent->SaveCustomData(Data);
 		this->RemoveFromParent();
 	}	
+}
+
+TArray<uint8> UCWCharacterCustom::CompressedRenderTargerToPNG(UTextureRenderTarget2D* RenderTarget)
+{
+	TArray<uint8> CompressedBitmap;
+
+	if (!RenderTarget)
+	return CompressedBitmap;
+
+	FTextureRenderTargetResource* RenderResource = RenderTarget->GameThread_GetRenderTargetResource();
+	FIntRect Region(320, 0, 960, 1280);
+	TArray<FColor> Bitmap;
+
+	if (RenderResource->ReadPixels(Bitmap, FReadSurfaceDataFlags(), Region))
+	{
+		int32 Width = Region.Width();
+		int32 Height = Region.Height();
+		FImageUtils::CompressImageArray(Width, Height, Bitmap, CompressedBitmap);
+	}
+
+	return CompressedBitmap;
 }
