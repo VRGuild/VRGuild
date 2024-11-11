@@ -29,7 +29,7 @@ public:
 
     // Get Project
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectGetCall(const int64& ProjectId);
+    void ProjectGetCall(const int64 ProjectId);
     void ProjectGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnProjectGetCallBack(const FProjectInfo& ProjectInfo);
@@ -38,7 +38,7 @@ public:
 
     // Update Project
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectUpdateCall(const int64& ProjectId, const FProjectInfo& ProjectInfo);
+    void ProjectUpdateCall(const int64 ProjectId, const FProjectInfo& ProjectInfo);
     void ProjectUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnProjectUpdateCallBack(const FProjectInfo& ProjectInfo);
@@ -47,7 +47,7 @@ public:
 
     // Get Project Detail
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectDetailGetCall(const int64& ProjectId);
+    void ProjectDetailGetCall(const int64 ProjectId);
     void ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnProjectDetailGetCallBack(const FProjectDetailInfo& ProjectDetail);
@@ -56,16 +56,25 @@ public:
 
     // Get Project List
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectListGetCall(const int64& Number);
+    void ProjectListGetCall(const int64 Number);
     void ProjectListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
-    void OnProjectListGetCallBack(const TArray<FProjectDetailInfo>& ProjectList);
+    void OnProjectListGetCallBack(FProjectPagedResponse ParsedResponse);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnFailProjectListGetCallBack();
 
+    // Get Project Detail List
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectDetailListGetCall(const int64 Number);
+    void ProjectDetailListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectDetailListGetCallBack(FProjectDetailPagedResponse ParsedResponse);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectDetailListGetCallBack();
+
     // Get Project Team List
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectTeamListGetCall(const int64& ProjectId);
+    void ProjectTeamListGetCall(const int64 ProjectId);
     void ProjectTeamListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnProjectTeamListGetCallBack(const FProjectTeamList& TeamList);
@@ -74,16 +83,16 @@ public:
 
     // Get Project Comment List
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectCommentListGetCall(const int64& ProjectId);
+    void ProjectCommentListGetCall(const int64 ProjectId);
     void ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
-    void OnProjectCommentListGetCallBack(const TArray<int64>& CommentList);
+    void OnProjectCommentListGetCallBack(const FProjectInfo& CommentList);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnFailProjectCommentListGetCallBack();
 
     // Apply To Project
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectApplyCall(const int64& ProjectId);
+    void ProjectApplyCall(const int64 ProjectId);
     void ProjectApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnProjectApplyCallBack(const FProjectTeamList& TeamList);

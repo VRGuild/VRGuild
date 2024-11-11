@@ -67,7 +67,7 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void PostAllProjectNotice(FProjectPagedResponse projectNoticeList);
+	void PostAllProjectNotice(FProjectDetailPagedResponse projectNoticeList);
 
 	UFUNCTION(BlueprintCallable)
 	void PostAllReviewNotice(FProjectListResponse projectNoticeList);
@@ -81,10 +81,7 @@ protected:
 	TSubclassOf<class ACAReviewNotice> ReviewNoticeClass;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<FProjectWithSupport> ProjectInfoList;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FProjectWithDetail> ProjectDetailInfoList;
+	TArray<FProjectWithDetail> ProjectInfoList;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Settings")
 	EPosterType PosterType;
