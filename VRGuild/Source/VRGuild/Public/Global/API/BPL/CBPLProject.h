@@ -123,6 +123,18 @@ public:
 
 // Project Team List Structure
 USTRUCT(BlueprintType)
+struct FProjectTeamApply
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "Project|Team")
+    FString teamIntroduction;
+    UPROPERTY(BlueprintReadWrite, Category = "Project|Team")
+    int64 leaderUserId;
+};
+
+// Project Team List Structure
+USTRUCT(BlueprintType)
 struct FProjectTeamList
 {
     GENERATED_USTRUCT_BODY()

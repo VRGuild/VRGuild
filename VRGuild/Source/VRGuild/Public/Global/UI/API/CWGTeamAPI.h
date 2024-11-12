@@ -69,7 +69,7 @@ public:
 
     // Apply To Team
     UFUNCTION(BlueprintCallable, Category = "Team API")
-    void TeamApplyCall(const FString& TeamId);
+    void TeamApplyCall(const FTeamInfo& TeamId);
     void TeamApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
     void OnTeamApplyCallBack(const FTeamInfo& TeamInfo);

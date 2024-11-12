@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Global/UI/API/CWGBaseAPI.h"
+#include "Global/UI/API/CWGCharacterAPI.h"
 #include "CWGGuildAPI.generated.h"
 
 struct FGuildDetailResponse;
@@ -12,7 +12,7 @@ struct FGuildInfo;
  * 
  */
 UCLASS()
-class VRGUILD_API UCWGGuildAPI : public UCWGBaseAPI
+class VRGUILD_API UCWGGuildAPI : public UCWGCharacterAPI
 {
 	GENERATED_BODY()
 

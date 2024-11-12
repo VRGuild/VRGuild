@@ -273,33 +273,17 @@ void UCACProjectAPI::ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpRes
     OnProjectCommentListGetCallBack(ParsedResponse.data);
 }
 
-void UCACProjectAPI::ProjectApplyCall(const int64 ProjectId)
+void UCACProjectAPI::ProjectApplyCall(const FProjectTeamApply& teamInfo, const int64 ProjectId)
 {
     this->API = FString::Printf(TEXT("api/project/apply/%d"), ProjectId);
-    HttpGetCall();
+    HttpPostCall<FProjectTeamApply>(teamInfo);
 }
 
 void UCACProjectAPI::ProjectApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FProjectTeamListResponse ParsedResponse = JsonPerse<FProjectTeamListResponse>(JsonString);
+   
+    OnProjectApplyCallBack(ParsedResponse.data);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectApplyCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        FString ErrorMessage = TEXT("프로젝트 지원에 실패했습니다.");
-        if (res->GetResponseCode() == 400)
-        {
-            TSharedPtr<FJsonObject> JsonObject;
-            TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(res->GetContentAsString());
-            if (FJsonSerializer::Deserialize(Reader, JsonObject))
-            {
-                ErrorMessage = JsonObject->GetStringField(TEXT("message"));
-            }
-        }
-        OnFailProjectApplyCallBack(ErrorMessage);
-    }
 }

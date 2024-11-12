@@ -15,12 +15,15 @@ struct FCharacterInfo;
 UCLASS()
 class VRGUILD_API UCWGCharacterAPI : public UCWGBaseAPI
 {
+
 	GENERATED_BODY()
+
+protected:
 
     virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
     virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
-protected:
+
     // Get Character
     UFUNCTION(BlueprintCallable, Category = "Character API")
     void CharacterGetCall();

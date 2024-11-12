@@ -18,7 +18,7 @@ void UCWGProjectAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
     FRegexPattern GetProjectCommentPattern(TEXT(R"(GET\s+/api/project/comment/(\d+)$)"));
-    FRegexPattern ApplyProjectPattern(TEXT(R"(GET\s+/api/project/apply/(\d+)$)"));
+    FRegexPattern ApplyProjectPattern(TEXT(R"(POST\s+/api/project/apply/epic/(\d+)$)"));
 
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
@@ -78,7 +78,7 @@ void UCWGProjectAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
     FRegexPattern GetProjectCommentPattern(TEXT(R"(GET\s+/api/project/comment/(\d+)$)"));
-    FRegexPattern ApplyProjectPattern(TEXT(R"(GET\s+/api/project/apply/(\d+)$)"));
+    FRegexPattern ApplyProjectPattern(TEXT(R"(POST\s+/api/project/apply/epic/(\d+)$)"));
 
     if (FRegexMatcher(CreateProjectPattern, UrlToMatch).FindNext())
     {
@@ -260,10 +260,10 @@ void UCWGProjectAPI::ProjectCommentListGetCallBack(FHttpRequestPtr req, FHttpRes
     OnProjectCommentListGetCallBack(ParsedResponse.data);
 }
 
-void UCWGProjectAPI::ProjectApplyCall(const int64 ProjectId)
+void UCWGProjectAPI::ProjectApplyCall(const FProjectTeamApply& teamInfo, const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/apply/%d"), ProjectId);
-    HttpGetCall();
+    this->API = FString::Printf(TEXT("api/project/apply/epic/%d"), ProjectId);
+    HttpPostCall<FProjectTeamApply>(teamInfo);
 }
 
 void UCWGProjectAPI::ProjectApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
@@ -271,22 +271,6 @@ void UCWGProjectAPI::ProjectApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr 
     FString JsonString = res->GetContentAsString();
     FProjectTeamListResponse ParsedResponse = JsonPerse<FProjectTeamListResponse>(JsonString);
 
-    if (ParsedResponse.status == TEXT("success"))
-    {
-        OnProjectApplyCallBack(ParsedResponse.data);
-    }
-    else
-    {
-        FString ErrorMessage = TEXT("프로젝트 지원에 실패했습니다.");
-        if (res->GetResponseCode() == 400)
-        {
-            TSharedPtr<FJsonObject> JsonObject;
-            TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(res->GetContentAsString());
-            if (FJsonSerializer::Deserialize(Reader, JsonObject))
-            {
-                ErrorMessage = JsonObject->GetStringField(TEXT("message"));
-            }
-        }
-        OnFailProjectApplyCallBack(ErrorMessage);
-    }
+    OnProjectApplyCallBack(ParsedResponse.data);
+
 }
