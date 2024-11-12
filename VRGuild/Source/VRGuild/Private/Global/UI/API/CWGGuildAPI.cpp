@@ -8,6 +8,8 @@ void UCWGGuildAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
 
+    Super::OnSuccessAPI(req, res);
+
     FRegexPattern CreateGuildPattern(TEXT(R"(POST\s+/api/guild$)"));
     FRegexPattern GetGuildPattern(TEXT(R"(GET\s+/api/guild/(\d+)$)"));
     FRegexPattern UpdateGuildPattern(TEXT(R"(PATCH\s+/api/guild/(\d+)$)"));
@@ -36,6 +38,8 @@ void UCWGGuildAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 
 void UCWGGuildAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
+    Super::OnFailAPI(req, res);
+
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
 
     FRegexPattern CreateGuildPattern(TEXT(R"(POST\s+/api/guild$)"));

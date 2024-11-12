@@ -13,7 +13,7 @@ void UCWGTeamAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern UpdateTeamPattern(TEXT(R"(PATCH\s+/api/team/(\d+)$)"));
     FRegexPattern GetTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist$)"));
     FRegexPattern GetUserTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist/user/(\d+)$)"));
-    FRegexPattern ApplyTeamPattern(TEXT(R"(GET\s+/api/team/apply/(\d+)$)"));
+    FRegexPattern ApplyTeamPattern(TEXT(R"(PATCH\s+/api/team/apply$)"));
 
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
@@ -53,7 +53,7 @@ void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern UpdateTeamPattern(TEXT(R"(PATCH\s+/api/team/(\d+)$)"));
     FRegexPattern GetTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist$)"));
     FRegexPattern GetUserTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist/user/(\d+)$)"));
-    FRegexPattern ApplyTeamPattern(TEXT(R"(GET\s+/api/team/apply/(\d+)$)"));
+    FRegexPattern ApplyTeamPattern(TEXT(R"(PATCH\s+/api/team/apply$)"));
 
     FString ErrorMessage;
     if (res && res->GetResponseCode() == 400)
@@ -165,10 +165,11 @@ void UCWGTeamAPI::TeamListByUserIdGetCallBack(FHttpRequestPtr req, FHttpResponse
     OnTeamListByUserIdGetCallBack(ParsedResponse.data);
 }
 
-void UCWGTeamAPI::TeamApplyCall(const FString& TeamId)
+void UCWGTeamAPI::TeamApplyCall(const FTeamInfo& TeamInfo)
 {
-    this->API = FString::Printf(TEXT("api/team/apply/%s"), *TeamId);
-    HttpGetCall();
+    this->API = FString::Printf(TEXT("api/team/apply"));
+
+    HttpPatchCall<FTeamInfo>(TeamInfo);
 }
 
 void UCWGTeamAPI::TeamApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)

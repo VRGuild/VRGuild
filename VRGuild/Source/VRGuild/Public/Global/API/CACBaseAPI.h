@@ -15,7 +15,8 @@ class VRGUILD_API UCACBaseAPI : public UActorComponent
 {
 	GENERATED_BODY()
 private:
-	FString URL = "http://125.132.216.190:15530/"; // Base URL
+	FString URL = "http://192.168.0.38:8443/"; // Base URL
+	//FString URL = "https://triplay.site/"; // Base URL
 public:	
 	// Sets default values for this component's properties
 	UCACBaseAPI();

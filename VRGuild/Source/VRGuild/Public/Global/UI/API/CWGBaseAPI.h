@@ -19,7 +19,8 @@ class VRGUILD_API UCWGBaseAPI : public UUserWidget
 	GENERATED_BODY()
 
 private:
-	FString URL = "http://125.132.216.190:15530/"; // Base URL
+	FString URL = "http://192.168.0.38:8443/"; // Base URL
+	//FString URL = "https://triplay.site/"; // Base URL
 
 protected:
 	bool bHttpWaitResponse = false;
@@ -41,9 +42,9 @@ public:
 	template<typename T>
 	void HttpJsonContentTypeCall(T sendData, FString Verb) {
 		UE_LOG(LogTemp, Display, TEXT("HttpJsonContentTypeCall"));
-		if (bHttpWaitResponse)
+		/*if (bHttpWaitResponse)
 			return;
-		bHttpWaitResponse = true;
+		bHttpWaitResponse = true;*/
 
 		FHttpModule& httpModule = FHttpModule::Get();
 
@@ -67,9 +68,9 @@ public:
 
 	void HttpJsonContentTypeCall(FString Verb) {
 		UE_LOG(LogTemp, Display, TEXT("HttpJsonContentTypeCall"));
-		if (bHttpWaitResponse)
+		/*if (bHttpWaitResponse)
 			return;
-		bHttpWaitResponse = true;
+		bHttpWaitResponse = true;*/
 
 		FHttpModule& httpModule = FHttpModule::Get();
 

@@ -106,7 +106,7 @@ public:
 
     // Apply To Project
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectApplyCall(const int64 ProjectId);
+    void ProjectApplyCall(const FProjectTeamApply& teamInfo, const int64 ProjectId);
     void ProjectApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnProjectApplyCallBack(const FProjectTeamList& TeamList);
