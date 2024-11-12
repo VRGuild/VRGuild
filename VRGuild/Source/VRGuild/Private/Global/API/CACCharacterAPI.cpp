@@ -95,6 +95,11 @@ void UCACCharacterAPI::CharacterGetCallBack(FHttpRequestPtr req, FHttpResponsePt
     FString JsonString = res->GetContentAsString();
     FCharacterDetailResponse ParsedResponse = JsonPerse<FCharacterDetailResponse>(JsonString);
 
+    if (ParsedResponse.data.characterId == 0)
+    {
+        OnFailCharacterGetCallBack();
+        return;
+    }
     OnCharacterGetCallBack(ParsedResponse.data);
 }
 
