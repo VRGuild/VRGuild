@@ -113,8 +113,8 @@ protected:
 	UFUNCTION()
 	void OnRep_CustomValues();
 	UFUNCTION(BlueprintImplementableEvent)
-	void AttachCustomSKMComponents(FCharacterCustomData customData);
-
+	void BP_CustomDataUpdate(FCharacterCustomData customData);
+	
 public:
 
 	void SetCustomValue(FCharacterCustomData data);
