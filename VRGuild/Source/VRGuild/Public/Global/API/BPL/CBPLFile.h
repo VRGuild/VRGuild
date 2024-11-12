@@ -7,6 +7,20 @@
 #include "Global/API/BPL/CBPLBase.h"
 #include "CBPLFile.generated.h"
 
+
+
+USTRUCT(BlueprintType)
+struct FFileData
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "Comment|User")
+    TArray<uint8> multipartFiles;
+    UPROPERTY(BlueprintReadWrite, Category = "Comment|User")
+    FString PathFile;
+};
+
+
 /**
  * 
  */
