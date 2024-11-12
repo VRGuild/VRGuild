@@ -79,7 +79,7 @@ public:
 
     // Get  Project by Account
     UFUNCTION(BlueprintCallable, Category = "Project API")
-    void ProjectAccountGetCall();
+    void ProjectAccountGetCall(int32 page);
     void ProjectAccountGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnProjectAccountGetCallBack(const FProjectPagedResponse& ProjectInfo);
