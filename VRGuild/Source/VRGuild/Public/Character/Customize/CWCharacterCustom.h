@@ -6,6 +6,7 @@
 #include "Global/CGIGameInstance.h"
 #include "Global/UI/API/CWGCharacterAPI.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "Engine/Texture2D.h"
 #include "CWCharacterCustom.generated.h"
 
 /**
@@ -61,4 +62,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "RenderTarget")
 	static TArray<uint8> CompressedRenderTargerToPNG(UTextureRenderTarget2D* RenderTarget);
+
+	/*UFUNCTION(BlueprintCallable, Category = "RenderTarget")
+	static UTexture2D* CreateTextureFromCompressedData(const TArray<uint8>& CompressedData);*/
+
 };

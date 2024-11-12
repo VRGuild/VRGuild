@@ -19,6 +19,10 @@ struct FCharacterCustomData
 public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> Selections;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<uint8> Pixels;
+
 	/* index 0: Head
 	* index 1: Body
 	* index 2: Lower

@@ -11,6 +11,9 @@
 #include "Character/Customize/CACCharacterLower.h"
 #include "Character/Customize/CACCustomInteraction.h"
 #include "ImageUtils.h"
+#include "Engine/Texture2D.h"
+#include "Engine/TextureRenderTarget2D.h"
+
 
 
 void UCWCharacterCustom::NativeConstruct()
@@ -76,7 +79,7 @@ TArray<uint8> UCWCharacterCustom::CompressedRenderTargerToPNG(UTextureRenderTarg
 	return CompressedBitmap;
 
 	FTextureRenderTargetResource* RenderResource = RenderTarget->GameThread_GetRenderTargetResource();
-	FIntRect Region(320, 0, 960, 1280);
+	FIntRect Region(220, 160, 420, 480);
 	TArray<FColor> Bitmap;
 
 	if (RenderResource->ReadPixels(Bitmap, FReadSurfaceDataFlags(), Region))
@@ -84,7 +87,31 @@ TArray<uint8> UCWCharacterCustom::CompressedRenderTargerToPNG(UTextureRenderTarg
 		int32 Width = Region.Width();
 		int32 Height = Region.Height();
 		FImageUtils::CompressImageArray(Width, Height, Bitmap, CompressedBitmap);
-	}
 
+	}
 	return CompressedBitmap;
 }
+
+//UTexture2D* UCWCharacterCustom::CreateTextureFromCompressedData(const TArray<uint8>& CompressedData)
+//{
+//	// JPEG Data 디코딩 
+//	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+//	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG);
+//
+//	if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(CompressedData.GetData(), CompressedData.Num()))
+//	{
+//		TArray<uint8> RawData;
+//		if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, RawData))
+//		{
+//			int32 Width = ImageWrapper->GetWidth();
+//			int32 Height = ImageWrapper->GetHeight();
+//
+//			UTexture2D* NewTexture = UTexture2D::CreateTransient(Width, Height, PF_B8G8R8A8);
+//			if (!NewTexture) { return nullptr;}
+//
+//			NewTexture->UpdateResource();
+//			return NewTexture;
+//		}
+//	}
+//	return nullptr;
+//}
