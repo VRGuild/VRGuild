@@ -1,11 +1,13 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "Global/API/BPL/CBPLDeveloper.h"
+
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Global/Project/CBPLProjectOld.h"
 #include "CWGReviewNotice.generated.h"
+
 
 /**
  * 
@@ -17,9 +19,9 @@ class VRGUILD_API UCWGReviewNotice : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetReviewInfo(FProjectNotice notice); /*Change to FReviewNotice*/
+	void SetReviewInfo(FDeveloperRequest notice); /*Change to FReviewNotice*/
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FProjectNotice ProjectInfo; /*Change to FReviewNotice*/
+	FDeveloperRequest ProjectInfo; /*Change to FReviewNotice*/
 };

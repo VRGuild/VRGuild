@@ -55,7 +55,7 @@ protected:
     void ProjectDetailGetCall(const int64 ProjectId);
     void ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
-    void OnProjectDetailGetCallBack(const FProjectDetailInfo& ProjectDetail);
+    void OnProjectDetailGetCallBack(const FProjectWithDetail& ProjectDetail);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnFailProjectDetailGetCallBack();
 
@@ -76,7 +76,16 @@ protected:
     void OnProjectDetailListGetCallBack(FProjectDetailPagedResponse ParsedResponse);
     UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
     void OnFailProjectDetailListGetCallBack();
-    
+
+    // Get  Project by Account
+    UFUNCTION(BlueprintCallable, Category = "Project API")
+    void ProjectAccountGetCall();
+    void ProjectAccountGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnProjectAccountGetCallBack(const FProjectPagedResponse& ProjectInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Project API")
+    void OnFailProjectAccountGetCallBack();
+
     // Get Project Team List
     UFUNCTION(BlueprintCallable, Category = "Project API")
     void ProjectTeamListGetCall(const int64 ProjectId);
