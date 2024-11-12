@@ -193,7 +193,7 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Character")
     TArray<FCustomInfo> customList;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
-    FString characterPicture;
+    TArray<uint8> characterPicture;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
     FDateTime createAt;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
