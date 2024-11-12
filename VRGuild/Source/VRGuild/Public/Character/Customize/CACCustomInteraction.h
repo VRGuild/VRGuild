@@ -43,7 +43,7 @@ public:
 	void ShowWidget();
 	
 	UFUNCTION(BlueprintCallable)
-	void SaveCustomData(FCharacterCustomData data);
+	void SaveCustomSelections(TArray<int32> data);
 
 	FCharacterCustomData CustomData;
 };

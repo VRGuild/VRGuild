@@ -66,7 +66,7 @@ void UCWCharacterCustom::CustomEnd()
 {
 	if (nullptr != CharacterCustomComponent)
 	{
-		CharacterCustomComponent->SaveCustomData(Data);
+		CharacterCustomComponent->SaveCustomSelections(Data.Selections);
 		this->RemoveFromParent();
 	}	
 }
