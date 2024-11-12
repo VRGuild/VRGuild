@@ -522,7 +522,8 @@ void ACPCBasePlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWa
 		//// Maybe via button or player action? Maybe add parameters here
 		//FindSessions();
 
-		//
+
+		SetEpicNickNameToGameInstance();
 
 		//APICall Check
 		OnLoginAPICall();

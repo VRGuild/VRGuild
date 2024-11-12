@@ -6,27 +6,38 @@
 #include "Engine/GameInstance.h"
 #include "Interfaces/OnlineSessionDelegates.h"
 
+#include "Global/API/BPL/CBPLBase.h"
+
 #include "CGIGameInstance.generated.h"
 
 
 class UCACCharacterPartBase;
 class UCWDisplayMessage;
 
+
 USTRUCT(BlueprintType)
 struct FCharacterCustomData
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 	TArray<int32> Selections;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<uint8> Pixels;
-
 	/* index 0: Head
 	* index 1: Body
 	* index 2: Lower
 	*/
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<uint8> Pixels;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString NickName;
+
+	UPROPERTY(BlueprintReadOnly)
+	FSkillCategoryInfo MainSkill;
+
+	UPROPERTY(BlueprintReadOnly)
+	int64 UserId;
 };
 
 UCLASS()
@@ -58,10 +69,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetEpicUserIdInstance(int64 EpicUserId);
 
-	FCharacterCustomData CustomData;
-
 	UFUNCTION(BlueprintCallable)
-	void AttachCustomSelections(ACharacter* NewCharacter);
+	void SetMainSkillCategory(FSkillCategoryInfo mainSkill);
+
+	FCharacterCustomData CustomData;
 
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
 	TArray<TSubclassOf<UActorComponent>> CharacterPartComponents;
