@@ -13,6 +13,7 @@ void UCWGProjectAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetProjectPattern(TEXT(R"(GET\s+/api/project/(\d+)$)"));
     FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
     FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
+    FRegexPattern GetProjectAccountPattern(TEXT(R"(GET\s+/api/project/account$)"));
     FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
     FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
@@ -37,6 +38,10 @@ void UCWGProjectAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     else if (FRegexMatcher(GetProjectDetailPattern, UrlToMatch).FindNext())
     {
         ProjectDetailGetCallBack(req, res);
+    }
+    else if (FRegexMatcher(GetProjectAccountPattern, UrlToMatch).FindNext())
+    {
+        ProjectAccountGetCallBack(req, res);
     }
     else if (FRegexMatcher(GetProjectListPattern, UrlToMatch).FindNext())
     {
@@ -68,6 +73,7 @@ void UCWGProjectAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetProjectPattern(TEXT(R"(GET\s+/api/project/(\d+)$)"));
     FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
     FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
+    FRegexPattern GetProjectAccountPattern(TEXT(R"(GET\s+/api/project/account$)"));
     FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
     FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
@@ -89,6 +95,10 @@ void UCWGProjectAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     else if (FRegexMatcher(GetProjectDetailPattern, UrlToMatch).FindNext())
     {
         OnFailProjectDetailGetCallBack();
+    }
+    else if (FRegexMatcher(GetProjectAccountPattern, UrlToMatch).FindNext())
+    {
+        OnFailProjectAccountGetCallBack();
     }
     else if (FRegexMatcher(GetProjectListPattern, UrlToMatch).FindNext())
     {
@@ -166,16 +176,30 @@ void UCWGProjectAPI::ProjectUpdateCallBack(FHttpRequestPtr req, FHttpResponsePtr
 
 void UCWGProjectAPI::ProjectDetailGetCall(const int64 ProjectId)
 {
-    this->API = FString::Printf(TEXT("api/project/detail/list/%d"), ProjectId);
+    this->API = FString::Printf(TEXT("api/project/detail/%d"), ProjectId);
     HttpGetCall();
 }
 
 void UCWGProjectAPI::ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
-    FProjectDetailResponse ParsedResponse = JsonPerse<FProjectDetailResponse>(JsonString);
+    FProjectWithDetailData ParsedResponse = JsonPerse<FProjectWithDetailData>(JsonString);
 
     OnProjectDetailGetCallBack(ParsedResponse.data);
+}
+
+void UCWGProjectAPI::ProjectAccountGetCall()
+{
+    this->API = FString::Printf(TEXT("api/project/account"));
+    HttpGetCall();
+}
+
+void UCWGProjectAPI::ProjectAccountGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FProjectPagedResponse ParsedResponse = JsonPerse<FProjectPagedResponse>(JsonString);
+
+    OnProjectAccountGetCallBack(ParsedResponse);
 }
 
 void UCWGProjectAPI::ProjectListGetCall(const int64 Number)

@@ -70,6 +70,15 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FProjectWithDetailData
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "Project")
+    FProjectWithDetail data;
+};
+
+USTRUCT(BlueprintType)
 struct FProjectDetailPagedResponse : public FBaseResponse
 {
     GENERATED_USTRUCT_BODY()
