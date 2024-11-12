@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 
 #include "Net/UnrealNetwork.h"
+#include "EngineUtils.h"
 
 #include "Global/Components/CACCarry.h"
 #include "Global/Components/CACInteraction.h"
@@ -185,8 +186,14 @@ void ATP_ThirdPersonCharacter::OnWidgetHoveredChanged(UWidgetComponent* WidgetCo
 
 void ATP_ThirdPersonCharacter::OnRep_CustomValues()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnRep_CustomValues"));
-	AttachCustomSKMComponents(CustomValues);
+	UE_LOG(LogTemp, Warning, TEXT("[%s] OnRep_CustomValues"), 
+		GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
+	
+	for (TActorIterator<ATP_ThirdPersonCharacter> iter(GetWorld()); iter; ++iter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[%s]"), *GetNameSafe(*iter));
+		iter->BP_CustomDataUpdate(iter->CustomValues);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
