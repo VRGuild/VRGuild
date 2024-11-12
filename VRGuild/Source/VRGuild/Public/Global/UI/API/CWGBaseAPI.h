@@ -18,9 +18,9 @@ class VRGUILD_API UCWGBaseAPI : public UUserWidget
 {
 	GENERATED_BODY()
 
-private:
-	FString URL = "http://192.168.0.38:8443/"; // Base URL
-	//FString URL = "https://triplay.site/"; // Base URL
+protected:
+	//FString URL = "http://192.168.0.38:8443/"; // Base URL
+	FString URL = "https://triplay.site/"; // Base URL
 
 protected:
 	bool bHttpWaitResponse = false;
@@ -150,4 +150,6 @@ public:
 
 		return ParseData;
 	};
+
+
 };

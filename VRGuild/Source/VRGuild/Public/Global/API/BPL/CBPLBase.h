@@ -16,6 +16,19 @@ public:
     FString message;
 };
 
+
+// Base FileSystem structure
+USTRUCT(BlueprintType)
+struct FBaseFile
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "Base|Response")
+    FString URL;
+    UPROPERTY(BlueprintReadWrite, Category = "Base|Response")
+    TArray<uint8> binary;
+};
+
 // Custom Info Structure
 USTRUCT(BlueprintType)
 struct FCustomInfo
@@ -171,6 +184,8 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Member")
     int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Member")
+    int64 groupId = 0;
+    UPROPERTY(BlueprintReadWrite, Category = "Member")
     FString motive;
     UPROPERTY(BlueprintReadWrite, Category = "Member")
     int32 isAccepted;
@@ -194,6 +209,8 @@ public:
     TArray<FCustomInfo> customList;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
     TArray<uint8> characterPicture;
+    UPROPERTY(BlueprintReadWrite, Category = "Character")
+    FString characterPictureURL;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
     FDateTime createAt;
     UPROPERTY(BlueprintReadWrite, Category = "Character")
@@ -323,7 +340,7 @@ struct FUserInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "User")
-    int32 userId = 0;
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User")
     FString epicAccountID;
     UPROPERTY(BlueprintReadWrite, Category = "User")

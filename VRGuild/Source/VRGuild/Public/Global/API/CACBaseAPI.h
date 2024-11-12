@@ -14,9 +14,9 @@ UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACBaseAPI : public UActorComponent
 {
 	GENERATED_BODY()
-private:
-	FString URL = "http://192.168.0.38:8443/"; // Base URL
-	//FString URL = "https://triplay.site/"; // Base URL
+protected:
+	//FString URL = "http://192.168.0.38:8443/"; // Base URL
+	FString URL = "https://triplay.site/"; // Base URL
 public:	
 	// Sets default values for this component's properties
 	UCACBaseAPI();
