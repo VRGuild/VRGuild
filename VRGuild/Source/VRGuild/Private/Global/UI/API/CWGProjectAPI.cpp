@@ -13,7 +13,7 @@ void UCWGProjectAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetProjectPattern(TEXT(R"(GET\s+/api/project/(\d+)$)"));
     FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
     FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
-    FRegexPattern GetProjectAccountPattern(TEXT(R"(GET\s+/api/project/account$)"));
+    FRegexPattern GetProjectAccountPattern(TEXT(R"(GET\s+/api/project/account\?page=(\d+)$)"));
     FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
     FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
@@ -73,7 +73,7 @@ void UCWGProjectAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetProjectPattern(TEXT(R"(GET\s+/api/project/(\d+)$)"));
     FRegexPattern UpdateProjectPattern(TEXT(R"(PATCH\s+/api/project/(\d+)$)"));
     FRegexPattern GetProjectDetailPattern(TEXT(R"(GET\s+/api/project/detail/(\d+)$)"));
-    FRegexPattern GetProjectAccountPattern(TEXT(R"(GET\s+/api/project/account$)"));
+    FRegexPattern GetProjectAccountPattern(TEXT(R"(GET\s+/api/project/account\?page=(\d+)$)"));
     FRegexPattern GetProjectListPattern(TEXT(R"(GET\s+/api/project/list/(\d+)$)"));
     FRegexPattern GetProjectDetailListPattern(TEXT(R"(GET\s+/api/project/detail/list/(\d+)$)"));
     FRegexPattern GetProjectTeamPattern(TEXT(R"(GET\s+/api/project/team/(\d+)$)"));
@@ -188,9 +188,9 @@ void UCWGProjectAPI::ProjectDetailGetCallBack(FHttpRequestPtr req, FHttpResponse
     OnProjectDetailGetCallBack(ParsedResponse.data);
 }
 
-void UCWGProjectAPI::ProjectAccountGetCall()
+void UCWGProjectAPI::ProjectAccountGetCall(int32 page)
 {
-    this->API = FString::Printf(TEXT("api/project/account"));
+    this->API = FString::Printf(TEXT("api/project/account?page=%d"), page);
     HttpGetCall();
 }
 
