@@ -93,7 +93,7 @@ void ACABasePoster::EndInteract(ACharacter* Initiator)
 	}
 }
 
-UUserWidget* ACABasePoster::GetPosterDisplayWidget() const
+UUserWidget* ACABasePoster::GetPosterDisplayWidget()
 {
 	return CreateWidget<UUserWidget>(GetWorld(), PosterWidgetToDisplayClass);
 }

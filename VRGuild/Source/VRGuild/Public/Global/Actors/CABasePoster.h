@@ -24,7 +24,7 @@ public:
 	virtual void BeginInteract(ACharacter* Initiator) override;
 	virtual void EndInteract(ACharacter* Initiator) override;
 
-	virtual UUserWidget* GetPosterDisplayWidget() const;
+	virtual UUserWidget* GetPosterDisplayWidget();
 
 	virtual bool CanTrace(ACharacter* player) const override;
 

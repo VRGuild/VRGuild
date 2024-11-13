@@ -239,7 +239,7 @@ void ACANoticeBoard::SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNot
 	Posters.Add(spawned);
 }
 
-void ACANoticeBoard::SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FDevInfo devInfo)
+void ACANoticeBoard::SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FDeveloperRequest devInfo)
 {
 	FActorSpawnParameters param;
 	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
