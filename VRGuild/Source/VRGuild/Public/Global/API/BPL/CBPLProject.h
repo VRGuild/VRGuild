@@ -142,7 +142,7 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Project|Team")
     int64 projectId;
     UPROPERTY(BlueprintReadWrite, Category = "Project|Team")
-    TArray<int64> teamIdList;
+    TArray<int64> supportTeamIdList;
 };
 
 // Project Team List Response Structure

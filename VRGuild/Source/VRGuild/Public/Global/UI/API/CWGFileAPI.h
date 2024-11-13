@@ -6,6 +6,20 @@
 #include "Global/UI/API/CWGBaseAPI.h"
 #include "CWGFileAPI.generated.h"
 
+
+USTRUCT()
+struct FFileUploadResponse
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    TArray<FString> fileURLs;
+
+    UPROPERTY()
+    FString message;
+};
+
+
 /**
  * 
  */
