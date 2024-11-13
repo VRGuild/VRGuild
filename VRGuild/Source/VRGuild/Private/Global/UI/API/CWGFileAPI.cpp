@@ -62,80 +62,6 @@ FString UCWGFileAPI::AddData(FString Name, FString Value)
 }
 
 
-void UCWGFileAPI::UploadFile(const FFileData& FullFilePath)
-{
-    FHttpModule& HttpModule = FHttpModule::Get();
-    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule.CreateRequest();
-
-    // We set the api URL
-    HttpRequest->SetURL(this->URL + "api/files/seper");
-
-    HttpRequest->SetVerb(TEXT("POST"));
-    
-    // Create a boundary label, for the header
-    BoundaryLabel = FString(TEXT("---BoundaryString")) + FString::FromInt(FMath::Rand());
-    // boundary label for begining of every payload chunk 
-    BoundaryBegin = FString(TEXT("--")) + BoundaryLabel + FString(TEXT("\r\n"));
-    // boundary label for the end of payload
-    BoundaryEnd = FString(TEXT("\r\n--")) + BoundaryLabel + FString(TEXT("--\r\n"));
-
-    // Set the content-type for server to know what are we going to send
-    HttpRequest->SetHeader(TEXT("Content-Type"), FString(TEXT("multipart/form-data; boundary=")) + BoundaryLabel);
-
-    // This is binary content of the request
-    TArray<uint8> CombinedContent;
-
-    // First, we add the boundary for the file, which is different from text payload
-    FString FileBoundaryString = FString(TEXT("\r\n"))
-        + BoundaryBegin
-        + FString(TEXT("Content-Disposition: form-data; name=\"multipartFiles\"; filename=\""))
-        + "CustomImage" + "\"\r\n"
-        + "Content-Type: image/png"
-        + FString(TEXT("\r\n\r\n"));
-    
-    // Notice, we convert all strings into uint8 format using FStringToUint8
-    CombinedContent.Append(FStringToUint8(FileBoundaryString));
-
-    // Append the file data
-    CombinedContent.Append(FullFilePath.multipartFiles);
-
-    // Let's add couple of text values to the payload
-    CombinedContent.Append(FStringToUint8(AddData("pathFiles", "trash")));
-
-    // Finally, add a boundary at the end of the payload
-    CombinedContent.Append(FStringToUint8(BoundaryEnd));
-
-    // Set the request content
-    HttpRequest->SetContent(CombinedContent);
-
-    // Hook a lambda(anonymous function) to when we receive a response
-    HttpRequest->OnProcessRequestComplete().BindLambda(
-        [this](
-            FHttpRequestPtr pRequest,
-            FHttpResponsePtr pResponse,
-            bool connectedSuccessfully) mutable {
-                UE_LOG(LogTemp, Error, TEXT("Connection."));
-
-                if (connectedSuccessfully) {
-                    FString Result = pResponse.Get()->GetContentAsString();
-                    OnFileUploadCallBack(Result);
-                }
-                else {
-                    OnFailFileUploadCallBack();
-                    switch (pRequest->GetStatus()) {
-                    case EHttpRequestStatus::Failed_ConnectionError:
-                        UE_LOG(LogTemp, Error, TEXT("Connection failed."));
-                    default:
-                        UE_LOG(LogTemp, Error, TEXT("Request failed."));
-                    }
-                }
-        });
-
-    // Send the request 
-    HttpRequest->ProcessRequest();
-}
-
-
 void UCWGFileAPI::UploadMultyFile(const FFileInfoDatas& FileInfos)
 {
     FHttpModule& HttpModule = FHttpModule::Get();
@@ -213,7 +139,11 @@ void UCWGFileAPI::UploadMultyFile(const FFileInfoDatas& FileInfos)
             if (bSuccess && Response.IsValid())
             {
                 FString Result = Response->GetContentAsString();
-                OnFileUploadCallBack(Result);
+                FString JsonString = Result;
+
+                // JSON을 struct로 변환
+                FFileUploadResponse Response = ParseJsonToStruct(JsonString);
+                OnFileUploadCallBack(Response);
             }
             else
             {
@@ -293,15 +223,7 @@ void UCWGFileAPI::UploadMultyBinary(const FFileDatas& FullFilePath)
 
                 // JSON을 struct로 변환
                 FFileUploadResponse Response = ParseJsonToStruct(JsonString);
-
-                // 결과 사용 예시
-                for (const FString& Url : Response.fileURLs)
-                {
-                    UE_LOG(LogTemp, Log, TEXT("File URL: %s"), *Url);
-                }
-                UE_LOG(LogTemp, Log, TEXT("Message: %s"), *Response.message);
-
-                OnFileUploadCallBack(Response.fileURLs[0]);
+                OnFileUploadCallBack(Response);
             }
             else
             {
@@ -319,3 +241,77 @@ void UCWGFileAPI::UploadMultyBinary(const FFileDatas& FullFilePath)
 
     HttpRequest->ProcessRequest();
 }
+
+
+//void UCWGFileAPI::UploadFile(const FFileData& FullFilePath)
+//{
+//    FHttpModule& HttpModule = FHttpModule::Get();
+//    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule.CreateRequest();
+//
+//    // We set the api URL
+//    HttpRequest->SetURL(this->URL + "api/files/seper");
+//
+//    HttpRequest->SetVerb(TEXT("POST"));
+//
+//    // Create a boundary label, for the header
+//    BoundaryLabel = FString(TEXT("---BoundaryString")) + FString::FromInt(FMath::Rand());
+//    // boundary label for begining of every payload chunk 
+//    BoundaryBegin = FString(TEXT("--")) + BoundaryLabel + FString(TEXT("\r\n"));
+//    // boundary label for the end of payload
+//    BoundaryEnd = FString(TEXT("\r\n--")) + BoundaryLabel + FString(TEXT("--\r\n"));
+//
+//    // Set the content-type for server to know what are we going to send
+//    HttpRequest->SetHeader(TEXT("Content-Type"), FString(TEXT("multipart/form-data; boundary=")) + BoundaryLabel);
+//
+//    // This is binary content of the request
+//    TArray<uint8> CombinedContent;
+//
+//    // First, we add the boundary for the file, which is different from text payload
+//    FString FileBoundaryString = FString(TEXT("\r\n"))
+//        + BoundaryBegin
+//        + FString(TEXT("Content-Disposition: form-data; name=\"multipartFiles\"; filename=\""))
+//        + "CustomImage" + "\"\r\n"
+//        + "Content-Type: image/png"
+//        + FString(TEXT("\r\n\r\n"));
+//
+//    // Notice, we convert all strings into uint8 format using FStringToUint8
+//    CombinedContent.Append(FStringToUint8(FileBoundaryString));
+//
+//    // Append the file data
+//    CombinedContent.Append(FullFilePath.multipartFiles);
+//
+//    // Let's add couple of text values to the payload
+//    CombinedContent.Append(FStringToUint8(AddData("pathFiles", "trash")));
+//
+//    // Finally, add a boundary at the end of the payload
+//    CombinedContent.Append(FStringToUint8(BoundaryEnd));
+//
+//    // Set the request content
+//    HttpRequest->SetContent(CombinedContent);
+//
+//    // Hook a lambda(anonymous function) to when we receive a response
+//    HttpRequest->OnProcessRequestComplete().BindLambda(
+//        [this](
+//            FHttpRequestPtr pRequest,
+//            FHttpResponsePtr pResponse,
+//            bool connectedSuccessfully) mutable {
+//                UE_LOG(LogTemp, Error, TEXT("Connection."));
+//
+//                if (connectedSuccessfully) {
+//                    FString Result = pResponse.Get()->GetContentAsString();
+//                    OnFileUploadCallBack(Result);
+//                }
+//                else {
+//                    OnFailFileUploadCallBack();
+//                    switch (pRequest->GetStatus()) {
+//                    case EHttpRequestStatus::Failed_ConnectionError:
+//                        UE_LOG(LogTemp, Error, TEXT("Connection failed."));
+//                    default:
+//                        UE_LOG(LogTemp, Error, TEXT("Request failed."));
+//                    }
+//                }
+//        });
+//
+//    // Send the request 
+//    HttpRequest->ProcessRequest();
+//}

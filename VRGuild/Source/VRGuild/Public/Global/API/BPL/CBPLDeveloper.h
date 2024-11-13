@@ -5,6 +5,20 @@
 #include "Global/API/BPL/CBPLBase.h"
 #include "CBPLDeveloper.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EDeveloperRole : uint8
+{
+    Server      UMETA(DisplayName = "Server Developer"),
+    Client      UMETA(DisplayName = "Client Developer"),
+    Design      UMETA(DisplayName = "Game Designer"),
+    AI          UMETA(DisplayName = "AI Developer"),
+    Planner     UMETA(DisplayName = "Game Planner"),
+    Community   UMETA(DisplayName = "Community Of Player")
+};
+
+
+
 // Developer Create/Update Request Structure
 USTRUCT(BlueprintType)
 struct FDeveloperRequest
@@ -141,4 +155,29 @@ UCLASS()
 class VRGUILD_API UCBPLDeveloper : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
+
+public:
+
+    // 문자열로 변환하는 헬퍼 함수
+    UFUNCTION(BlueprintCallable)
+    static FString GetDeveloperRoleString(EDeveloperRole Role)
+    {
+        switch (Role)
+        {
+        case EDeveloperRole::Server:
+            return TEXT("Server");
+        case EDeveloperRole::Client:
+            return TEXT("Client");
+        case EDeveloperRole::Design:
+            return TEXT("Designer");
+        case EDeveloperRole::AI:
+            return TEXT("AI");
+        case EDeveloperRole::Planner:
+            return TEXT("Planner");
+        case EDeveloperRole::Community:
+            return TEXT("Community");
+        default:
+            return TEXT("Unknown");
+        }
+    }
 };
