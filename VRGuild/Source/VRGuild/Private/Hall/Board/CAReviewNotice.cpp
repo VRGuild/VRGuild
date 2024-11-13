@@ -28,27 +28,22 @@ void ACAReviewNotice::BeginPlay()
 	}
 }
 
-void ACAReviewNotice::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}
-
 void ACAReviewNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin)
 {
 	Super::Init(bIsEnabled, owner, bAttachToOwner, actorOrigin);
 
 	if (auto notice = Cast<ACAReviewNotice>(actorOrigin))
 	{
-		Init(notice->NoticeData);
+		Init(notice->DevData);
 	}
 }
 
-void ACAReviewNotice::Init(const FEvaluation& newData) /*Change to FReviewNotice*/
+void ACAReviewNotice::Init(const FDevInfo& newData) /*Change to FReviewNotice*/
 {
 	UE_LOG(LogTemp, Warning, TEXT("ReviewNotice SetNoticeData success"));
 
-	if (newData.evaluationId != -1)
-		NoticeData = newData;
+	if (newData.devId != 0)
+		DevData = newData;
 }
 
 void ACAReviewNotice::OnCompletedCallback()
@@ -72,7 +67,7 @@ bool ACAReviewNotice::CheckCanTrace(ACharacter* player) const
 	{
 		if (auto carriedNotice = Cast<ACAReviewNotice>(carryComp->GetCarriedActor()))
 		{
-			return NoticeData.evaluationId != carriedNotice->NoticeData.evaluationId;
+			return DevData.devId != carriedNotice->DevData.devId;
 		}
 	}
 

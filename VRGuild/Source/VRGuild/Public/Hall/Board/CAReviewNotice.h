@@ -14,19 +14,18 @@ class VRGUILD_API ACAReviewNotice : public ACABasePoster
 	GENERATED_BODY()
 protected:
 	virtual void BeginPlay() override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	virtual void Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwner, AActor* actorOrigin) override;
-	void Init(const FEvaluation& newData); /*Change to FReviewNotice*/
+	void Init(const FDevInfo& newData); /*Change to FReviewNotice*/
 
 	virtual void OnCompletedCallback() override;
 	virtual UUserWidget* GetPosterDisplayWidget() const override;
 	
 
 protected:
-	UPROPERTY(Replicated, BlueprintReadWrite)
-	FEvaluation NoticeData;
+	UPROPERTY(BlueprintReadWrite)
+	FDevInfo DevData;
 
 	virtual bool CheckCanTrace(ACharacter* player) const override;
 	virtual void ServerExecuteOnCompletedDelegate_Implementation() override;
