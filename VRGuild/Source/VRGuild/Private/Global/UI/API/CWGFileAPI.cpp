@@ -7,6 +7,36 @@
 #include "Misc/FileHelper.h"
 #include "HAL/PlatformFilemanager.h"
 
+
+
+// JSON 파싱 및 struct 변환을 위한 함수
+FFileUploadResponse ParseJsonToStruct(const FString& JsonString)
+{
+    FFileUploadResponse Response;
+
+    TSharedPtr<FJsonObject> JsonObject;
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+
+    if (FJsonSerializer::Deserialize(Reader, JsonObject))
+    {
+        // fileURLs 배열 파싱
+        const TArray<TSharedPtr<FJsonValue>>* UrlArray;
+        if (JsonObject->TryGetArrayField(TEXT("fileURLs"), UrlArray))
+        {
+            for (const auto& Url : *UrlArray)
+            {
+                Response.fileURLs.Add(Url->AsString());
+            }
+        }
+
+        // message 파싱
+        Response.message = JsonObject->GetStringField(TEXT("message"));
+    }
+
+    return Response;
+}
+
+
 TArray<uint8> FStringToUint8(const FString& InString)
 {
     TArray<uint8> OutBytes;
@@ -258,7 +288,20 @@ void UCWGFileAPI::UploadMultyBinary(const FFileDatas& FullFilePath)
             if (bSuccess && Response.IsValid())
             {
                 FString Result = Response->GetContentAsString();
-                OnFileUploadCallBack(Result);
+
+                FString JsonString = Result;
+
+                // JSON을 struct로 변환
+                FFileUploadResponse Response = ParseJsonToStruct(JsonString);
+
+                // 결과 사용 예시
+                for (const FString& Url : Response.fileURLs)
+                {
+                    UE_LOG(LogTemp, Log, TEXT("File URL: %s"), *Url);
+                }
+                UE_LOG(LogTemp, Log, TEXT("Message: %s"), *Response.message);
+
+                OnFileUploadCallBack(Response.fileURLs[0]);
             }
             else
             {
