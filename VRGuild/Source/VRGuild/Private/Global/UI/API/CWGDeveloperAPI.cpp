@@ -65,10 +65,10 @@ void UCWGDeveloperAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCWGDeveloperAPI::DeveloperCreateCall(const FDeveloperRequest& Request)
+void UCWGDeveloperAPI::DeveloperCreateCall(const FDevCreateInfo& Request)
 {
     this->API = TEXT("api/epic/developer");
-    HttpPostCall<FDeveloperRequest>(Request);
+    HttpPostCall<FDevCreateInfo>(Request);
 }
 
 void UCWGDeveloperAPI::DeveloperCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
