@@ -11,18 +11,23 @@ struct FUserMemberInfo
 {
     GENERATED_USTRUCT_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite, Category = "User|Member")
-    int32 userId;
-    UPROPERTY(BlueprintReadWrite, Category = "User|Member")
-    FCharacterInfo characterInfo;
-    UPROPERTY(BlueprintReadWrite, Category = "User|Member")
-    FDevInfo devInfo;
-    UPROPERTY(BlueprintReadWrite, Category = "User|Member")
-    int32 experienceValue;
-    UPROPERTY(BlueprintReadWrite, Category = "User|Member")
-    int32 businessId;
-    UPROPERTY(BlueprintReadWrite, Category = "User|Member")
-    FString nickname;
+    UPROPERTY(BlueprintReadWrite, Category = "API")
+    int32 UserId;
+
+    UPROPERTY(BlueprintReadWrite, Category = "API")
+    FCharacterInfo CharacterInfo;
+
+    UPROPERTY(BlueprintReadWrite, Category = "API")
+    FDevInfo DevInfoDTO;
+
+    UPROPERTY(BlueprintReadWrite, Category = "API")
+    int32 ExperienceValue;
+
+    UPROPERTY(BlueprintReadWrite, Category = "API")
+    int32 BusinessId;
+
+    UPROPERTY(BlueprintReadWrite, Category = "API")
+    FString Nickname;
 };
 
 // Response Structures
