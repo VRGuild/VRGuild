@@ -56,4 +56,14 @@ protected:
     void OnDeveloperGetByUserIdCallBack(const FDevInfo& DeveloperInfo);
     UFUNCTION(BlueprintImplementableEvent, Category = "Developer API")
     void OnFailDeveloperGetByUserIdCallBack();
+
+
+    // Get Developer By UserId
+    UFUNCTION(BlueprintCallable, Category = "Developer API")
+    void DeveloperReviewGetCall(const int32& page);
+    void DeveloperReviewGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Developer API")
+    void OnDeveloperReviewGetCallBack(const FDeveloperListResponse& DeveloperInfo);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Developer API")
+    void OnFailDeveloperReviewGetCallBack();
 };

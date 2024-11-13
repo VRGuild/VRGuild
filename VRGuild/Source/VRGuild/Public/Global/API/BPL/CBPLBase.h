@@ -88,6 +88,8 @@ struct FDevInfo
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
+    int64 userId = 0;
+    UPROPERTY(BlueprintReadWrite, Category = "Developer")
     int64 devId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FString devName;
