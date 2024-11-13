@@ -57,6 +57,7 @@ ACANoticeBoard::ACANoticeBoard()
 	bDisplayRefreshButton = false;
 
 	SpawnedActorScale = .5f;
+	MaxPosterNumbers = -1;
 }
 
 void ACANoticeBoard::BeginPlay()
@@ -217,7 +218,7 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReview
 			int32 index = horizontalCount * i + j;
 
 			if (!DevInfoList.IsValidIndex(index)) return; // can't post anymore posters 
-
+			
 			FTransform trans;
 			FVector widthVector = widthDir * FMath::Abs(horiLength + spacerWidth) * j;
 			FVector heigthVector = heightDir * FMath::Abs(vertiLength + spacerHeight) * i;
@@ -227,6 +228,8 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReview
 			trans.SetRotation(GetActorRotation().Quaternion());
 
 			SpawnNoticePoster(ReviewNoticeClass, trans, DevInfoList[index]);
+
+			if (MaxPosterNumbers == index + 1) return;
 		}
 	}
 }
