@@ -28,11 +28,16 @@ private:
     FString BoundaryBegin = FString();
     FString BoundaryEnd = FString();
 
+protected:
 
     // Main function for upload
     UFUNCTION(BlueprintCallable)
     void UploadFile(const FFileData& FullFilePath);
 
+    UFUNCTION(BlueprintCallable)
+    void UploadMultyFile(const FFileInfoDatas& FullFilePath);
+    UFUNCTION(BlueprintCallable)
+    void UploadMultyBinary(const FFileDatas& FullFilePath);
     // This is a function to add simple text fields to response
     FString AddData(FString Name, FString Value);
 

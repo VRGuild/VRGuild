@@ -87,10 +87,11 @@ struct FDevInfo
 {
     GENERATED_USTRUCT_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite, Category = "Developer")
-    int64 userId = 0;
+
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     int64 devId = 0;
+    UPROPERTY(BlueprintReadWrite, Category = "Developer")
+    int64 userId = 0;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FString devName;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
@@ -100,7 +101,7 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FString githubLink;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
-    TArray<FString> portfolioUrlList;
+    TArray<FString> portfolioList;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FString career;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
@@ -110,7 +111,7 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FString hope;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
-    FDateTime createAt;
+    FDateTime createdAt;  // createAt -> createdAt
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FDateTime modifiedAt;
 };
