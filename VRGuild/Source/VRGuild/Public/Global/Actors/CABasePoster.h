@@ -22,6 +22,7 @@ public:
 	ACABasePoster();
 
 	virtual void BeginInteract(ACharacter* Initiator) override;
+	virtual void EndInteract(ACharacter* Initiator) override;
 
 	virtual UUserWidget* GetPosterDisplayWidget() const;
 
@@ -80,4 +81,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Settings|Player")
 	FString PlayerCarryingMessage;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
+	bool bCanCarry;
 };

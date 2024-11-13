@@ -9,7 +9,10 @@
 #include "Global/Widgets/CWScrollBase.h"
 #include "Global/CACarryInteractable.h"
 #include "Global/Actors/CABasePoster.h"
+#include "Hall/Board/CAReviewNotice.h"
 #include "Global/CACarryInteractable.h"
+
+#include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 
 UCACCarry::UCACCarry()
 {
@@ -47,27 +50,38 @@ void UCACCarry::StartCarry(ACACarryInteractable* actorToHold)
 
 	bProcessingHold = true;
 
-	if (IsValid(ScrollBaseWidget))
+	if (actorToHold->GetLocalRole() == ROLE_Authority)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.1, remove %s from parent"), *GetNameSafe(ScrollBaseWidget));
-		ScrollBaseWidget->RemoveFromParent();
-		ScrollBaseWidget = nullptr;
+		StartDrop(true);
+
+		Read(actorToHold);		
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.2"));
-
-	if (IsValid(ActorInHand))
+	else
 	{
-		ActorInHand->Destroy();
-		ActorInHand = nullptr;
-	}
+		if (IsValid(ScrollBaseWidget))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.1, remove %s from parent"), *GetNameSafe(ScrollBaseWidget));
+			ScrollBaseWidget->RemoveFromParent();
+			ScrollBaseWidget = nullptr;
+		}
 
-	ServerHold(actorToHold);
+		UE_LOG(LogTemp, Warning, TEXT("Carry: 1111.2"));
+
+		if (IsValid(ActorInHand))
+		{
+			ActorInHand->Destroy();
+			ActorInHand = nullptr;
+		}
+
+		ServerHold(actorToHold);
+	}	
 }
 
 void UCACCarry::StartDrop(bool bDoServerRPC)
 {
-	if (/*ScrollBaseWidget && */ActorInHand)
+	HideCarryWidget();
+
+	if (ActorInHand)
 	{
 		if (IsValid(ScrollBaseWidget))
 		{
@@ -87,6 +101,27 @@ void UCACCarry::StartDrop(bool bDoServerRPC)
 			ServerDrop();
 		}
 	}
+}
+
+void UCACCarry::Read(ACACarryInteractable* ActorToRead)
+{	
+	if (auto Review = Cast<ACAReviewNotice>(ActorToRead))
+	{
+		ATP_ThirdPersonCharacter::SetInteracting(Owner, true);
+
+		ReadWidget = Review->GetPosterDisplayWidget();
+
+		ReadWidget->AddToViewport(-1);
+	}
+
+	bProcessingHold = false;
+}
+
+void UCACCarry::StopReading()
+{
+	ATP_ThirdPersonCharacter::SetInteracting(Owner, false);
+	ReadWidget->RemoveFromParent();
+	ReadWidget = nullptr;
 }
 
 void UCACCarry::HideCarryWidget()

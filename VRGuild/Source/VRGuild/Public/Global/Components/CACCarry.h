@@ -32,6 +32,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartDrop(bool bDoServerRPC = true);
 
+	UFUNCTION()
+	void Read(ACACarryInteractable* ActorToRead);
+	UFUNCTION(BlueprintCallable)
+	void StopReading();
+
+
 	UFUNCTION(BlueprintCallable)
 	void HideCarryWidget();
 	UFUNCTION(BlueprintCallable)
@@ -49,6 +55,9 @@ private:
 	TObjectPtr<ACharacter> Owner;
 	UPROPERTY()
 	TObjectPtr<UCWScrollBase> ScrollBaseWidget;
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> ReadWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess))
 	TSubclassOf<UCWScrollBase> ScrollBaseWidgetClass;

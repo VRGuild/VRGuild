@@ -85,5 +85,6 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta=(AllowPrivateAccess))
 	TSubclassOf<UCWDisplayMessage> DisplayMsgWidgetClass;
+	UPROPERTY()
 	TObjectPtr<UCWDisplayMessage> DisplayWidget;
 };

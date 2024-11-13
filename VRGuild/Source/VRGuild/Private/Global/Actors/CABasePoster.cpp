@@ -19,6 +19,8 @@ ACABasePoster::ACABasePoster()
 	this->SetRootComponent(this->RootSceneComp);*/
 
 	bReplicates = true;
+	
+	bCanCarry = true;
 
 	this->FrontSideComp = CreateDefaultSubobject<UWidgetComponent>(FName("FrontSide"));
 	this->FrontSideComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -64,11 +66,30 @@ ACABasePoster::ACABasePoster()
 
 void ACABasePoster::BeginInteract(ACharacter* Initiator)
 {
-	Super::BeginInteract(Initiator);
-
-	if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+	if (bCanCarry)
 	{
-		montageComp->StartAnimMontage(EAnimMontageType::PICKUP);
+		Super::BeginInteract(Initiator);
+
+		if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+		{
+			montageComp->StartAnimMontage(EAnimMontageType::PICKUP);
+		}
+	}
+	else
+	{
+
+	}
+}
+
+void ACABasePoster::EndInteract(ACharacter* Initiator)
+{
+	if (bCanCarry)
+	{
+		Super::EndInteract(Initiator);
+	}	
+	else
+	{
+
 	}
 }
 
