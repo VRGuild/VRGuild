@@ -104,7 +104,8 @@ private:
 
 	EFeatureType FeatureType;
 	TArray<ACABasePoster*> Posters;
-	
+	UPROPERTY(EditInstanceOnly, meta = (AllowPrivateAccess), Category = "Settings|Interactions")
+	int32 MaxPosterNumbers;
 	UPROPERTY(EditInstanceOnly, meta = (AllowPrivateAccess), Category = "Settings|Interactions")
 	bool bDisplayRefreshButton;
 };
