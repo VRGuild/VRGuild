@@ -152,7 +152,6 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& projectNo
 	//
 	for (auto test: projectNoticeList.data)
 	{
-		UE_LOG(LogTemp, Display, TEXT("test %d"), test.devId );
 	}
 }
 
