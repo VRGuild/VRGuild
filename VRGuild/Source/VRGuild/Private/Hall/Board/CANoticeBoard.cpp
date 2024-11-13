@@ -49,6 +49,7 @@ ACANoticeBoard::ACANoticeBoard()
 	LeftSize->SetRelativeLocation(FVector(0.f, -20.f, 0.f));
 	LeftSize->SetupAttachment(RootComponent);
 
+	StartLocation = FVector::Zero();
 	SpacerWidth += FVector(0.f, 15.f, 0.f);
 	SpacerHeight += FVector(0.f, 0.f, 15.f);
 
@@ -73,6 +74,7 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNot
 {
 	this->ProjectInfoList.Empty();
 	this->ProjectInfoList.Append(projectNoticeList.data);
+	Posters.Empty();
 
 	auto defaultObj = ProjectNoticeClass->GetDefaultObject<ACABasePoster>();
 	check(defaultObj);
@@ -147,11 +149,85 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNot
 	}
 }
 
-void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& projectNoticeList)
+void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReviewList)
 {
-	//
-	for (auto test: projectNoticeList.data)
+	this->DevInfoList.Empty();
+	this->DevInfoList.Append(devReviewList.data);
+	Posters.Empty();
+
+	auto defaultObj = ReviewNoticeClass->GetDefaultObject<ACABasePoster>();
+	check(defaultObj);
+
+	float horiLength = SpawnedActorScale * defaultObj->GetRightLength();
+	float vertiLength = SpawnedActorScale * defaultObj->GetTopLength();
+
+	float boardWidth = (TopSize->GetRelativeLocation() - BottomSize->GetRelativeLocation()).Length();
+	float boardHeight = (LeftSize->GetRelativeLocation() - RightSize->GetRelativeLocation()).Length();
+
+	float spacerWidth = (StartLocation - SpacerWidth).Length();
+	float spacerHeight = (StartLocation - SpacerHeight).Length();
+
+	TArray<FVector> nice;
+
+	FVector tempLoc = RightSize->GetRelativeLocation();
+	RightSize->SetRelativeLocation(StartLocation);
+	FVector startLoc = RightSize->GetComponentLocation();
+	RightSize->SetRelativeLocation(tempLoc);
+
+	int horizontalCount = 0;
+	FVector leftSize = LeftSize->GetComponentLocation();
+	leftSize.Z = startLoc.Z;
+	FVector widthDir = (leftSize - startLoc);
+	float maxWidth = widthDir.Length();
+	widthDir.Normalize();
+
+	DrawDebugLine(GetWorld(), startLoc, startLoc + widthDir * 200.f, FColor::Blue, true, 10.f, 0, 2.f);
+
+	float test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
+	float testHuh = FMath::Abs(maxWidth);
+	while (test < testHuh)
 	{
+		horizontalCount++;
+		test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
+	}
+
+	int verticalCount = 1;
+	FVector bottomSize = BottomSize->GetComponentLocation();
+	bottomSize.X = startLoc.X;
+	FVector heightDir = (bottomSize - startLoc);
+	float maxHeight = heightDir.Length();
+	heightDir.Normalize();
+
+	DrawDebugLine(GetWorld(), startLoc, startLoc + heightDir * 200.f, FColor::Red, true, 10.f, 0, 2.f);
+
+	float test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
+	float testHuh1 = FMath::Abs(maxHeight);
+	while (test1 < testHuh1)
+	{
+		verticalCount++;
+		test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("horizontalCount: %d, verticalCount: %d"), horizontalCount, verticalCount);
+
+	for (int i = 0; i < verticalCount; ++i)
+	{
+		for (int j = 0; j < horizontalCount; ++j)
+		{
+			int32 index = horizontalCount * i + j;
+
+			if (!DevInfoList.IsValidIndex(index)) return; // can't post anymore posters 
+
+			FTransform trans;
+			FVector widthVector = widthDir * FMath::Abs(horiLength + spacerWidth) * j;
+			FVector heigthVector = heightDir * FMath::Abs(vertiLength + spacerHeight) * i;
+
+			trans.SetLocation(startLoc + heigthVector + widthVector);
+			trans.SetScale3D(FVector(SpawnedActorScale));
+			trans.SetRotation(GetActorRotation().Quaternion());
+
+			SpawnNoticePoster(ReviewNoticeClass, trans, DevInfoList[index]);
+		}
 	}
 }
 
@@ -164,17 +240,21 @@ void ACANoticeBoard::SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNot
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	spawned->Init(projectInfo);
 	spawned->FinishSpawning(trans);
+
+	Posters.Add(spawned);
 }
 
-void ACANoticeBoard::SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FEvaluation evaluation)
+void ACANoticeBoard::SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FDevInfo devInfo)
 {
 	FActorSpawnParameters param;
 	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	auto spawned = GetWorld()->SpawnActorDeferred<ACAReviewNotice>(reviewNoticeClass, trans, nullptr, nullptr,
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-	spawned->Init(evaluation);
+	spawned->Init(devInfo);
 	spawned->FinishSpawning(trans);
+
+	Posters.Add(spawned);
 }
 
 void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
@@ -190,6 +270,8 @@ void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
 			UE_LOG(LogTemp, Warning, TEXT("What %s"), *GetNameSafe(poster));
 			poster->Destroy();
 		}
+
+		BP_MakeReview();
 		break;
 	}
 	}

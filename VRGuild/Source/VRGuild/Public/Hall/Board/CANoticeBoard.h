@@ -66,13 +66,15 @@ protected:
 	FVector SpacerHeight;
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_MakeReview();
+
 	UFUNCTION(BlueprintCallable)
 	void PostAllProjectNotice(FProjectDetailPagedResponse projectNoticeList);
 
 	UFUNCTION(BlueprintCallable)
-	void PostAllReviewNotice(const FDeveloperListResponse& projectNoticeList);
+	void PostAllReviewNotice(const FDeveloperListResponse& devReviewList);
 	
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	TSubclassOf<class ACAProjectNotice> ProjectNoticeClass;
@@ -82,6 +84,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FProjectWithDetail> ProjectInfoList;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FDevInfo> DevInfoList;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Settings")
 	EPosterType PosterType;
@@ -95,7 +100,7 @@ private:
 	void ResetFeatureType();
 
 	void SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNoticeClass, const FTransform& trans, FProjectWithDetail projectInfo);
-	void SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FEvaluation evaluation);
+	void SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FDevInfo devInfo);
 
 	EFeatureType FeatureType;
 	TArray<ACABasePoster*> Posters;
