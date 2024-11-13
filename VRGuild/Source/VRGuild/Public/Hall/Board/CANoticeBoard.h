@@ -70,7 +70,7 @@ protected:
 	void PostAllProjectNotice(FProjectDetailPagedResponse projectNoticeList);
 
 	UFUNCTION(BlueprintCallable)
-	void PostAllReviewNotice(FProjectListResponse projectNoticeList);
+	void PostAllReviewNotice(const FDeveloperListResponse& projectNoticeList);
 	
 
 protected:

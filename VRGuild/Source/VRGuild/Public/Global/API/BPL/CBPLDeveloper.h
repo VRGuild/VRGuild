@@ -27,6 +27,16 @@ public:
     FDevInfo data;
 };
 
+// Response Structure
+USTRUCT(BlueprintType)
+struct FDeveloperListResponse : public FBaseResponse
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FDevInfo> data;
+};
+
 UCLASS()
 class VRGUILD_API UCBPLDeveloper : public UBlueprintFunctionLibrary
 {

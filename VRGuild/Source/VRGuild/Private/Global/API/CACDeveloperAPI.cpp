@@ -26,6 +26,7 @@ void UCACDeveloperAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetDeveloperPattern(TEXT(R"(GET\s+/api/epic/developer$)"));
     FRegexPattern UpdateDeveloperPattern(TEXT(R"(PATCH\s+/api/epic/developer$)"));
     FRegexPattern GetDeveloperByUserIdPattern(TEXT(R"(GET\s+/api/epic/developer/users/(\d+)$)"));
+    FRegexPattern GetDeveloperReviewPattern(TEXT(R"(GET\s+/api/epic/developer/all\?page=(\d+)$)"));
 
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
@@ -50,6 +51,10 @@ void UCACDeveloperAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
         UE_LOG(LogTemp, Display, TEXT("GET Developer By User ID: %s"), *UserId);
         DeveloperGetByUserIdCallBack(req, res);
     }
+    else if (FRegexMatcher(GetDeveloperReviewPattern, UrlToMatch).FindNext())
+    {
+        DeveloperReviewGetCallBack(req, res);
+    }
 }
 
 void UCACDeveloperAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
@@ -58,6 +63,7 @@ void UCACDeveloperAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetDeveloperPattern(TEXT(R"(GET\s+/api/epic/developer$)"));
     FRegexPattern UpdateDeveloperPattern(TEXT(R"(PATCH\s+/api/epic/developer$)"));
     FRegexPattern GetDeveloperByUserIdPattern(TEXT(R"(GET\s+/api/epic/developer/users/(\d+)$)"));
+    FRegexPattern GetDeveloperReviewPattern(TEXT(R"(GET\s+/api/epic/developer/all\?page=(\d+)$)"));
 
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
 
@@ -76,6 +82,10 @@ void UCACDeveloperAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     else if (FRegexMatcher(GetDeveloperByUserIdPattern, UrlToMatch).FindNext())
     {
         OnFailDeveloperGetByUserIdCallBack();
+    }
+    else if (FRegexMatcher(GetDeveloperReviewPattern, UrlToMatch).FindNext())
+    {
+        OnFailDeveloperReviewGetCallBack();
     }
 }
 
@@ -133,4 +143,18 @@ void UCACDeveloperAPI::DeveloperGetByUserIdCallBack(FHttpRequestPtr req, FHttpRe
     FDeveloperResponse ParsedResponse = JsonPerse<FDeveloperResponse>(JsonString);
 
     OnDeveloperGetByUserIdCallBack(ParsedResponse.data);
+}
+
+void UCACDeveloperAPI::DeveloperReviewGetCall(const int32& page)
+{
+    this->API = FString::Printf(TEXT("api/epic/developer/all?page=%d"), page);
+    HttpGetCall();
+}
+
+void UCACDeveloperAPI::DeveloperReviewGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FDeveloperListResponse ParsedResponse = JsonPerse<FDeveloperListResponse>(JsonString);
+
+    OnDeveloperReviewGetCallBack(ParsedResponse);
 }

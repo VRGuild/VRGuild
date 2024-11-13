@@ -13,6 +13,7 @@
 #include "GameFramework/Character.h"
 #include "Components/SceneComponent.h"
 #include "Global/Actors/CABasePoster.h"
+#include "Global/API/BPL/CBPLDeveloper.h"
 
 // Sets default values
 ACANoticeBoard::ACANoticeBoard()
@@ -146,9 +147,13 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNot
 	}
 }
 
-void ACANoticeBoard::PostAllReviewNotice(FProjectListResponse projectNoticeList)
+void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& projectNoticeList)
 {
 	//
+	for (auto test: projectNoticeList.data)
+	{
+		UE_LOG(LogTemp, Display, TEXT("test %d"), test.devId );
+	}
 }
 
 void ACANoticeBoard::SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNoticeClass, const FTransform& trans, FProjectWithDetail projectInfo)
