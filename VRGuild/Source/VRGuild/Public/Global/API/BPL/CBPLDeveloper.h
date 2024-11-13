@@ -34,7 +34,7 @@ struct FDeveloperListResponse : public FBaseResponse
     GENERATED_USTRUCT_BODY()
 public:
     UPROPERTY(BlueprintReadWrite, Category = "API Response")
-    TArray<FDevInfo> data;
+    TArray<FDeveloperRequest> data;
 };
 
 

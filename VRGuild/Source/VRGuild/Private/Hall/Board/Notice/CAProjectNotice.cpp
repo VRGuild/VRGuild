@@ -70,7 +70,7 @@ void ACAProjectNotice::OnCompletedCallback()
 	UE_LOG(LogTemp, Warning, TEXT("OnCompletedCallback done in ACAProjectNotice"));
 }
 
-UUserWidget* ACAProjectNotice::GetPosterDisplayWidget() const
+UUserWidget* ACAProjectNotice::GetPosterDisplayWidget()
 {
 	auto widget = Super::GetPosterDisplayWidget();
 	auto ProjectAPIWidget = Cast<UCWGProjectNoticeFull>(widget);

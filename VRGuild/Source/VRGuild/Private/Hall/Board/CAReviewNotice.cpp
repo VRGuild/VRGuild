@@ -7,6 +7,7 @@
 #include "Hall/Board/Notice/UI/CWGReviewNotice.h"
 #include "GameFramework/Character.h"
 #include "Global/Components/CACCarry.h"
+#include "Global/API/CACCharacterAPI.h"
 
 ACAReviewNotice::ACAReviewNotice()
 {
@@ -43,12 +44,15 @@ void ACAReviewNotice::Init(bool bIsEnabled, ACharacter* owner, bool bAttachToOwn
 	}
 }
 
-void ACAReviewNotice::Init(const FDevInfo& newData) /*Change to FReviewNotice*/
+void ACAReviewNotice::Init(const FDeveloperRequest& newData) /*Change to FReviewNotice*/
 {
 	UE_LOG(LogTemp, Warning, TEXT("ReviewNotice SetNoticeData success"));
 
-	if (newData.devId != 0)
+	if (newData.devInfo.devId != 0)
+	{
 		DevData = newData;
+		UpdatePoster();
+	}
 }
 
 void ACAReviewNotice::OnCompletedCallback()
@@ -61,9 +65,13 @@ void ACAReviewNotice::OnCompletedCallback()
 	Destroy();
 }
 
-UUserWidget* ACAReviewNotice::GetPosterDisplayWidget() const
+UUserWidget* ACAReviewNotice::GetPosterDisplayWidget()
 {
-	return Super::GetPosterDisplayWidget();
+	UUserWidget* widget = Super::GetPosterDisplayWidget();
+
+	UpdatePoster(widget);
+
+	return widget;
 }
 
 bool ACAReviewNotice::CheckCanTrace(ACharacter* player) const
@@ -72,7 +80,7 @@ bool ACAReviewNotice::CheckCanTrace(ACharacter* player) const
 	{
 		if (auto carriedNotice = Cast<ACAReviewNotice>(carryComp->GetCarriedActor()))
 		{
-			return DevData.devId != carriedNotice->DevData.devId;
+			return DevData.devInfo.devId != carriedNotice->DevData.devInfo.devId;
 		}
 	}
 

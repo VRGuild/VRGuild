@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Global/API/BPL/CBPLProject.h"
+#include "Global/API/BPL/CBPLDeveloper.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -86,7 +87,7 @@ protected:
 	TArray<FProjectWithDetail> ProjectInfoList;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<FDevInfo> DevInfoList;
+	TArray<FDeveloperRequest> DevInfoList;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Settings")
 	EPosterType PosterType;
@@ -100,7 +101,7 @@ private:
 	void ResetFeatureType();
 
 	void SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNoticeClass, const FTransform& trans, FProjectWithDetail projectInfo);
-	void SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FDevInfo devInfo);
+	void SpawnNoticePoster(TSubclassOf<ACAReviewNotice> reviewNoticeClass, const FTransform& trans, FDeveloperRequest devInfo);
 
 	EFeatureType FeatureType;
 	TArray<ACABasePoster*> Posters;

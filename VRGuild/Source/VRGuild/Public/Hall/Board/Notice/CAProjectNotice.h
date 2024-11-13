@@ -22,7 +22,7 @@ public:
 	void Init(const FProjectWithDetail& newData);
 
 	virtual void OnCompletedCallback() override;
-	virtual UUserWidget* GetPosterDisplayWidget() const override;
+	virtual UUserWidget* GetPosterDisplayWidget() override;
 protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	FProjectWithDetail NoticeData;
