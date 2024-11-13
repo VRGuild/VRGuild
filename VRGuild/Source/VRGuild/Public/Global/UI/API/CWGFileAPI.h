@@ -7,15 +7,15 @@
 #include "CWGFileAPI.generated.h"
 
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FFileUploadResponse
 {
     GENERATED_BODY()
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadWrite, Category = "API File")
     TArray<FString> fileURLs;
 
-    UPROPERTY()
+    UPROPERTY(BlueprintReadWrite, Category = "API File")
     FString message;
 };
 
@@ -29,7 +29,7 @@ class VRGUILD_API UCWGFileAPI : public UCWGBaseAPI
 	GENERATED_BODY()
 public:
     UFUNCTION(BlueprintImplementableEvent)
-    void OnFileUploadCallBack(const FString& fileUrl);
+    void OnFileUploadCallBack(const FFileUploadResponse& fileUrl);
     UFUNCTION(BlueprintImplementableEvent)
     void OnFailFileUploadCallBack();
 
@@ -45,8 +45,7 @@ private:
 protected:
 
     // Main function for upload
-    UFUNCTION(BlueprintCallable)
-    void UploadFile(const FFileData& FullFilePath);
+
 
     UFUNCTION(BlueprintCallable)
     void UploadMultyFile(const FFileInfoDatas& FullFilePath);
@@ -55,4 +54,7 @@ protected:
     // This is a function to add simple text fields to response
     FString AddData(FString Name, FString Value);
 
+
+    //UFUNCTION(BlueprintCallable)
+    //void UploadFile(const FFileData& FullFilePath);
 };

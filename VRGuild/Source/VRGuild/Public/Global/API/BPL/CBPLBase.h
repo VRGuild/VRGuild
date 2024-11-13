@@ -103,6 +103,8 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     TArray<FString> portfolioList;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
+    TArray<FString> portfolioUrlList;
+    UPROPERTY(BlueprintReadWrite, Category = "Developer")
     FString career;
     UPROPERTY(BlueprintReadWrite, Category = "Developer")
     TArray<FSkillCategoryInfo> skillCategoryList;
