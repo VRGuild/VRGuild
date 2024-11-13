@@ -22,7 +22,7 @@ protected:
 
     // Create Developer
     UFUNCTION(BlueprintCallable, Category = "Developer API")
-    void DeveloperCreateCall(const FDeveloperRequest& Request);
+    void DeveloperCreateCall(const FDevCreateInfo& Request);
     void DeveloperCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Developer API")
     void OnDeveloperCreateCallBack(const FDevInfo& DeveloperInfo);
