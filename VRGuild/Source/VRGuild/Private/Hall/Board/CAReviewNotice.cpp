@@ -8,6 +8,11 @@
 #include "GameFramework/Character.h"
 #include "Global/Components/CACCarry.h"
 
+ACAReviewNotice::ACAReviewNotice()
+{
+	bReplicates = true;
+}
+
 void ACAReviewNotice::BeginPlay()
 {
 	Super::BeginPlay();

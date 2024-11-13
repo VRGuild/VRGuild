@@ -100,8 +100,6 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNot
 	float maxWidth = widthDir.Length();
 	widthDir.Normalize();
 
-	DrawDebugLine(GetWorld(), startLoc, startLoc + widthDir * 200.f, FColor::Blue, true, 10.f, 0, 2.f);
-
 	float test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
 	float testHuh = FMath::Abs(maxWidth);
 	while (test < testHuh)
@@ -116,8 +114,6 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNot
 	FVector heightDir = (bottomSize - startLoc);
 	float maxHeight = heightDir.Length();
 	heightDir.Normalize();
-
-	DrawDebugLine(GetWorld(), startLoc, startLoc + heightDir * 200.f, FColor::Red, true, 10.f, 0, 2.f);
 
 	float test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
 	float testHuh1 = FMath::Abs(maxHeight);
@@ -182,8 +178,6 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReview
 	float maxWidth = widthDir.Length();
 	widthDir.Normalize();
 
-	DrawDebugLine(GetWorld(), startLoc, startLoc + widthDir * 200.f, FColor::Blue, true, 10.f, 0, 2.f);
-
 	float test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
 	float testHuh = FMath::Abs(maxWidth);
 	while (test < testHuh)
@@ -198,8 +192,6 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReview
 	FVector heightDir = (bottomSize - startLoc);
 	float maxHeight = heightDir.Length();
 	heightDir.Normalize();
-
-	DrawDebugLine(GetWorld(), startLoc, startLoc + heightDir * 200.f, FColor::Red, true, 10.f, 0, 2.f);
 
 	float test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
 	float testHuh1 = FMath::Abs(maxHeight);

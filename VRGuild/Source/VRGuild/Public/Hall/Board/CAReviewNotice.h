@@ -12,6 +12,9 @@ UCLASS()
 class VRGUILD_API ACAReviewNotice : public ACABasePoster
 {
 	GENERATED_BODY()
+public:
+	ACAReviewNotice();
+
 protected:
 	virtual void BeginPlay() override;
 
