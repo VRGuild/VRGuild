@@ -75,7 +75,7 @@ void ACAInteractable::BeginTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayTraceMessage(true, GetTraceMessage(Initiator));
+		//GameInstance->DisplayTraceMessage(true, GetTraceMessage(Initiator));
 
 		TraceBegin();
 	}
@@ -85,7 +85,7 @@ void ACAInteractable::EndTrace(ACharacter* Initiator)
 {
 	if (ensure(GameInstance))
 	{
-		GameInstance->DisplayTraceMessage(false, GetTraceMessage(Initiator));
+		//GameInstance->DisplayTraceMessage(false, GetTraceMessage(Initiator));
 
 		TraceEnd();
 	}
