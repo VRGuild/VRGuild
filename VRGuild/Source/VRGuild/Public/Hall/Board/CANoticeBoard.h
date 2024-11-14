@@ -47,7 +47,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMesh* BoardMesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Settings|Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Components")
 	TObjectPtr<UTestWidgetComp> WidgetCompCancelButton;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
@@ -67,8 +67,17 @@ protected:
 	FVector SpacerHeight;
 
 protected:
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartTrace();
+	UFUNCTION(BlueprintImplementableEvent)
+	void EndTrace();
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void BP_MakeReview();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_MakeProjects();
 
 	UFUNCTION(BlueprintCallable)
 	void PostAllProjectNotice(FProjectDetailPagedResponse projectNoticeList);
@@ -95,9 +104,17 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "Settings")
 	float SpawnedActorScale;
 
-private:
 	void RefreshBoard(ACharacter* initiator);
 	
+	UFUNCTION(Server, Reliable)
+	void ServerRefreshBoard(ACharacter* initiator);
+	
+	virtual void OnRep_Owner() override;
+
+private:
+
+	bool bUpdating = false;
+
 	void ResetFeatureType();
 
 	void SpawnProjectPoster(TSubclassOf<ACAProjectNotice> projectNoticeClass, const FTransform& trans, FProjectWithDetail projectInfo);

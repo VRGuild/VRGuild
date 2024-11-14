@@ -19,6 +19,8 @@
 #include "Components/WidgetInteractionComponent.h"
 #include "Components/WidgetComponent.h"
 
+#include "Global/Widgets/TestWidgetComp.h"
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -28,7 +30,7 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	
+
 	//Overlap with Portal
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Overlap);
 
@@ -148,7 +150,7 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-	
+
 	WidgetInteractionComp->OnHoveredWidgetChanged.AddDynamic(this, &ATP_ThirdPersonCharacter::OnWidgetHoveredChanged);
 }
 
@@ -161,34 +163,44 @@ void ATP_ThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 void ATP_ThirdPersonCharacter::SetCustomValue(FCharacterCustomData data)
 {
-	/*FCharacterCustomData stuff; 
+	/*FCharacterCustomData stuff;
 	stuff.Selections.Empty();
 	stuff.Selections.Add(1);
 	stuff.Selections.Add(1);
 	stuff.Selections.Add(1);
-	
+
 	CustomValues = stuff;*/
-	for(int i = 0; i < data.Selections.Num(); ++i)
-		UE_LOG(LogTemp, Warning, TEXT("[%d]SetCustomValue %d"),i, data.Selections[i]);
+	for (int i = 0; i < data.Selections.Num(); ++i)
+		UE_LOG(LogTemp, Warning, TEXT("[%d]SetCustomValue %d"), i, data.Selections[i]);
 
 	CustomValues = data;
-	if(GetController() && GetController()->IsLocalPlayerController()) 
+	if (GetController() && GetController()->IsLocalPlayerController())
 		OnRep_CustomValues();
 }
 
 void ATP_ThirdPersonCharacter::OnWidgetHoveredChanged(UWidgetComponent* WidgetComponent, UWidgetComponent* PreviousWidgetComponent)
 {
-	UE_LOG(LogTemp, Warning, TEXT("WidgetComp hover. Current %s, Prev %s [%s]"), 
-		*GetNameSafe(WidgetComponent), *GetNameSafe(WidgetComponent),
-		GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER")
-	);
+	if (WidgetComponent)
+	{
+		if (WidgetComp = Cast<UTestWidgetComp>(WidgetComponent))
+		{
+			WidgetComp->StartTrace();
+		}
+	}
+	else
+	{
+		if (WidgetComp)
+		{
+			WidgetComp->EndTrace();
+		}
+	}
 }
 
 void ATP_ThirdPersonCharacter::OnRep_CustomValues()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[%s] OnRep_CustomValues"), 
+	UE_LOG(LogTemp, Warning, TEXT("[%s] OnRep_CustomValues"),
 		GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
-	
+
 	for (TActorIterator<ATP_ThirdPersonCharacter> iter(GetWorld()); iter; ++iter)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[%s]"), *GetNameSafe(*iter));
@@ -209,10 +221,10 @@ void ATP_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -246,7 +258,7 @@ void ATP_ThirdPersonCharacter::Move(const FInputActionValue& Value)
 
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
+
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
@@ -292,5 +304,5 @@ void ATP_ThirdPersonCharacter::Discard(const FInputActionValue& Value)
 	if (CarryComponent && CarryComponent->GetCarriedActor())
 	{
 		DiscardCarryObject();
-	}	
+	}
 }

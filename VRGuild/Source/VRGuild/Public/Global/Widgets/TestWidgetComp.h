@@ -21,6 +21,10 @@ class VRGUILD_API UTestWidgetComp : public UWidgetComponent
 public:
 	UTestWidgetComp();
 
+
+
+	void StartTrace();
+	void EndTrace();
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitializeComponent() override;

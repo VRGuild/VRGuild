@@ -210,7 +210,7 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReview
 			int32 index = horizontalCount * i + j;
 
 			if (!DevInfoList.IsValidIndex(index)) return; // can't post anymore posters 
-			
+
 			FTransform trans;
 			FVector widthVector = widthDir * FMath::Abs(horiLength + spacerWidth) * j;
 			FVector heigthVector = heightDir * FMath::Abs(vertiLength + spacerHeight) * i;
@@ -269,7 +269,34 @@ void ACANoticeBoard::RefreshBoard(ACharacter* initiator)
 		BP_MakeReview();
 		break;
 	}
+	case EPosterType::PROJECT:
+	{
+		if (GetOwner() == nullptr)
+			ATP_ThirdPersonCharacter::SetOwnerFor(this, initiator);
+		else ServerRefreshBoard(initiator);
 	}
+	}
+}
+
+void ACANoticeBoard::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+
+	if (PosterType == EPosterType::PROJECT)
+	{
+		ServerRefreshBoard(GetOwner<ACharacter>());
+	}
+}
+
+void ACANoticeBoard::ServerRefreshBoard_Implementation(ACharacter* initiator)
+{
+	for (auto poster : Posters)
+	{
+		if (poster) poster->Destroy();
+	}
+	Posters.Empty();
+
+	BP_MakeProjects();
 }
 
 void ACANoticeBoard::ResetFeatureType()
