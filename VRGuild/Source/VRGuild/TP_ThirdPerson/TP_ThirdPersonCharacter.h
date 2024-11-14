@@ -21,6 +21,8 @@ struct FInputActionValue;
 class UCACInteraction;
 class UCACCarry;
 
+class UTestWidgetComp;
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
@@ -133,5 +135,8 @@ private:
 
 	bool bIsInteracting;
 	FVector2D MousePos;
+
+	UPROPERTY()
+	TObjectPtr<UTestWidgetComp> WidgetComp;
 };
 

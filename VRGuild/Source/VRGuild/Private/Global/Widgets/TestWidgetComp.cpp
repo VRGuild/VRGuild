@@ -14,6 +14,19 @@ UTestWidgetComp::UTestWidgetComp()
 	FeatureType = EFeatureType::NONE;
 }
 
+void UTestWidgetComp::StartTrace()
+{
+	if (NoticeBoard)
+		NoticeBoard->StartTrace();
+
+}
+
+void UTestWidgetComp::EndTrace()
+{
+	if (NoticeBoard)
+		NoticeBoard->EndTrace();
+}
+
 void UTestWidgetComp::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,6 +42,8 @@ void UTestWidgetComp::BeginPlay()
 	}
 }
 
+
+
 void UTestWidgetComp::InitializeComponent()
 {
 	Super::InitializeComponent();
@@ -42,7 +57,11 @@ void UTestWidgetComp::OnButtonReleased()
 	{
 	case EFeatureType::REFRESH:
 	{
-		NoticeBoard->RefreshBoard(nullptr);
+		auto what = GetUserWidgetObject();
+		if (auto widget = Cast<UCWBaseWorld>(what))
+		{
+			NoticeBoard->RefreshBoard(widget->GetOwningPlayerPawn<ACharacter>());
+		}		
 		break;
 	}
 	}
