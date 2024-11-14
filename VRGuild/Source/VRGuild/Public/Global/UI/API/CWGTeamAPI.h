@@ -75,4 +75,15 @@ public:
     void OnTeamApplyCallBack(const FTeamInfo& TeamInfo);
     UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
     void OnFailTeamApplyCallBack(const FString& ErrorMessage);
+
+
+    // Get User Team List
+    UFUNCTION(BlueprintCallable, Category = "Team API")
+    void TeamListByLeaderGetCall();
+    void TeamListByLeaderGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnTeamListByLeaderGetCallBack(const FTeamListResponse& TeamList);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Team API")
+    void OnFailTeamListLeaderGetCallBack(const FString& ErrorMessage);
+
 };
