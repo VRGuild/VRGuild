@@ -20,7 +20,7 @@ class VRGUILD_API UCWGBaseAPI : public UUserWidget
 
 protected:
 	//FString URL = "http://192.168.0.38:8443/"; // Base URL
-	FString URL = "https://triplay.site/"; // Base URL
+	FString URL = "http://triplay.site/"; // Base URL
 
 protected:
 	bool bHttpWaitResponse = false;
@@ -116,6 +116,12 @@ public:
 		UE_LOG(LogTemp, Display, TEXT("HttpPatchCall"));
 		HttpJsonContentTypeCall<T>(sendData, "PATCH");
 	};
+
+	void HttpPatchCall() {
+		UE_LOG(LogTemp, Display, TEXT("HttpPatchCall"));
+		HttpJsonContentTypeCall("PATCH");
+	};
+
 
 	void HttpCallBack(FHttpRequestPtr req, FHttpResponsePtr res, bool bConnectedSuccessfully);
 

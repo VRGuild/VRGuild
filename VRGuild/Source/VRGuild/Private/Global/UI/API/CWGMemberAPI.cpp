@@ -46,6 +46,8 @@ void UCWGMemberAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern AcceptMemberPattern(TEXT(R"(GET\s+/api/member/apply/(\d+)$)"));
     FRegexPattern RejectMemberPattern(TEXT(R"(GET\s+/api/member/except/(\d+)$)"));
     FRegexPattern DeleteMemberPattern(TEXT(R"(DELETE\s+/api/member/delete/(\d+)$)"));
+    FRegexPattern AcceptNewMemberPattern(TEXT(R"(PATCH\s+/api/member/accept/(\d+)$)"));
+    FRegexPattern RejectNewMemberPattern(TEXT(R"(PATCH\s+/api/member/reject/(\d+)$)"));
 
     if (FRegexMatcher(GetMemberPattern, UrlToMatch).FindNext())
     {
@@ -59,7 +61,15 @@ void UCWGMemberAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     {
         OnFailMemberRejectCallBack();
     }
-    else if (FRegexMatcher(DeleteMemberPattern, UrlToMatch).FindNext())
+    else if (FRegexMatcher(AcceptNewMemberPattern, UrlToMatch).FindNext())
+    {
+        OnFailMemberNewAccpetCallBack("error reject");
+    }
+    else if (FRegexMatcher(RejectNewMemberPattern, UrlToMatch).FindNext())
+    {
+        OnFailMemberNewRejectCallBack("error reject");
+    }
+    else if (FRegexMatcher(RejectMemberPattern, UrlToMatch).FindNext())
     {
         FString ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다.");
         if (res->GetResponseCode() == 400)
@@ -76,9 +86,9 @@ void UCWGMemberAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCWGMemberAPI::MemberGetCall(const FString& MemberId)
+void UCWGMemberAPI::MemberGetCall(const int64& MemberId)
 {
-    this->API = FString::Printf(TEXT("api/member/%s"), *MemberId);
+    this->API = FString::Printf(TEXT("api/member/%d"), MemberId);
     HttpGetCall();
 }
 
@@ -128,3 +138,28 @@ void UCWGMemberAPI::MemberDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr r
 {
     OnMemberDeleteCallBack();
 }
+
+
+void UCWGMemberAPI::MemberNewAccpetCall(const int64& MemberId)
+{
+    this->API = FString::Printf(TEXT("api/member/accept/%d"), MemberId);
+    HttpPatchCall();
+}
+
+void UCWGMemberAPI::MemberNewAccpetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    OnMemberNewAccpetCallBack();
+}
+
+void UCWGMemberAPI::MemberNewRejectCall(const int64& MemberId)
+{
+    this->API = FString::Printf(TEXT("api/member/reject/%d"), MemberId);
+    HttpPatchCall();
+}
+
+void UCWGMemberAPI::MemberNewRejectCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    OnMemberNewRejectCallBack();
+}
+
+

@@ -15,6 +15,9 @@ void UCWGTeamAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetUserTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist/user/(\d+)$)"));
     FRegexPattern ApplyTeamPattern(TEXT(R"(PATCH\s+/api/team/apply$)"));
 
+
+    FRegexPattern GetTeamLeaderTeamListPattern(TEXT(R"(GET\s+/api/team/leader$)"));
+
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
 
@@ -42,6 +45,10 @@ void UCWGTeamAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     {
         TeamApplyCallBack(req, res);
     }
+    else if (FRegexMatcher(GetTeamLeaderTeamListPattern, UrlToMatch).FindNext())
+    {
+        TeamListByLeaderGetCallBack(req, res);
+    }
 }
 
 void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
@@ -54,6 +61,8 @@ void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern GetTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist$)"));
     FRegexPattern GetUserTeamListPattern(TEXT(R"(GET\s+/api/team/teamlist/user/(\d+)$)"));
     FRegexPattern ApplyTeamPattern(TEXT(R"(PATCH\s+/api/team/apply$)"));
+
+    FRegexPattern GetTeamLeaderTeamListPattern(TEXT(R"(GET\s+/api/team/leader$)"));
 
     FString ErrorMessage;
     if (res && res->GetResponseCode() == 400)
@@ -91,6 +100,10 @@ void UCWGTeamAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     else if (FRegexMatcher(ApplyTeamPattern, UrlToMatch).FindNext())
     {
         OnFailTeamApplyCallBack(ErrorMessage);
+    }
+    else if (FRegexMatcher(GetTeamLeaderTeamListPattern, UrlToMatch).FindNext())
+    {
+        OnFailTeamListLeaderGetCallBack(ErrorMessage);
     }
 }
 
@@ -178,4 +191,20 @@ void UCWGTeamAPI::TeamApplyCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     FTeamDetailResponse ParsedResponse = JsonPerse<FTeamDetailResponse>(JsonString);
 
     OnTeamApplyCallBack(ParsedResponse.data);
+}
+
+
+void UCWGTeamAPI::TeamListByLeaderGetCall()
+{
+    this->API = FString::Printf(TEXT("api/team/leader"));
+
+    HttpGetCall();
+}
+
+void UCWGTeamAPI::TeamListByLeaderGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+    FString JsonString = res->GetContentAsString();
+    FTeamListResponse ParsedResponse = JsonPerse<FTeamListResponse>(JsonString);
+
+    OnTeamListByLeaderGetCallBack(ParsedResponse);
 }

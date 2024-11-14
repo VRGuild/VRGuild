@@ -23,7 +23,7 @@ protected:
 
     // Get Member Info
     UFUNCTION(BlueprintCallable, Category = "Member API")
-    void MemberGetCall(const FString& MemberId);
+    void MemberGetCall(const int64& MemberId);
     void MemberGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
     UFUNCTION(BlueprintImplementableEvent, Category = "Member API")
     void OnMemberGetCallBack(const FMemberInfo& MemberInfo);
@@ -56,5 +56,24 @@ protected:
     void OnMemberDeleteCallBack();
     UFUNCTION(BlueprintImplementableEvent, Category = "Member API")
     void OnFailMemberDeleteCallBack(const FString& ErrorMessage);
+
+
+    // accept Member
+    UFUNCTION(BlueprintCallable, Category = "Member API")
+    void MemberNewAccpetCall(const int64& MemberId);
+    void MemberNewAccpetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Member API")
+    void OnMemberNewAccpetCallBack();
+    UFUNCTION(BlueprintImplementableEvent, Category = "Member API")
+    void OnFailMemberNewAccpetCallBack(const FString& ErrorMessage);
+    // Reject Member
+    UFUNCTION(BlueprintCallable, Category = "Member API")
+    void MemberNewRejectCall(const int64& MemberId);
+    void MemberNewRejectCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+    UFUNCTION(BlueprintImplementableEvent, Category = "Member API")
+    void OnMemberNewRejectCallBack();
+    UFUNCTION(BlueprintImplementableEvent, Category = "Member API")
+    void OnFailMemberNewRejectCallBack(const FString& ErrorMessage);
+
 
 };
