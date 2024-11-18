@@ -115,14 +115,14 @@ void ACABasePoster::ExecuteOnCompletedDelegate()
 	ServerExecuteOnCompletedDelegate();
 }
 
-float ACABasePoster::GetRightLength() const
+float ACABasePoster::GetWidth() const
 {
 	return (LeftSize->GetRelativeLocation() - RightSize->GetRelativeLocation()).Length();
 }
 
-float ACABasePoster::GetTopLength() const
+float ACABasePoster::GetHeight() const
 {
-	return (LeftSize->GetRelativeLocation() - TopSize->GetRelativeLocation()).Length();
+	return (BottomSize->GetRelativeLocation() - TopSize->GetRelativeLocation()).Length();
 }
 
 void ACABasePoster::OnCompletedCallback()
