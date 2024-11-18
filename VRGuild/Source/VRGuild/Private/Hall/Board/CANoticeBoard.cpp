@@ -15,6 +15,8 @@
 #include "Global/Actors/CABasePoster.h"
 #include "Global/API/BPL/CBPLDeveloper.h"
 
+#include <random>
+
 // Sets default values
 ACANoticeBoard::ACANoticeBoard()
 {
@@ -58,6 +60,10 @@ ACANoticeBoard::ACANoticeBoard()
 
 	SpawnedActorScale = .5f;
 	MaxPosterNumbers = -1;
+
+	RollRange = 3.f;
+	ScaleRange = 0.05f;
+	LocRange = 7.f;
 }
 
 void ACANoticeBoard::BeginPlay()
@@ -77,71 +83,45 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNot
 	this->ProjectInfoList.Append(projectNoticeList.data);
 	Posters.Empty();
 
-	auto defaultObj = ProjectNoticeClass->GetDefaultObject<ACABasePoster>();
-	check(defaultObj);
+	FDataP data;
+	GetData(data, ProjectNoticeClass);
+	UE_LOG(LogTemp, Warning, TEXT("horizontalCount: %d, verticalCount: %d"), data.horizontalCount, data.verticalCount);
 
-	float horiLength = SpawnedActorScale * defaultObj->GetRightLength();
-	float vertiLength = SpawnedActorScale * defaultObj->GetTopLength();
-
-	float boardWidth = (TopSize->GetComponentLocation() - BottomSize->GetComponentLocation()).Length();
-	float boardHeight = (LeftSize->GetComponentLocation() - RightSize->GetComponentLocation()).Length();
-
-	float spacerWidth = (StartLocation - SpacerWidth).Length();
-	float spacerHeight = (StartLocation - SpacerHeight).Length();
-
-	TArray<FVector> nice;
-
-	FVector startLoc = GetActorLocation() + StartLocation;
-
-	int horizontalCount = 0;
-	FVector leftSize = LeftSize->GetComponentLocation();
-	leftSize.Z = GetActorLocation().Z + StartLocation.Z;
-	FVector widthDir = (leftSize - startLoc);
-	float maxWidth = widthDir.Length();
-	widthDir.Normalize();
-
-	float test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
-	float testHuh = FMath::Abs(maxWidth);
-	while (test < testHuh)
+	for (int i = 0; i < data.verticalCount; ++i)
 	{
-		horizontalCount++;
-		test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
-	}
-
-	int verticalCount = 1;
-	FVector bottomSize = BottomSize->GetComponentLocation();
-	bottomSize.Y = GetActorLocation().Y + StartLocation.Y;
-	FVector heightDir = (bottomSize - startLoc);
-	float maxHeight = heightDir.Length();
-	heightDir.Normalize();
-
-	float test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
-	float testHuh1 = FMath::Abs(maxHeight);
-	while (test1 < testHuh1)
-	{
-		verticalCount++;
-		test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("horizontalCount: %d, verticalCount: %d"), horizontalCount, verticalCount);
-
-	for (int i = 0; i < verticalCount; ++i)
-	{
-		for (int j = 0; j < horizontalCount; ++j)
+		for (int j = 0; j < data.horizontalCount; ++j)
 		{
-			int32 index = horizontalCount * i + j;
+			int32 index = data.horizontalCount * i + j;
 
 			if (!ProjectInfoList.IsValidIndex(index)) return; // can't post anymore posters 
 
-			FTransform trans;
-			FVector widthVector = widthDir * FMath::Abs(horiLength + spacerWidth) * j;
-			FVector heigthVector = heightDir * FMath::Abs(vertiLength + spacerHeight) * i;
+			std::random_device rd{};
+			std::mt19937 rng(rd());
 
-			trans.SetLocation(startLoc + heigthVector + widthVector);
-			trans.SetScale3D(FVector(SpawnedActorScale));
-			trans.SetRotation(GetActorRotation().Quaternion());
+			std::normal_distribution<float> distScale(0.f, ScaleRange);
+			float randScale = distScale(rng);
+
+			std::normal_distribution<float> distRoll(0.f, RollRange);
+			float randRoll = distRoll(rng);
+
+			std::normal_distribution<float> distLoc(0.f, LocRange);
+			float randY = distLoc(rng);
+			float randZ = distLoc(rng);
+
+			FVector randLoc = FVector(0.f, randY, randZ);
+
+			FTransform trans;
+			FVector widthVector = data.widthDir * FMath::Abs(data.posterWidth + data.spacerWidth) * j;
+			FVector heigthVector = data.heightDir * FMath::Abs(data.posterHeight + data.spacerHeight) * i;
+
+			trans.SetLocation(data.startLoc + heigthVector + widthVector + randLoc);
+			trans.SetScale3D(FVector(SpawnedActorScale) + randScale);
+			FRotator rot = GetActorRotation() + FRotator(0.f, 0.f, randRoll);
+			trans.SetRotation(rot.Quaternion());
 
 			SpawnProjectPoster(ProjectNoticeClass, trans, ProjectInfoList[index]);
+
+			if (MaxPosterNumbers == index + 1) return;
 		}
 	}
 }
@@ -152,72 +132,41 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReview
 	this->DevInfoList.Append(devReviewList.data);
 	Posters.Empty();
 
-	auto defaultObj = ReviewNoticeClass->GetDefaultObject<ACABasePoster>();
-	check(defaultObj);
+	FDataP data;
+	GetData(data, ReviewNoticeClass);
+	UE_LOG(LogTemp, Warning, TEXT("horizontalCount: %d, verticalCount: %d"), data.horizontalCount, data.verticalCount);
 
-	float horiLength = SpawnedActorScale * defaultObj->GetRightLength();
-	float vertiLength = SpawnedActorScale * defaultObj->GetTopLength();
-
-	float boardWidth = (TopSize->GetRelativeLocation() - BottomSize->GetRelativeLocation()).Length();
-	float boardHeight = (LeftSize->GetRelativeLocation() - RightSize->GetRelativeLocation()).Length();
-
-	float spacerWidth = (StartLocation - SpacerWidth).Length();
-	float spacerHeight = (StartLocation - SpacerHeight).Length();
-
-	TArray<FVector> nice;
-
-	FVector tempLoc = RightSize->GetRelativeLocation();
-	RightSize->SetRelativeLocation(StartLocation);
-	FVector startLoc = RightSize->GetComponentLocation();
-	RightSize->SetRelativeLocation(tempLoc);
-
-	int horizontalCount = 0;
-	FVector leftSize = LeftSize->GetComponentLocation();
-	leftSize.Z = startLoc.Z;
-	FVector widthDir = (leftSize - startLoc);
-	float maxWidth = widthDir.Length();
-	widthDir.Normalize();
-
-	float test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
-	float testHuh = FMath::Abs(maxWidth);
-	while (test < testHuh)
+	for (int i = 0; i < data.verticalCount; ++i)
 	{
-		horizontalCount++;
-		test = FMath::Abs((horiLength + spacerWidth) * horizontalCount);
-	}
-
-	int verticalCount = 1;
-	FVector bottomSize = BottomSize->GetComponentLocation();
-	bottomSize.X = startLoc.X;
-	FVector heightDir = (bottomSize - startLoc);
-	float maxHeight = heightDir.Length();
-	heightDir.Normalize();
-
-	float test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
-	float testHuh1 = FMath::Abs(maxHeight);
-	while (test1 < testHuh1)
-	{
-		verticalCount++;
-		test1 = FMath::Abs((vertiLength + spacerHeight) * verticalCount);
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("horizontalCount: %d, verticalCount: %d"), horizontalCount, verticalCount);
-
-	for (int i = 0; i < verticalCount; ++i)
-	{
-		for (int j = 0; j < horizontalCount; ++j)
+		for (int j = 0; j < data.horizontalCount; ++j)
 		{
-			int32 index = horizontalCount * i + j;
+			int32 index = data.horizontalCount * i + j;
 
 			if (!DevInfoList.IsValidIndex(index)) return; // can't post anymore posters 
 
-			FTransform trans;
-			FVector widthVector = widthDir * FMath::Abs(horiLength + spacerWidth) * j;
-			FVector heigthVector = heightDir * FMath::Abs(vertiLength + spacerHeight) * i;
+			std::random_device rd{};
+			std::mt19937 rng(rd());
 
-			trans.SetLocation(startLoc + heigthVector + widthVector);
-			trans.SetScale3D(FVector(SpawnedActorScale));
-			trans.SetRotation(GetActorRotation().Quaternion());
+			std::normal_distribution<float> distScale(0.f, ScaleRange);
+			float randScale = distScale(rng);
+
+			std::normal_distribution<float> distRoll(0.f, RollRange);
+			float randRoll = distRoll(rng);
+
+			std::normal_distribution<float> distLoc(0.f, LocRange);
+			float randY = distLoc(rng);
+			float randZ = distLoc(rng);
+
+			FVector randLoc = FVector(0.f, randY, randZ);
+
+			FTransform trans;
+			FVector widthVector = data.widthDir * FMath::Abs(data.posterWidth + data.spacerWidth) * j;
+			FVector heigthVector = data.heightDir * FMath::Abs(data.posterHeight + data.spacerHeight) * i;
+
+			trans.SetLocation(data.startLoc + heigthVector + widthVector + randLoc);
+			trans.SetScale3D(FVector(SpawnedActorScale) + randScale);
+			FRotator rot = GetActorRotation() + FRotator(0.f, 0.f, randRoll);
+			trans.SetRotation(rot.Quaternion());
 
 			SpawnNoticePoster(ReviewNoticeClass, trans, DevInfoList[index]);
 
@@ -297,6 +246,91 @@ void ACANoticeBoard::ServerRefreshBoard_Implementation(ACharacter* initiator)
 	Posters.Empty();
 
 	BP_MakeProjects();
+}
+
+void ACANoticeBoard::GetData(FDataP& data, const TSubclassOf<ACABasePoster>& posterClass)
+{
+	auto defaultObj = posterClass->GetDefaultObject<ACABasePoster>();
+	check(defaultObj);
+
+	data.boardWidth = (TopSize->GetRelativeLocation() - BottomSize->GetRelativeLocation()).Length();
+	data.boardHeight = (LeftSize->GetRelativeLocation() - RightSize->GetRelativeLocation()).Length();
+
+	data.spacerWidth = (StartLocation - SpacerWidth).Length();
+	data.spacerHeight = (StartLocation - SpacerHeight).Length();
+
+	GetStartLocation(data);
+
+	GetPosterDimensions(data, posterClass);
+
+	GetDirections(data, data.startLoc);
+
+	GetMaxHeightAndWidth(data, data.startLoc);
+
+	GetCounts(data, ReviewNoticeClass);
+}
+
+void ACANoticeBoard::GetCounts(FDataP& data, const TSubclassOf<ACABasePoster>& posterClass)
+{
+	float test = FMath::Abs((data.posterWidth + data.spacerWidth) * data.horizontalCount);
+	float testHuh = FMath::Abs(data.maxWidth);
+	while (test < testHuh)
+	{
+		data.horizontalCount++;
+		test = FMath::Abs((data.posterWidth + data.spacerWidth) * data.horizontalCount);
+	}
+
+	float test1 = FMath::Abs((data.posterHeight+ data.spacerHeight) * data.verticalCount);
+	float testHuh1 = FMath::Abs(data.maxHeight);
+	while (test1 < testHuh1)
+	{
+		data.verticalCount++;
+		test1 = FMath::Abs((data.posterHeight + data.spacerHeight) * data.verticalCount);
+	}
+}
+
+void ACANoticeBoard::GetPosterDimensions(FDataP& data, const TSubclassOf<ACABasePoster>& posterClass)
+{
+	auto defaultObj = posterClass->GetDefaultObject<ACABasePoster>();
+	check(defaultObj);
+
+	data.posterWidth = SpawnedActorScale * defaultObj->GetWidth();
+	data.posterHeight = SpawnedActorScale * defaultObj->GetHeight();
+}
+
+void ACANoticeBoard::GetStartLocation(FDataP& data)
+{
+	FVector tempLoc = RightSize->GetRelativeLocation();
+	RightSize->SetRelativeLocation(StartLocation);
+	data.startLoc = RightSize->GetComponentLocation();
+	RightSize->SetRelativeLocation(tempLoc);
+}
+
+void ACANoticeBoard::GetMaxHeightAndWidth(FDataP& data, const FVector& startLoc)
+{
+	FVector leftSize = LeftSize->GetComponentLocation();
+	leftSize.Z = startLoc.Z;
+	FVector widthDir = (leftSize - startLoc);
+	data.maxWidth = widthDir.Length();
+
+	FVector bottomSize = BottomSize->GetComponentLocation();
+	bottomSize.X = startLoc.X;
+	FVector heightDir = (bottomSize - startLoc);
+	data.maxHeight = heightDir.Length();
+}
+
+void ACANoticeBoard::GetDirections(FDataP& data, const FVector& startLoc)
+{
+	FVector leftSize = LeftSize->GetComponentLocation();
+	leftSize.Z = startLoc.Z;
+	data.widthDir = (leftSize - startLoc);
+	data.widthDir.Normalize();
+
+	int verticalCount = 1;
+	FVector bottomSize = BottomSize->GetComponentLocation();
+	bottomSize.X = startLoc.X;
+	data.heightDir = (bottomSize - startLoc);
+	data.heightDir.Normalize();
 }
 
 void ACANoticeBoard::ResetFeatureType()
