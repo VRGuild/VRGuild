@@ -142,8 +142,8 @@ void UCWGFileAPI::UploadMultyFile(const FFileInfoDatas& FileInfos)
                 FString JsonString = Result;
 
                 // JSON을 struct로 변환
-                FFileUploadResponse Response = ParseJsonToStruct(JsonString);
-                OnFileUploadCallBack(Response);
+                FFileUploadResponse resultStruct = ParseJsonToStruct(JsonString);
+                OnFileUploadCallBack(resultStruct);
             }
             else
             {
@@ -222,8 +222,8 @@ void UCWGFileAPI::UploadMultyBinary(const FFileDatas& FullFilePath)
                 FString JsonString = Result;
 
                 // JSON을 struct로 변환
-                FFileUploadResponse Response = ParseJsonToStruct(JsonString);
-                OnFileUploadCallBack(Response);
+                FFileUploadResponse result = ParseJsonToStruct(JsonString);
+                OnFileUploadCallBack(result);
             }
             else
             {
