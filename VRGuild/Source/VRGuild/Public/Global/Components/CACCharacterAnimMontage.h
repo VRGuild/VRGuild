@@ -14,7 +14,9 @@ enum class EAnimMontageType : uint8
 	PICKUP UMETA(DisplayName = "Pickup"),
 	PICKDOWN UMETA(DisplayName = "Pickdown"),
 	DANCE UMETA(DisplayName = "Dance"),
-	RAISEHAND UMETA(DisplayName = "Raisehand")
+	RAISEHAND UMETA(DisplayName = "Raisehand"),
+	SIT UMETA(DisplayName = "Sit"),
+	STAND UMETA(DisplayName = "Stand")
 };
 
 
@@ -49,6 +51,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	class UAnimMontage* RaiseHandAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	class UAnimMontage* SitAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	class UAnimMontage* StandAnim;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartAnimMontage(EAnimMontageType value);
