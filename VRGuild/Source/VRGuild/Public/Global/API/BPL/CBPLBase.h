@@ -370,6 +370,20 @@ public:
     FDateTime modifiedAt;
 };
 
+// Email Structure
+USTRUCT(BlueprintType)
+struct FEmailAPI
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "Email")
+    FString email;
+    UPROPERTY(BlueprintReadWrite, Category = "Email")
+    FString text;
+    UPROPERTY(BlueprintReadWrite, Category = "Email")
+    bool isSuccess;
+};
+
 UCLASS()
 class VRGUILD_API UCBPLBase : public UBlueprintFunctionLibrary
 {
