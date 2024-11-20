@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "CACTileInteraction.generated.h"
 
+struct FEther;
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGUILD_API UCACTileInteraction : public UActorComponent
@@ -46,6 +47,7 @@ public:
 	AActor* TileLineTrace();
 
 	void HoverTile();
+	UFUNCTION(BlueprintCallable)
 	void AddTile();
 	void DeleteTile();
 
@@ -63,5 +65,7 @@ public:
 	void OnHolding(const FInputActionValue& Value);
 	void OnReleased(const FInputActionValue& Value);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Tile")
+	bool CheckPayEther(const FEther& price, const FString& itemName);
 
 };

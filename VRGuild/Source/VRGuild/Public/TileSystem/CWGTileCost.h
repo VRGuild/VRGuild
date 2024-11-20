@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "Global/UI/API/CWGEtherAPI.h"
 #include "CWGTileCost.generated.h"
 
 enum class ESpaceType : uint8;
@@ -19,28 +19,11 @@ enum class ETileCostType : uint8
  * 
  */
 UCLASS()
-class VRGUILD_API UCWGTileCost : public UUserWidget
+class VRGUILD_API UCWGTileCost : public UCWGEtherAPI
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly);
-	class ACATileZone* TargetTileZone;
-
-	UPROPERTY(BlueprintReadOnly);
-	ETileCostType TileConstType;
-
-	UPROPERTY(BlueprintReadOnly);
-	FVector Position;
-
-	UPROPERTY(BlueprintReadOnly);
-	ESpaceType SpaceType;
-
-	UPROPERTY(BlueprintReadOnly);
-	int32 Cost;
-
-
-	void InitializeSetting(ACATileZone* targetZone, ETileCostType tileConstType, FVector position, ESpaceType spaceType, int32 cost);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateInit();

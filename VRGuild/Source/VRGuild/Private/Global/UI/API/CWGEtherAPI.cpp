@@ -1,23 +1,11 @@
-﻿#include "Global/API/CACEtherAPI.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Global/UI/API/CWGEtherAPI.h"
 #include "Global/API/BPL/CBPLEther.h"
 
-UCACEtherAPI::UCACEtherAPI()
-{
-    PrimaryComponentTick.bCanEverTick = false;
-    bWantsInitializeComponent = true;
-}
 
-void UCACEtherAPI::BeginPlay()
-{
-    Super::BeginPlay();
-}
-
-void UCACEtherAPI::InitializeComponent()
-{
-    Super::InitializeComponent();
-}
-
-void UCACEtherAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGEtherAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     UE_LOG(LogTemp, Display, TEXT("OnSuccessAPI : %s"), *req->GetURL());
 
@@ -47,7 +35,7 @@ void UCACEtherAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACEtherAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGEtherAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     FString ErrorMessage = TEXT("알 수 없는 오류가 발생했습니다.");
@@ -86,13 +74,13 @@ void UCACEtherAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     }
 }
 
-void UCACEtherAPI::EtherCreateCall(const FEther& Ether)
+void UCWGEtherAPI::EtherCreateCall(const FEther& Ether)
 {
     this->API = TEXT("api/ether");
     HttpPostCall<FEther>(Ether);
 }
 
-void UCACEtherAPI::EtherCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGEtherAPI::EtherCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FEtherResponse ParsedResponse = JsonPerse<FEtherResponse>(JsonString);
@@ -100,13 +88,13 @@ void UCACEtherAPI::EtherCreateCallBack(FHttpRequestPtr req, FHttpResponsePtr res
     OnEtherCreateCallBack(ParsedResponse.data);
 }
 
-void UCACEtherAPI::EtherGetCall(const FString& EtherId)
+void UCWGEtherAPI::EtherGetCall(const FString& EtherId)
 {
     this->API = FString::Printf(TEXT("api/ether/%s"), *EtherId);
     HttpGetCall();
 }
 
-void UCACEtherAPI::EtherGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGEtherAPI::EtherGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FEtherResponse ParsedResponse = JsonPerse<FEtherResponse>(JsonString);
@@ -114,13 +102,13 @@ void UCACEtherAPI::EtherGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
     OnEtherGetCallBack(ParsedResponse.data);
 }
 
-void UCACEtherAPI::EtherListGetCall()
+void UCWGEtherAPI::EtherListGetCall()
 {
     this->API = TEXT("api/ether/list");
     HttpGetCall();
 }
 
-void UCACEtherAPI::EtherListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGEtherAPI::EtherListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FEtherListResponse ParsedResponse = JsonPerse<FEtherListResponse>(JsonString);
@@ -128,13 +116,13 @@ void UCACEtherAPI::EtherListGetCallBack(FHttpRequestPtr req, FHttpResponsePtr re
     OnEtherListGetCallBack(ParsedResponse.data);
 }
 
-void UCACEtherAPI::EtherHistoryGetCall(const FString& UserId)
+void UCWGEtherAPI::EtherHistoryGetCall(const FString& UserId)
 {
     this->API = FString::Printf(TEXT("api/ether/history/%s"), *UserId);
     HttpGetCall();
 }
 
-void UCACEtherAPI::EtherHistoryGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGEtherAPI::EtherHistoryGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
     FString JsonString = res->GetContentAsString();
     FEtherBalanceResponse ParsedResponse = JsonPerse<FEtherBalanceResponse>(JsonString);

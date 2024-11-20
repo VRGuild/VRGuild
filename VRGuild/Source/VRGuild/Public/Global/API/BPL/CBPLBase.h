@@ -331,9 +331,9 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
     FString cause;
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
-    int32 goldAmount;
+    int32 goldAmount = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
-    int32 silverAmount;
+    int32 silverAmount = 0;
     UPROPERTY(BlueprintReadWrite, Category = "User|Ether")
     FDateTime createAt;
 };
