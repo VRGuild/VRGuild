@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Global/UI/API/CWGBaseAPI.h"
+#include "Global/UI/API/CWGUserAPI.h"
 #include "CWGFileAPI.generated.h"
 
 
@@ -24,7 +24,7 @@ struct FFileUploadResponse
  * 
  */
 UCLASS()
-class VRGUILD_API UCWGFileAPI : public UCWGBaseAPI
+class VRGUILD_API UCWGFileAPI : public UCWGUserAPI
 {
 	GENERATED_BODY()
 public:
