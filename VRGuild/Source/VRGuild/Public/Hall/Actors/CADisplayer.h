@@ -24,15 +24,15 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual bool CanTrace(ACharacter* Initiator) const override;
-	virtual bool CanInteract(ACharacter* Initiator) const override;
+	virtual bool CanTrace(ACharacter* initiator) const override;
+	virtual bool CanInteract(ACharacter* initiator) const override;
 
-	virtual void BeginTrace(ACharacter* Initiator) override;
-	virtual void EndTrace(ACharacter* Initiator) override;
-	void EndScroll(ACharacter* Initiator);
+	virtual void BeginTrace(ACharacter* initiator) override;
+	virtual void EndTrace(ACharacter* initiator) override;
+	void EndScroll(ACharacter* initiator);
 
-	virtual void BeginInteract(ACharacter* Initiator) override;
-	virtual void EndInteract(ACharacter* Initiator) override;
+	virtual void BeginInteract(ACharacter* initiator) override;
+	virtual void EndInteract(ACharacter* initiator) override;
 
 protected:
 	//virtual void Tick(float DeltaTime) override;
@@ -43,7 +43,7 @@ protected:
 	virtual FString GetTraceMessage(ACharacter* player) const override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Settings)
-	TObjectPtr<UCWCDisplayScroll> WidgetComponent;
+	TObjectPtr<UWidgetComponent> WidgetComponent;
 
 	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Settings)
 	TObjectPtr<UWidgetComponent> WidgetComponent2;*/
@@ -61,6 +61,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnMousePressInteract(FVector2D result);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void Enabled(bool bEnabled);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category=Settings)
 	FString ErrorMessage;
@@ -76,6 +79,8 @@ private:
 	UFUNCTION()
 	void OnRep_ActorDisplayed();
 
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess))
+	TObjectPtr<AActor> PlayerInitiated;
 	/*FVector2D StartMousePos;
 	FVector2D UpdatedMousePos;
 	TObjectPtr<ATP_ThirdPersonCharacter> PlayerThatStartedInteracting;*/
