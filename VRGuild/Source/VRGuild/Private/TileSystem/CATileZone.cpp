@@ -192,7 +192,7 @@ void ACATileZone::CloneTileToZone(FVector position, ACATileSpace* tileSpace)
 		if (ACATileFloor* newFloor = Cast<ACATileFloor>(newTileSpace))
 		{
 			// 새로 생성된 타일의 벽 업데이트
-			newFloor->UpdateWallVisible();
+			newFloor->UpdateSurfaceVisible();
 		}
 	}
 }

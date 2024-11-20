@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Global/API/CACEtherAPI.h"
 
 // Sets default values for this component's properties
 UCACTileInteraction::UCACTileInteraction()
@@ -83,12 +84,15 @@ AActor* UCACTileInteraction::TileLineTrace()
 
 	bool hit = GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility, params);
 
+#if WITH_EDITOR 
+	DrawDebugLine(GetWorld(), start, end, hit ? FColor::Cyan : FColor::Red, false, 3);
+#endif
+
 	if (hit)
 	{
 		HitResult = hitResult;
 		return HitResult.GetActor();
 	}
-	DrawDebugLine(GetWorld(), start, end, hit ? FColor::Cyan : FColor::Red, false, 3);
 	return nullptr;
 }
 
@@ -131,7 +135,12 @@ void UCACTileInteraction::OnReleased(const FInputActionValue& Value)
 	bHold = false;
 	if (DebugMode)
 		UE_LOG(LogTemp, Display, TEXT("OnReleased"));
-	AddTile();
+	//AddTile();
+	FEther price;
+
+	price.silverAmount = 10;
+	price.cause = "fucking Genius!!";
+	CheckPayEther(price, "Wall Object");
 }
 
 void UCACTileInteraction::AddTile()
@@ -159,10 +168,12 @@ void UCACTileInteraction::AddTile()
 			target->AttachSpace(HitResult, target);
 		}
 	}
+	/*
 	else
 	{
 		target->AttachSpace(HitResult, target);
 	}
+	*/
 }
 
 void UCACTileInteraction::DeleteTile()

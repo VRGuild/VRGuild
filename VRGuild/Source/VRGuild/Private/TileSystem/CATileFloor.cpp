@@ -22,6 +22,7 @@ ACATileFloor::ACATileFloor()
 	this->SouthWallComp = CreateDefaultSubobject<UStaticMeshComponent>(FName("SouthWallComp"));
 	this->EastWallComp = CreateDefaultSubobject<UStaticMeshComponent>(FName("EastWallComp"));
 	this->WestWallComp = CreateDefaultSubobject<UStaticMeshComponent>(FName("WestWallComp"));
+	this->CeilingComp = CreateDefaultSubobject<UStaticMeshComponent>(FName("CeilingComp"));
 
 	this->BasePivotComp->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	this->BaseFloorComp->AttachToComponent(this->BasePivotComp, FAttachmentTransformRules::KeepRelativeTransform);
@@ -29,7 +30,7 @@ ACATileFloor::ACATileFloor()
 	this->SouthWallComp->AttachToComponent(this->BasePivotComp, FAttachmentTransformRules::KeepRelativeTransform);
 	this->EastWallComp->AttachToComponent(this->BasePivotComp, FAttachmentTransformRules::KeepRelativeTransform);
 	this->WestWallComp->AttachToComponent(this->BasePivotComp, FAttachmentTransformRules::KeepRelativeTransform);
-
+	this->CeilingComp->AttachToComponent(this->BasePivotComp, FAttachmentTransformRules::KeepRelativeTransform);
 
 	this->BasePivotComp->SetRelativeLocation(FVector(0, 0, -this->TileSize / 2));
 	this->BaseFloorComp->SetRelativeLocation(FVector(0, 0, 0));
@@ -37,6 +38,7 @@ ACATileFloor::ACATileFloor()
 	this->SouthWallComp->SetRelativeLocation(FVector(-this->TileSize / 2, 0, 0));
 	this->EastWallComp->SetRelativeLocation(FVector(0, +this->TileSize / 2, 0));
 	this->WestWallComp->SetRelativeLocation(FVector(0, -this->TileSize / 2, 0));
+	this->CeilingComp->SetRelativeLocation(FVector(0, 0, this->TileSize));
 
 	this->NorthWallComp->SetRelativeRotation(FRotator(0, 90, 0));
 	this->SouthWallComp->SetRelativeRotation(FRotator(0, -90, 0));
@@ -74,15 +76,17 @@ void ACATileFloor::OnConstruction(const FTransform& Transform)
 		this->EastWallComp->SetStaticMesh(this->EastWallMeshList[0]);
 	if (this->WestWallMeshList.IsValidIndex(0))
 		this->WestWallComp->SetStaticMesh(this->WestWallMeshList[0]);
+	if (this->CeilingMeshList.IsValidIndex(0))
+		this->CeilingComp->SetStaticMesh(this->CeilingMeshList[0]);
 }
 
 void ACATileFloor::CreateDefualtSpace()
 {
 	// 기본 Floor 타일 생성
 		// 3x3 그리드 생성 (-3 ~ 3)
-	for (int y = -1; y <= 1; y++)
+	for (int y = -1; y <= 2; y++)
 	{
-		for (int x = -1; x <= 1; x++)
+		for (int x = -1; x <= 2; x++)
 		{
 			this->ParentZone->SRPCAppendSpace(FVector(x, y, 0), this);
 		}
@@ -93,33 +97,40 @@ void ACATileFloor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACATileFloor, WallVisibilityFlags);
+	DOREPLIFETIME(ACATileFloor, SurfaceVisibilityFlags);
 
 }
 
-void ACATileFloor::ApplyWallVisibility()
+void ACATileFloor::ApplySurfaceVisibility()
 {
 	// 비트 플래그에 따라 컴포넌트 visibility 설정
-	NorthWallComp->SetVisibility((WallVisibilityFlags & (1 << 0)) != 0);
-	SouthWallComp->SetVisibility((WallVisibilityFlags & (1 << 1)) != 0);
-	EastWallComp->SetVisibility((WallVisibilityFlags & (1 << 2)) != 0);
-	WestWallComp->SetVisibility((WallVisibilityFlags & (1 << 3)) != 0);
+	NorthWallComp->SetVisibility((SurfaceVisibilityFlags & WALL_NORTH) != 0);
+	SouthWallComp->SetVisibility((SurfaceVisibilityFlags & WALL_SOUTH) != 0);
+	EastWallComp->SetVisibility((SurfaceVisibilityFlags & WALL_EAST) != 0);
+	WestWallComp->SetVisibility((SurfaceVisibilityFlags & WALL_WEST) != 0);
 
-	NorthWallComp->SetCollisionEnabled(((WallVisibilityFlags & (1 << 0)) != 0 )? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
-	SouthWallComp->SetCollisionEnabled(((WallVisibilityFlags & (1 << 1)) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
-	EastWallComp->SetCollisionEnabled(((WallVisibilityFlags & (1 << 2)) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
-	WestWallComp->SetCollisionEnabled(((WallVisibilityFlags & (1 << 3)) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	// Apply visibility to floor and ceiling
+	BaseFloorComp->SetVisibility((SurfaceVisibilityFlags & SURFACE_FLOOR) != 0);
+	CeilingComp->SetVisibility((SurfaceVisibilityFlags & SURFACE_CEILING) != 0);
+
+	// Apply collision settings
+	NorthWallComp->SetCollisionEnabled(((SurfaceVisibilityFlags & WALL_NORTH) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	SouthWallComp->SetCollisionEnabled(((SurfaceVisibilityFlags & WALL_SOUTH) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	EastWallComp->SetCollisionEnabled(((SurfaceVisibilityFlags & WALL_EAST) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	WestWallComp->SetCollisionEnabled(((SurfaceVisibilityFlags & WALL_WEST) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	BaseFloorComp->SetCollisionEnabled(((SurfaceVisibilityFlags & SURFACE_FLOOR) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	CeilingComp->SetCollisionEnabled(((SurfaceVisibilityFlags & SURFACE_CEILING) != 0) ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 }
 
-void ACATileFloor::MulticastUpdateWallVisibility_Implementation(uint8 NewFlags)
+void ACATileFloor::MulticastUpdateSurfaceVisibility_Implementation(uint8 NewFlags)
 {
-	WallVisibilityFlags = NewFlags;
-	ApplyWallVisibility();
+	SurfaceVisibilityFlags = NewFlags;
+	ApplySurfaceVisibility();
 }
 
 void ACATileFloor::OnRep_WallVisibility()
 {
-	ApplyWallVisibility();
+	ApplySurfaceVisibility();
 }
 
 ACATileSpace* ACATileFloor::Clone()
@@ -145,31 +156,45 @@ ACATileSpace* ACATileFloor::Clone()
 
 void ACATileFloor::AttachSpace(FHitResult hitResult, ACATileSpace* newTileSpace)
 {
+	if (!ParentZone || !newTileSpace) return;
+
 	FString HitCompName = hitResult.GetComponent()->GetName();
-	UE_LOG(LogTemp, Display, TEXT("Hit Comp : %s"), *HitCompName);
+	FVector AttachOffset = FVector::ZeroVector;
+
 	if (HitCompName == "NorthWallComp")
 	{
-		this->ParentZone->AttachTile(this->Position + FVector(1, 0, 0), newTileSpace);
+		AttachOffset = FVector(1, 0, 0);
 	}
 	else if (HitCompName == "SouthWallComp")
 	{
-		this->ParentZone->AttachTile(this->Position + FVector(-1, 0, 0), newTileSpace);
+		AttachOffset = FVector(-1, 0, 0);
 	}
 	else if (HitCompName == "EastWallComp")
 	{
-		this->ParentZone->AttachTile(this->Position + FVector(0, 1, 0), newTileSpace);
+		AttachOffset = FVector(0, 1, 0);
 	}
-	else if(HitCompName == "WestWallComp")
+	else if (HitCompName == "WestWallComp")
 	{
-		this->ParentZone->AttachTile(this->Position + FVector(0, -1, 0), newTileSpace);
+		AttachOffset = FVector(0, -1, 0);
 	}
 	else if (HitCompName == "BaseFloorComp")
 	{
+		AttachOffset = FVector(0, 0, -1);
+	}
+	else if (HitCompName == "CeilingComp")
+	{
+		AttachOffset = FVector(0, 0, 1);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("Wrong Attachspace floortile"));
+		UE_LOG(LogTemp, Warning, TEXT("Hit invalid component: %s"), *HitCompName);
+		return;
 	}
+
+	// 새 타일 부착 및 가시성 업데이트
+	FVector NewPosition = this->Position + AttachOffset;
+	ParentZone->AttachTile(NewPosition, newTileSpace);
+
 }
 
 void ACATileFloor::AttachPostision(FVector position, ACATileSpace* newTileSpace)
@@ -177,21 +202,23 @@ void ACATileFloor::AttachPostision(FVector position, ACATileSpace* newTileSpace)
 	this->ParentZone->AttachTile(this->Position + position, newTileSpace);
 }
 
-void ACATileFloor::UpdateWallVisible()
+void ACATileFloor::UpdateSurfaceVisible()
 {
 	if (!ParentZone) return;
-
-	UE_LOG(LogTemp, Display, TEXT("UpdateWallVisible "));
-
+#if WITH_EDITOR
+	UE_LOG(LogTemp, Display, TEXT("UpdateSurfaceVisible "));
+#endif
 	// 각 방향 체크
 	const TArray<TPair<FString, FVector>> Directions = {
 		TPair<FString, FVector>("NorthWallComp", FVector(1, 0, 0)),
 		TPair<FString, FVector>("SouthWallComp", FVector(-1, 0, 0)),
 		TPair<FString, FVector>("EastWallComp", FVector(0, 1, 0)),
-		TPair<FString, FVector>("WestWallComp", FVector(0, -1, 0))
+		TPair<FString, FVector>("WestWallComp", FVector(0, -1, 0)),
+		TPair<FString, FVector>("BaseFloorComp", FVector(0, 0, -1)),
+		TPair<FString, FVector>("CeilingComp", FVector(0, 0, 1))
 	};
 
-	uint8 NewFlags = WallVisibilityFlags;
+	uint8 NewFlags = SurfaceVisibilityFlags;
 
 	for (const auto& Dir : Directions)
 	{
@@ -204,30 +231,40 @@ void ACATileFloor::UpdateWallVisible()
 				if (Dir.Key == "NorthWallComp")
 				{
 					NewFlags &= ~WALL_NORTH;
-					NeighborFloor->MulticastUpdateWallVisibility(NeighborFloor->WallVisibilityFlags & ~WALL_SOUTH);
+					NeighborFloor->MulticastUpdateSurfaceVisibility(NeighborFloor->SurfaceVisibilityFlags & ~WALL_SOUTH);
 				}
 				else if (Dir.Key == "SouthWallComp")
 				{
 					NewFlags &= ~WALL_SOUTH;
-					NeighborFloor->MulticastUpdateWallVisibility(NeighborFloor->WallVisibilityFlags & ~WALL_NORTH);
+					NeighborFloor->MulticastUpdateSurfaceVisibility(NeighborFloor->SurfaceVisibilityFlags & ~WALL_NORTH);
 				}
 				else if (Dir.Key == "EastWallComp")
 				{
 					NewFlags &= ~WALL_EAST;
-					NeighborFloor->MulticastUpdateWallVisibility(NeighborFloor->WallVisibilityFlags & ~WALL_WEST);
+					NeighborFloor->MulticastUpdateSurfaceVisibility(NeighborFloor->SurfaceVisibilityFlags & ~WALL_WEST);
 				}
 				else if (Dir.Key == "WestWallComp")
 				{
 					NewFlags &= ~WALL_WEST;
-					NeighborFloor->MulticastUpdateWallVisibility(NeighborFloor->WallVisibilityFlags & ~WALL_EAST);
+					NeighborFloor->MulticastUpdateSurfaceVisibility(NeighborFloor->SurfaceVisibilityFlags & ~WALL_EAST);
+				}
+				else if (Dir.Key == "BaseFloorComp")
+				{
+					NewFlags &= ~SURFACE_FLOOR;
+					NeighborFloor->MulticastUpdateSurfaceVisibility(NeighborFloor->SurfaceVisibilityFlags & ~SURFACE_CEILING);
+				}
+				else if (Dir.Key == "CeilingComp")
+				{
+					NewFlags &= ~SURFACE_CEILING;
+					NeighborFloor->MulticastUpdateSurfaceVisibility(NeighborFloor->SurfaceVisibilityFlags & ~SURFACE_FLOOR);
 				}
 			}
 		}
 	}
 	// 상태가 변경되었다면 모든 클라이언트에 전파
-	if (NewFlags != WallVisibilityFlags)
+	if (NewFlags != SurfaceVisibilityFlags)
 	{
-		MulticastUpdateWallVisibility(NewFlags);
+		MulticastUpdateSurfaceVisibility(NewFlags);
 	}
 }
 
