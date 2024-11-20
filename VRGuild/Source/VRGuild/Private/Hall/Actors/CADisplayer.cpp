@@ -59,29 +59,29 @@ void ACADisplayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(ACADisplayer, ActorDisplayed);
 }
 
-bool ACADisplayer::CanTrace(ACharacter* Initiator) const
+bool ACADisplayer::CanTrace(ACharacter* initiator) const
 {
 	if (ActorDisplayed)
 	{
-		return (Owner == Initiator && Initiator->IsLocallyControlled());
+		return (Owner == initiator && initiator->IsLocallyControlled());
 	}
 
-	return Super::CanTrace(Initiator);
+	return Super::CanTrace(initiator);
 }
 
-bool ACADisplayer::CanInteract(ACharacter* Initiator) const
+bool ACADisplayer::CanInteract(ACharacter* initiator) const
 {
-	return Super::CanInteract(Initiator);
+	return Super::CanInteract(initiator);
 }
 
-void ACADisplayer::BeginTrace(ACharacter* Initiator)
+void ACADisplayer::BeginTrace(ACharacter* initiator)
 {
-	Super::BeginTrace(Initiator);
+	Super::BeginTrace(initiator);
 }
 
-void ACADisplayer::EndTrace(ACharacter* Initiator)
+void ACADisplayer::EndTrace(ACharacter* initiator)
 {
-	Super::EndTrace(Initiator);
+	Super::EndTrace(initiator);
 
 	/*if (ActorDisplayed)
 	{
@@ -94,22 +94,22 @@ void ACADisplayer::EndTrace(ACharacter* Initiator)
 	}*/
 }
 
-void ACADisplayer::EndScroll(ACharacter* Initiator)
+void ACADisplayer::EndScroll(ACharacter* initiator)
 {
 
 }
 
-void ACADisplayer::BeginInteract(ACharacter* Initiator)
+void ACADisplayer::BeginInteract(ACharacter* initiator)
 {
-	Super::BeginInteract(Initiator);
+	Super::BeginInteract(initiator);
 
-	if (!Initiator) return;
+	if (!initiator) return;
 
 	/*if (ActorDisplayed)
 	{
 		SetActorTickEnabled(true);
 
-		PlayerThatStartedInteracting = Cast<ATP_ThirdPersonCharacter>(Initiator);
+		PlayerThatStartedInteracting = Cast<ATP_ThirdPersonCharacter>(initiator);
 
 		if (auto carry = PlayerThatStartedInteracting->GetComponentByClass<UCACCarry>())
 		{
@@ -123,7 +123,7 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 		
 	}*/	
 
-	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	if (auto carryComp = initiator->GetComponentByClass<UCACCarry>())
 	{
 		switch (carryComp->GetCarryType())
 		{
@@ -132,9 +132,10 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 			AActor* actorCarried = carryComp->GetCarriedActor();
 			if (ensure(actorCarried) && !ActorDisplayed)
 			{
-				ATP_ThirdPersonCharacter::SetOwnerFor(this, Initiator);
+				PlayerInitiated = initiator;
+				ATP_ThirdPersonCharacter::SetOwnerFor(this, initiator);
 
-				if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+				if (auto montageComp = initiator->GetComponentByClass<UCACCharacterAnimMontage>())
 				{
 					montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
 				}
@@ -143,11 +144,11 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 		}
 		case ECarriedType::NONE:
 		{
-			ServerPickupCommission(Initiator);
+			ServerPickupCommission(initiator);
 			UE_LOG(LogTemp, Warning, TEXT("Not nice"));
 
 
-			if (auto montageComp = Initiator->GetComponentByClass<UCACCharacterAnimMontage>())
+			if (auto montageComp = initiator->GetComponentByClass<UCACCharacterAnimMontage>())
 			{
 				montageComp->StartAnimMontage(EAnimMontageType::PICKDOWN);
 			}
@@ -157,13 +158,13 @@ void ACADisplayer::BeginInteract(ACharacter* Initiator)
 	}
 }
 
-void ACADisplayer::EndInteract(ACharacter* Initiator)
+void ACADisplayer::EndInteract(ACharacter* initiator)
 {
-	Super::EndInteract(Initiator);
+	Super::EndInteract(initiator);
 
-	if (!Initiator) return;
+	if (!initiator) return;
 
-	if (auto carryComp = Initiator->GetComponentByClass<UCACCarry>())
+	if (auto carryComp = initiator->GetComponentByClass<UCACCarry>())
 	{
 		switch (carryComp->GetCarryType())
 		{
@@ -174,11 +175,11 @@ void ACADisplayer::EndInteract(ACharacter* Initiator)
 		}
 		case ECarriedType::NONE:
 		{
-			if (ActorDisplayed && ensureAlways(Owner == Initiator))
+			if (ActorDisplayed && ensureAlways(Owner == initiator))
 			{
 				if (ActorDisplayed)
 				{
-					ServerPickupCommission(Initiator);
+					ServerPickupCommission(initiator);
 				}
 			}
 			break;
@@ -206,10 +207,10 @@ void ACADisplayer::OnRep_Owner()
 	}
 	else
 	{
-		if (WidgetComponent)
+		/*if (WidgetComponent)
 		{
 			WidgetComponent->SetWidgetClass(nullptr);
-		}
+		}*/
 	}
 }
 
@@ -236,33 +237,43 @@ FString ACADisplayer::GetTraceMessage(ACharacter* player) const
 
 void ACADisplayer::OnRep_ActorDisplayed()
 {
-	if (!WidgetComponent) return;
-
 	if (ActorDisplayed)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Success in displaying Actor Displayed"));
-				
-		WidgetComponent->SetWidget(ActorDisplayed->GetPosterDisplayWidget());
-		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
-
-		StartAnimateScrolling();
-
-		/*WidgetComponent->SetTwoSided(true);
-
-		WidgetComponent2->SetWidgetClass(BackSideWidgetClass);
-		WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);*/
+		Enabled(true);
+		PlayerInitiated = nullptr;
 	}
 	else
 	{
-		WidgetComponent->SetWidget(nullptr);
-		WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
-
-		StopAnimateScrolling();
-
-		/*WidgetComponent2->SetWidget(nullptr);
-		WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);*/
+		Enabled(false);
+		PlayerInitiated = nullptr;
 	}
-	
+
+	//if (!WidgetComponent) return;
+
+	//if (ActorDisplayed)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Success in displaying Actor Displayed"));
+	//			
+	//	WidgetComponent->SetWidget(ActorDisplayed->GetPosterDisplayWidget());
+	//	WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+
+	//	StartAnimateScrolling();
+
+	//	/*WidgetComponent->SetTwoSided(true);
+
+	//	WidgetComponent2->SetWidgetClass(BackSideWidgetClass);
+	//	WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);*/
+	//}
+	//else
+	//{
+	//	WidgetComponent->SetWidget(nullptr);
+	//	WidgetComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	//	StopAnimateScrolling();
+
+	//	/*WidgetComponent2->SetWidget(nullptr);
+	//	WidgetComponent2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);*/
+	//}	
 }
 
 void ACADisplayer::ServerDisplayCommission_Implementation(AActor* commissionPassed)
