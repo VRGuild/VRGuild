@@ -9,6 +9,7 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Net/UnrealNetwork.h"
+#include "Global/API/BPL/CBPLTile.h"
 
 // Sets default values
 ACATileZone::ACATileZone()
@@ -74,15 +75,9 @@ void ACATileZone::CreateDefualtSpace()
 		if (!TileFloorClass)
 			return;
 		tempTile = GetWorld()->SpawnActor<ACATileFloor>(TileFloorClass);
+		tempTile->SetParentZone(this);
 		SRPCAppendSpace(FVector(0, 0, 0), tempTile);
-		// 3x3 그리드 생성 (-3 ~ 3)
-		for (int y = -1; y <= 1; y++)
-		{
-			for (int x = -1; x <= 1; x++)
-			{
-				SRPCAppendSpace(FVector(x,y,0), tempTile);
-			}
-		}
+		tempTile->CreateDefualtSpace();
 	}
 	else
 	{ 
@@ -90,6 +85,21 @@ void ACATileZone::CreateDefualtSpace()
 		SRPCAppendSpace(this->GetActorLocation(), tempTile);
 	}
 	tempTile->Destroy();
+}
+
+void ACATileZone::CreateFloorZone(const FTileInfo& tileInfo)
+{
+	ACATileFloor* tempTile;
+	tempTile = GetWorld()->SpawnActor<ACATileFloor>(TileFloorClass);
+	tempTile->SetParentZone(this);
+	tempTile->CreateApiFloor(tileInfo);
+	tempTile->Destroy();
+}
+void ACATileZone::CreateObjectZone(const FTileInfo& tileInfo)
+{
+
+	TArray<AActor*> test = UFL_TileTools::SpawnTileObjects(GetWorld(), tileInfo.objectInfoList);
+
 }
 
 void ACATileZone::SRPCAppendSpace_Implementation(FVector relativePosition, ACATileSpace* tileSpace)
@@ -238,7 +248,7 @@ void ACATileZone::AttachTile(FVector position, ACATileSpace* newTile)
 	this->SendDataPosition = position;
 	this->SendDataNewTile = newTile;
 	this->SendDataNewTileClass = nullptr;
-	if (GetOwner())
+	if (GetOwner() || HasAuthority())
 		SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
 	else
 		ATP_ThirdPersonCharacter::SetOwnerFor(this, GetWorld()->GetFirstPlayerController()->GetCharacter());

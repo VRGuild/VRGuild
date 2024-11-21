@@ -384,6 +384,53 @@ public:
     bool isSuccess;
 };
 
+// Comment Response Structure
+USTRUCT(BlueprintType)
+struct FTileObjectInfo
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    int64 objectId;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    FString objectName;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    FString objectClassName;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    FVector postition;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    FRotator rotator;
+};
+
+USTRUCT(BlueprintType)
+struct FTileMemoInfo
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    int64 memoId;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    FString memoText;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    FVector postition;
+};
+
+// Comment Response Structure
+USTRUCT(BlueprintType)
+struct FTileInfo
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FVector> tileList;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FTileObjectInfo> objectInfoList;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FTileMemoInfo> memoList;
+    UPROPERTY(BlueprintReadWrite, Category = "API Response")
+    TArray<FString> pdfUrlList;
+};
+
 UCLASS()
 class VRGUILD_API UCBPLBase : public UBlueprintFunctionLibrary
 {

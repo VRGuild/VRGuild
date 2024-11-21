@@ -177,19 +177,6 @@ TArray<FTileInfo> UCACChannelAPI::DefaultTile()
 	{
 		for (int y = -3; y <= 3; y++)
 		{
-			tempTileInfo.TileList = FVector(x, y, 0);
-			tempTileInfo.type = 0;
-			defaulTileMap.Add(tempTileInfo);
-			if (x == 3 || x == -3 || y == 3 || y == -3)
-			{
-				for (int z = 1; z <= 5; z++)
-				{
-
-					tempTileInfo.TileList = FVector(x, y, z);
-					tempTileInfo.type = 0;
-					defaulTileMap.Add(tempTileInfo);
-				}
-			}
 		}
 	}
 

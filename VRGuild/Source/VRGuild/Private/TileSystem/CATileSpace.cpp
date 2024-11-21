@@ -53,7 +53,7 @@ void ACATileSpace::BeginPlay()
         SetReplicateMovement(true);
     }
 
-	if (!ChildZone && GetWorld())
+	/*if (!ChildZone && GetWorld())
 	{
 		ChildZone = GetWorld()->SpawnActor<ACATileZone>(ACATileZone::StaticClass(), GetActorLocation(), GetActorRotation());
 		if (ChildZone)
@@ -61,7 +61,7 @@ void ACATileSpace::BeginPlay()
 			ChildZone->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 			ChildZone->TileSize = TileSize / 5;
 		}
-	}
+	}*/
 }
 
 

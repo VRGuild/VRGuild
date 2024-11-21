@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "CATileSpace.h"
+#include "Global/API/BPL/CBPLTile.h"
 #include "CATileFloor.generated.h"
 
 UCLASS()
@@ -46,7 +47,6 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void OnConstruction(const FTransform& Transform) override;
-    virtual void CreateDefualtSpace() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     UPROPERTY(ReplicatedUsing = OnRep_WallVisibility)
@@ -58,7 +58,7 @@ protected:
     static constexpr uint8 WALL_WEST = 1 << 3;
     static constexpr uint8 SURFACE_FLOOR = 1 << 4;
     static constexpr uint8 SURFACE_CEILING = 1 << 5;
-    
+
     UFUNCTION()
     void OnRep_WallVisibility();
 
@@ -71,6 +71,8 @@ protected:
 
 public:
     virtual ACATileSpace* Clone() override;
+    virtual void CreateDefualtSpace() override;
+    void CreateApiFloor(const FTileInfo& tileinfo);
     virtual void AttachSpace(FHitResult HitResult, ACATileSpace* newTileSpace) override;
     virtual void AttachPostision(FVector position, ACATileSpace* newTileSpace) override;
     void UpdateSurfaceVisible();

@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "CATileSpace.generated.h"
 
+
 UCLASS()
 class VRGUILD_API ACATileSpace : public AActor
 {
@@ -28,20 +29,21 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
-	virtual void CreateDefualtSpace();
-
 	UPROPERTY(Replicated)
 	class ACATileZone* ParentZone;
 
-	UPROPERTY(Replicated)
-	class ACATileZone* ChildZone;
+	//UPROPERTY(Replicated)
+	//class ACATileZone* ChildZone;
 
 	UPROPERTY(Replicated)
 	FVector Position = FVector(0);
+
 	UPROPERTY(Replicated)
 	ESpaceType SpaceType = ESpaceType::None;
 
 public:
+	virtual void CreateDefualtSpace();
+
 	class ACATileZone* GetParentZone() { return this->ParentZone; };
 	void SetParentZone(class ACATileZone* parentZone) { this->ParentZone = parentZone; };
 

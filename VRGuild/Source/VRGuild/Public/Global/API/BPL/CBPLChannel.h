@@ -4,22 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "CBPLTile.h"
 #include "CBPLChannel.generated.h"
 
-
-USTRUCT(BlueprintType, Atomic)
-struct FTileInfo
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	FTileInfo() {};
-
-	UPROPERTY(BlueprintReadWrite)
-	FVector TileList;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString type;
-};
 
 
 USTRUCT(BlueprintType, Atomic)

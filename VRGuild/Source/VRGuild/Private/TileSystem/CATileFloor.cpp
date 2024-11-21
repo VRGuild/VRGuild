@@ -8,12 +8,13 @@
 #include "TileSystem/CWGTileCost.h"
 #include "TileSystem/CATileCube.h"
 #include "Net/UnrealNetwork.h"
+#include "Math/UnrealMathUtility.h"
 
 ACATileFloor::ACATileFloor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	this->TileSize = 400;
+	this->TileSize = 370;
 	this->SpaceType = ESpaceType::Floor;
 
 	this->BasePivotComp = CreateDefaultSubobject< USceneComponent>(FName("BasePivotComp"));
@@ -40,9 +41,8 @@ ACATileFloor::ACATileFloor()
 	this->WestWallComp->SetRelativeLocation(FVector(0, -this->TileSize / 2, 0));
 	this->CeilingComp->SetRelativeLocation(FVector(0, 0, this->TileSize));
 
-	this->NorthWallComp->SetRelativeRotation(FRotator(0, 90, 0));
-	this->SouthWallComp->SetRelativeRotation(FRotator(0, -90, 0));
-
+	this->NorthWallComp->SetRelativeRotation(FRotator(0, -90, 0));
+	this->SouthWallComp->SetRelativeRotation(FRotator(0, 90, 0));
 }
 
 void ACATileFloor::BeginPlay()
@@ -59,6 +59,22 @@ void ACATileFloor::BeginPlay()
 		SetReplicateMovement(true);
 	}
 
+	// if (HasAuthority())
+	// {
+	// 	if (BaseFloorMeshList.Num() > 0)
+	// 		BaseFloorComp->SetStaticMesh(BaseFloorMeshList[FMath::RandRange(0, BaseFloorMeshList.Num() - 1)]);
+	// 	if (NorthWallMeshList.Num() > 0)
+	// 		NorthWallComp->SetStaticMesh(NorthWallMeshList[FMath::RandRange(0, NorthWallMeshList.Num() - 1)]);
+	// 	if (SouthWallMeshList.Num() > 0)
+	// 		SouthWallComp->SetStaticMesh(SouthWallMeshList[FMath::RandRange(0, SouthWallMeshList.Num() - 1)]);
+	// 	if (EastWallMeshList.Num() > 0)
+	// 		EastWallComp->SetStaticMesh(EastWallMeshList[FMath::RandRange(0, EastWallMeshList.Num() - 1)]);
+	// 	if (WestWallMeshList.Num() > 0)
+	// 		WestWallComp->SetStaticMesh(WestWallMeshList[FMath::RandRange(0, WestWallMeshList.Num() - 1)]);
+	// 	if (this->CeilingMeshList.IsValidIndex(0))
+	// 		this->CeilingComp->SetStaticMesh(this->CeilingMeshList[0]);
+	// }
+
 	UE_LOG(LogTemp, Warning, TEXT("Spawned [%s]"), GetWorld()->GetNetMode() == NM_Client ? TEXT("CLIENT") : TEXT("SERVER"));
 }
 
@@ -71,13 +87,20 @@ void ACATileFloor::OnConstruction(const FTransform& Transform)
 	if (this->NorthWallMeshList.IsValidIndex(0))
 		this->NorthWallComp->SetStaticMesh(this->NorthWallMeshList[0]);
 	if (this->SouthWallMeshList.IsValidIndex(0))
+	{
 		this->SouthWallComp->SetStaticMesh(this->SouthWallMeshList[0]);
+		if (FMath::FloorToInt(this->Position.X) % 2 && this->SouthWallMeshList.IsValidIndex(1))
+		{
+			this->SouthWallComp->SetStaticMesh(this->SouthWallMeshList[1]);	
+		}
+	}
 	if (this->EastWallMeshList.IsValidIndex(0))
 		this->EastWallComp->SetStaticMesh(this->EastWallMeshList[0]);
 	if (this->WestWallMeshList.IsValidIndex(0))
 		this->WestWallComp->SetStaticMesh(this->WestWallMeshList[0]);
 	if (this->CeilingMeshList.IsValidIndex(0))
 		this->CeilingComp->SetStaticMesh(this->CeilingMeshList[0]);
+
 }
 
 void ACATileFloor::CreateDefualtSpace()
@@ -89,8 +112,24 @@ void ACATileFloor::CreateDefualtSpace()
 		for (int x = -1; x <= 2; x++)
 		{
 			this->ParentZone->SRPCAppendSpace(FVector(x, y, 0), this);
+			this->ParentZone->SRPCAppendSpace(FVector(x, y, 1), this);
 		}
 	}
+}
+
+void ACATileFloor::CreateApiFloor(const FTileInfo& tileinfo)
+{
+	for (FVector tile : tileinfo.tileList)
+	{
+		FVector NewPosition = this->Position + tile;
+		NewPosition.Z = 0;
+		ParentZone->AttachTile(NewPosition, this);
+		ParentZone->AttachTile(NewPosition + FVector(0, 0, 1), this);
+	}
+
+
+	//TArray<AActor*> spawnActor = UFL_TileTools::SpawnTileObjects(GetWorld(), tileinfo.objectInfoList);
+	UE_LOG(LogTemp, Display, TEXT("spawn Suc"));
 }
 
 void ACATileFloor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -193,8 +232,9 @@ void ACATileFloor::AttachSpace(FHitResult hitResult, ACATileSpace* newTileSpace)
 
 	// 새 타일 부착 및 가시성 업데이트
 	FVector NewPosition = this->Position + AttachOffset;
+	NewPosition.Z = 0;
 	ParentZone->AttachTile(NewPosition, newTileSpace);
-
+	ParentZone->AttachTile(NewPosition + FVector(0,0,1), newTileSpace);
 }
 
 void ACATileFloor::AttachPostision(FVector position, ACATileSpace* newTileSpace)
