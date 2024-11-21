@@ -40,6 +40,11 @@
 			"Name": "EOSIntegrationKit",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/dba0aa05bdd144e69405653a387ad63e"
+		},
+		{
+			"Name": "PDFViewer",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/8170d77a81e3458fbdf42fc2c5736f8a"
 		}
 	]
 }
