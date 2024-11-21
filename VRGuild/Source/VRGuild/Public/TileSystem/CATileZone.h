@@ -3,10 +3,12 @@
 #pragma once
 
 #include "FL_TileTools.h"
+#include "Global/API/BPL/CBPLTile.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CATileZone.generated.h"
+
 
 USTRUCT()
 struct FTileSpaceData
@@ -50,6 +52,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void CreateDefualtSpace();
+
+	UFUNCTION(BlueprintCallable)
+	void CreateFloorZone(const FTileInfo& tileInfo);
+
+	UFUNCTION(BlueprintCallable)
+	void CreateObjectZone(const FTileInfo& tileInfo);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

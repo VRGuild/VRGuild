@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Global/API/BPL/CBPLBase.h"
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "FL_TileTools.generated.h"
@@ -26,4 +27,16 @@ class VRGUILD_API UFL_TileTools : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = "Tools")
 	static FVector SnapGridVector(FVector vector, float gridSize);
+
+
+    UFUNCTION(BlueprintCallable, Category = "Tile System")
+    static AActor* SpawnTileObject(UWorld* World, const FTileObjectInfo& ObjectInfo);
+
+    // 여러 오브젝트 스폰
+    UFUNCTION(BlueprintCallable, Category = "Tile System")
+    static TArray<AActor*> SpawnTileObjects(UWorld* World, const TArray<FTileObjectInfo>& ObjectInfoList);
+
+    // FTileObjectInfo 생성 헬퍼
+    UFUNCTION(BlueprintCallable, Category = "Tile System")
+    static FTileObjectInfo CreateTileObjectInfo(AActor* Actor);
 };

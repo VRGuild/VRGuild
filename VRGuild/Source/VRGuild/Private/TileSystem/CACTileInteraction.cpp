@@ -140,7 +140,26 @@ void UCACTileInteraction::OnReleased(const FInputActionValue& Value)
 
 	price.silverAmount = 10;
 	price.cause = "fucking Genius!!";
-	CheckPayEther(price, "Wall Object");
+
+	ACATileSpace* target = Cast<ACATileSpace>(HitResult.GetActor());
+	if (!target)
+		return;
+	if (target->GetSpaceType() == ESpaceType::Floor)
+	{
+		if (HitResult.GetComponent()->GetName() == "CeilingComp")
+		{
+			// 아무 작업 하지않음
+		}
+		else if (HitResult.GetComponent()->GetName() == "BaseFloorComp")
+		{
+			AddTile();
+		}
+		else
+		{
+			CheckPayEther(price, "Wall Object");
+		}
+	}
+
 }
 
 void UCACTileInteraction::AddTile()
@@ -162,6 +181,10 @@ void UCACTileInteraction::AddTile()
 			{
 				target->SpawnSpace(HitResult, this->SelectedTileCube);
 			}
+		}
+		else if (HitResult.GetComponent()->GetName() == "CeilingComp")
+		{
+			// 아무 작업 하지않음
 		}
 		else
 		{
