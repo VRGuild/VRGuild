@@ -45,6 +45,10 @@
 			"Name": "PDFViewer",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/8170d77a81e3458fbdf42fc2c5736f8a"
+		},
+		{
+			"Name": "SkeletalMeshModelingTools",
+			"Enabled": true
 		}
 	]
 }

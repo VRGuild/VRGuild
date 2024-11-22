@@ -74,7 +74,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Settings)
 	FString PickupMessage;
 
-	UPROPERTY(ReplicatedUsing = OnRep_ActorDisplayed)
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess), ReplicatedUsing = OnRep_ActorDisplayed)
 	TObjectPtr<ACAProjectNotice> ActorDisplayed;
 	UFUNCTION()
 	void OnRep_ActorDisplayed();
