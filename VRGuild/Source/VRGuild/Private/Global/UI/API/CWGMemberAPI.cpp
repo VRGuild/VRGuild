@@ -14,6 +14,8 @@ void UCWGMemberAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     FRegexPattern AcceptMemberPattern(TEXT(R"(GET\s+/api/member/apply/(\d+)$)"));
     FRegexPattern RejectMemberPattern(TEXT(R"(GET\s+/api/member/except/(\d+)$)"));
     FRegexPattern DeleteMemberPattern(TEXT(R"(DELETE\s+/api/member/delete/(\d+)$)"));
+    FRegexPattern AcceptNewMemberPattern(TEXT(R"(PATCH\s+/api/member/accept/(\d+)$)"));
+    FRegexPattern RejectNewMemberPattern(TEXT(R"(PATCH\s+/api/member/reject/(\d+)$)"));
 
     FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
     UE_LOG(LogTemp, Display, TEXT("URL to match: %s"), *UrlToMatch);
@@ -33,6 +35,14 @@ void UCWGMemberAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
     else if (FRegexMatcher(DeleteMemberPattern, UrlToMatch).FindNext())
     {
         MemberDeleteCallBack(req, res);
+    }
+    else if (FRegexMatcher(AcceptNewMemberPattern, UrlToMatch).FindNext())
+    {
+        MemberNewAccpetCallBack(req, res);
+    }
+    else if (FRegexMatcher(RejectNewMemberPattern, UrlToMatch).FindNext())
+    {
+        MemberNewRejectCallBack(req, res);
     }
 }
 

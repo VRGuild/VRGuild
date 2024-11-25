@@ -180,4 +180,12 @@ public:
             return TEXT("Unknown");
         }
     }
+
+    UFUNCTION(BlueprintCallable, Category = "String")
+    static bool IsValidEmail(const FString& Email)
+    {
+        const FRegexPattern EmailPattern(TEXT("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"));
+        FRegexMatcher Matcher(EmailPattern, Email);
+        return Matcher.FindNext();
+    }
 };
