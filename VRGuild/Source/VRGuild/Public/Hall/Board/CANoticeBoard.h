@@ -76,20 +76,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Settings|Components")
 	TObjectPtr<UTestWidgetComp> WidgetCompCancelButton;
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
 	TObjectPtr<USceneComponent> TopSize;
-	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
 	TObjectPtr<USceneComponent> BottomSize;
-	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
 	TObjectPtr<USceneComponent> LeftSize;
-	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Components|Size")
+	UPROPERTY(EditAnywhere, Category = "Settings|Components|Size")
 	TObjectPtr<USceneComponent> RightSize;
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta=(MakeEditWidget))
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Spacer", meta=(MakeEditWidget))
 	FVector StartLocation;
-	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
 	FVector SpacerWidth;
-	UPROPERTY(VisibleInstanceOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Spacer", meta = (MakeEditWidget))
 	FVector SpacerHeight;
 
 protected:
