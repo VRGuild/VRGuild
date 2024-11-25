@@ -82,11 +82,13 @@ void ACACarryInteractable::Init(bool bIsEnabled, ACharacter* owner, bool bAttach
 			//
 			//UE_LOG(LogTemp, Warning, TEXT("Trans after: %s"), *socketTransform.ToString());
 
-			AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HoldSocketName);
-
-			UE_LOG(LogTemp, Warning, TEXT("SUCCESS"));
+			if (AttachToComponent(owner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HoldSocketName))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Attach: SUCCESS"));
+			}
+			else UE_LOG(LogTemp, Warning, TEXT("Attach: NONE"));			
 		}
-		else UE_LOG(LogTemp, Warning, TEXT("NONE"));
+		
 		//else
 		//{			
 		//	USkeletalMeshSocket* NewSocket = NewObject<USkeletalMeshSocket>(owner->GetMesh()->SkeletalMesh);

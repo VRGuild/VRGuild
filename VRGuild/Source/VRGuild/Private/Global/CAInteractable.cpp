@@ -15,11 +15,11 @@ ACAInteractable::ACAInteractable()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	RootComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
-	RootComponent = RootComp;
+	/*RootComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
+	RootComponent = RootComp;*/
 	
 	BoxOverlap = CreateDefaultSubobject<UBoxComponent>("PlayerBoxOverlap");
-	BoxOverlap->SetupAttachment(RootComp);
+	SetRootComponent(BoxOverlap);
 	BoxOverlap->SetBoxExtent(FVector(200.f));
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
