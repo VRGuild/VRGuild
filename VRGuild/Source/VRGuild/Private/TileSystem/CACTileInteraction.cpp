@@ -152,7 +152,8 @@ void UCACTileInteraction::OnReleased(const FInputActionValue& Value)
 		}
 		else if (HitResult.GetComponent()->GetName() == "BaseFloorComp")
 		{
-			AddTile();
+			// 만들지 않음
+			// AddTile();
 		}
 		else
 		{
