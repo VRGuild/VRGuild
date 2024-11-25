@@ -96,8 +96,7 @@ void UCACInteraction::UpdateActorsOverlapped(AActor* actorOverlapped, bool bAdd)
 	{
 		ActorsOverlapped.Remove(actorOverlapped);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("ActorsOverlapped: %d"), ActorsOverlapped.Num());
-
+	//UE_LOG(LogTemp, Warning, TEXT("ActorsOverlapped: %d"), ActorsOverlapped.Num());
 }
 
 void UCACInteraction::Enable()

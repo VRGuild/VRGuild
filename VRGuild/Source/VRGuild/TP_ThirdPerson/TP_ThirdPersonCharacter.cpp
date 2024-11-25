@@ -180,6 +180,7 @@ void ATP_ThirdPersonCharacter::SetCustomValue(FCharacterCustomData data)
 
 void ATP_ThirdPersonCharacter::OnWidgetHoveredChanged(UWidgetComponent* WidgetComponent, UWidgetComponent* PreviousWidgetComponent)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Active WidgetComponent: %s"), *GetNameSafe(WidgetComponent));
 	if (WidgetComponent)
 	{
 		if (WidgetComp = Cast<UTestWidgetComp>(WidgetComponent))
