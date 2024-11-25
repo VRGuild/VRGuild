@@ -51,29 +51,32 @@ AActor* UFL_TileTools::SpawnTileObject(UWorld* World, const FTileObjectInfo& Obj
 
     // 액터 스폰 시도
     AActor* SpawnedActor = nullptr;
-    try
+
+    SpawnedActor = World->SpawnActor<AActor>(LoadedClass, SpawnTransform);
+    if (SpawnedActor)
     {
-        SpawnedActor = World->SpawnActor<AActor>(LoadedClass, SpawnTransform);
-        if (SpawnedActor)
+        SpawnedActor->SetReplicates(true);
+        SpawnedActor->SetReplicateMovement(true);
+
+        if (UStaticMeshComponent* MeshComp = SpawnedActor->FindComponentByClass<UStaticMeshComponent>())
         {
-            SpawnedActor->SetReplicates(true);
-            SpawnedActor->SetReplicateMovement(true);
-
-            if (UStaticMeshComponent* MeshComp = SpawnedActor->FindComponentByClass<UStaticMeshComponent>())
-            {
-                MeshComp->SetIsReplicated(true);
-                MeshComp->SetVisibility(true);
-            }
-
-            SpawnedActor->SetActorLabel(ObjectInfo.objectName);
-            SpawnedActor->Tags.Add(FName(*FString::Printf(TEXT("ObjectId_%lld"), ObjectInfo.objectId)));
-            UE_LOG(LogTemp, Display, TEXT("Successfully spawned actor: %s"), *SpawnedActor->GetName());
+            MeshComp->SetIsReplicated(true);
+            MeshComp->SetVisibility(true);
         }
+
+        //SpawnedActor->SetActorLabel(ObjectInfo.objectName);
+        SpawnedActor->Tags.Add(FName(*FString::Printf(TEXT("ObjectId_%lld"), ObjectInfo.objectId)));
+        UE_LOG(LogTemp, Display, TEXT("Successfully spawned actor: %s"), *SpawnedActor->GetName());
+    }
+
+    /*try
+    {
+       
     }
     catch (const std::exception& e)
     {
         UE_LOG(LogTemp, Error, TEXT("Spawn failed with exception: %s"), UTF8_TO_TCHAR(e.what()));
-    }
+    }*/
 
     return SpawnedActor;
 }
