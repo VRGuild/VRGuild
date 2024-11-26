@@ -6,147 +6,117 @@
 
 void UCWGChannelAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	FRegexPattern GetChannelPattern(TEXT(R"(GET\s+/api/channel)"));
-	FRegexPattern PostChannelPattern(TEXT(R"(POST\s+/api/channel)"));
-	FRegexPattern PatchChannelPattern(TEXT(R"(PATCH\s+/api/channel)"));
-	FRegexPattern GetChannelSearchPattern(TEXT(R"(GET\s+/api/channel/([a-zA-Z0-9가-힣-_]+))"));
-	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([a-zA-Z0-9가-힣-_]+))"));
+	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel/([^/]+))"));
+	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/([^/]+))"));
+	FRegexPattern UpdateChannelPattern(TEXT(R"(PUT\s+/api/channel/([^/]+))"));
+	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([^/]+))"));
 
-	// Implementation of routing logic
 	FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
 
-	if (FRegexMatcher(GetChannelPattern, UrlToMatch).FindNext())
+	if (FRegexMatcher(RegisterChannelPattern, UrlToMatch).FindNext())
 	{
-		ChannelGetCallBack(req, res);
+		RegisterChannelCallBack(req, res);
 	}
-	else if (FRegexMatcher(PostChannelPattern, UrlToMatch).FindNext())
+	else if (FRegexMatcher(GetChannelInfoPattern, UrlToMatch).FindNext())
 	{
-		ChannelPostCallBack(req, res);
+		GetChannelInfoCallBack(req, res);
 	}
-	else if (FRegexMatcher(PatchChannelPattern, UrlToMatch).FindNext())
+	else if (FRegexMatcher(UpdateChannelPattern, UrlToMatch).FindNext())
 	{
-		ChannelPatchCallBack(req, res);
-	}
-	else if (FRegexMatcher(GetChannelSearchPattern, UrlToMatch).FindNext())
-	{
-		ChannelSearchIdGetCallBack(req, res);
+		UpdateChannelCallBack(req, res);
 	}
 	else if (FRegexMatcher(DeleteChannelPattern, UrlToMatch).FindNext())
 	{
-		ChannelSearchIdDeleteCallBack(req, res);
+		DeleteChannelCallBack(req, res);
 	}
 }
 
 void UCWGChannelAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	FRegexPattern GetChannelPattern(TEXT(R"(GET\s+/api/channel)"));
-	FRegexPattern PostChannelPattern(TEXT(R"(POST\s+/api/channel)"));
-	FRegexPattern PatchChannelPattern(TEXT(R"(PATCH\s+/api/channel)"));
-	FRegexPattern GetChannelSearchPattern(TEXT(R"(GET\s+/api/channel/([a-zA-Z0-9가-힣-_]+))"));
-	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([a-zA-Z0-9가-힣-_]+))"));
+	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel/([^/]+))"));
+	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/([^/]+))"));
+	FRegexPattern UpdateChannelPattern(TEXT(R"(PUT\s+/api/channel/([^/]+))"));
+	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([^/]+))"));
 
-	// Implementation of routing logic
 	FString UrlToMatch = req->GetVerb() + TEXT(" /") + GetAPIPath(req->GetURL());
 
-	if (FRegexMatcher(GetChannelPattern, UrlToMatch).FindNext())
+	if (FRegexMatcher(RegisterChannelPattern, UrlToMatch).FindNext())
 	{
-		OnFailChannelGetCallBack();
+		OnFailRegisterChannelCallBack();
 	}
-	else if (FRegexMatcher(PostChannelPattern, UrlToMatch).FindNext())
+	else if (FRegexMatcher(GetChannelInfoPattern, UrlToMatch).FindNext())
 	{
-		OnFailChannelPostCallBack();
+		OnFailGetChannelInfoCallBack();
 	}
-	else if (FRegexMatcher(PatchChannelPattern, UrlToMatch).FindNext())
+	else if (FRegexMatcher(UpdateChannelPattern, UrlToMatch).FindNext())
 	{
-		OnFailChannelPatchCallBack();
-	}
-	else if (FRegexMatcher(GetChannelSearchPattern, UrlToMatch).FindNext())
-	{
-		OnFailChannelSearchIdGetCallBack();
+		OnFailUpdateChannelCallBack();
 	}
 	else if (FRegexMatcher(DeleteChannelPattern, UrlToMatch).FindNext())
 	{
-		OnFailChannelSearchIdDeleteCallBack();
+		OnFailDeleteChannelCallBack();
 	}
 }
 
-void UCWGChannelAPI::ChannelGetCall()
+// Register Channel Implementation
+void UCWGChannelAPI::RegisterChannelCall(const FString& accountId, const FChannelnfoCreateAPI& ChannelData)
 {
-	this->API = "api/channel";
+	this->API = FString::Printf(TEXT("api/channel/%s"), *accountId);
+	HttpPostCall<FChannelnfoCreateAPI>(ChannelData);
+}
 
+void UCWGChannelAPI::RegisterChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+	FString jsonString = res->GetContentAsString();
+	FChannelInfoDataAPI ParseData;
+	ParseData = JsonPerse<FChannelInfoDataAPI>(jsonString);
+	OnRegisterChannelCallBack(ParseData.Data);
+}
+
+// Get Channel Info Implementation
+void UCWGChannelAPI::GetChannelInfoCall(const FString& channelId)
+{
+	this->API = FString::Printf(TEXT("api/channel/%s"), *channelId);
 	HttpGetCall();
 }
 
-void UCWGChannelAPI::ChannelGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-	FString jsonString = res->GetContentAsString();
-	FChannelInfoDataListAPI ParseData;
-	ParseData = JsonPerse<FChannelInfoDataListAPI>(jsonString);
-	OnChannelGetCallBack(ParseData);
-}
-
-void UCWGChannelAPI::ChannelPostCall(FChannelnfoCreateAPI TileData)
-{
-	this->API = "api/channel";
-
-	HttpPostCall<FChannelnfoCreateAPI>(TileData);
-}
-
-void UCWGChannelAPI::ChannelPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGChannelAPI::GetChannelInfoCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	FString jsonString = res->GetContentAsString();
 	FChannelInfoDataAPI ParseData;
 	ParseData = JsonPerse<FChannelInfoDataAPI>(jsonString);
-	OnChannelPostCallBack(ParseData.Data);
+	OnGetChannelInfoCallBack(ParseData.Data);
 }
 
-void UCWGChannelAPI::ChannelPatchCall(FChannelInfoUpdateAPI TileData)
+// Update Channel Implementation
+void UCWGChannelAPI::UpdateChannelCall(const FString& channelId, const FChannelInfoUpdateAPI& ChannelData)
 {
-	this->API = "api/channel";
-
-	HttpPatchCall<FChannelInfoUpdateAPI>(TileData);
+	this->API = FString::Printf(TEXT("api/channel/%s"), *channelId);
+	HttpPutCall<FChannelInfoUpdateAPI>(ChannelData);
 }
 
-void UCWGChannelAPI::ChannelPatchCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
-{
-	FString jsonString = res->GetContentAsString();
-	FChannelInfoDataAPI ParseData;
-	ParseData = JsonPerse<FChannelInfoDataAPI>(jsonString);
-	OnChannelPatchCallBack(ParseData.Data);
-}
-
-void UCWGChannelAPI::ChannelSearchIdGetCall(FString channeld)
-{
-	this->API = "api/channel/" + channeld;
-
-	HttpGetCall();
-}
-
-void UCWGChannelAPI::ChannelSearchIdGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGChannelAPI::UpdateChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
 	FString jsonString = res->GetContentAsString();
 	FChannelInfoDataAPI ParseData;
 	ParseData = JsonPerse<FChannelInfoDataAPI>(jsonString);
-	OnChannelSearchIdGetCallBack(ParseData.Data);
+	OnUpdateChannelCallBack(ParseData.Data);
 }
 
-void UCWGChannelAPI::ChannelSearchIdDeleteCall(FString channeld)
+// Delete Channel Implementation
+void UCWGChannelAPI::DeleteChannelCall(const FString& channelId)
 {
-	this->API = "api/channel/" + channeld;
-
+	this->API = FString::Printf(TEXT("api/channel/%s"), *channelId);
 	HttpDeleteCall();
 }
 
-void UCWGChannelAPI::ChannelSearchIdDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+void UCWGChannelAPI::DeleteChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	OnChannelSearchIdDeleteCallBack();
+	OnDeleteChannelCallBack();
 }
 
 TArray<FTileInfo> UCWGChannelAPI::DefaultTile()
 {
-	TArray<FTileInfo> defaulTileMap;
-
-	FTileInfo tempTileInfo;
-
-	return defaulTileMap;
+	TArray<FTileInfo> defaultTileMap;
+	return defaultTileMap;
 }
