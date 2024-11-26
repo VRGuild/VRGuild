@@ -78,7 +78,7 @@ AActor* UCACTileInteraction::TileLineTrace()
 		return nullptr;
 	FHitResult hitResult;
 	FVector start = this->OwnerCamera->GetComponentLocation();
-	FVector end = start  + (this->OwnerCamera->GetForwardVector() * 3000);
+	FVector end = start  + (this->OwnerCamera->GetForwardVector() * 200);
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(Owner);
 
