@@ -16,52 +16,46 @@ class VRGUILD_API UCWGChannelAPI : public UCWGBaseAPI
 {
 	GENERATED_BODY()
 public:
-
 	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
 
 	class ACPCBasePlayerController* OwnerPlayerController;
 
+	// Register Channel (POST /api/channel/{accountId})
 	UFUNCTION(BlueprintCallable)
-	void ChannelGetCall();
-	void ChannelGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	void RegisterChannelCall(const FString& accountId, const FChannelnfoCreateAPI& ChannelData);
+	void RegisterChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnChannelGetCallBack(FChannelInfoDataListAPI ChannelData);
+	void OnRegisterChannelCallBack(const FChannelInfoAPI& ChannelData);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailChannelGetCallBack();
+	void OnFailRegisterChannelCallBack();
 
+	// Get Channel Info (GET /api/channel/{channelId})
 	UFUNCTION(BlueprintCallable)
-	void ChannelPostCall(FChannelnfoCreateAPI ChannelData);
-	void ChannelPostCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	void GetChannelInfoCall(const FString& channelId);
+	void GetChannelInfoCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnChannelPostCallBack(FChannelInfoAPI ChannelData);
+	void OnGetChannelInfoCallBack(const FChannelInfoAPI& ChannelData);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailChannelPostCallBack();
+	void OnFailGetChannelInfoCallBack();
 
+	// Update Channel (PUT /api/channel/{channelId})
 	UFUNCTION(BlueprintCallable)
-	void ChannelPatchCall(FChannelInfoUpdateAPI ChannelData);
-	void ChannelPatchCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	void UpdateChannelCall(const FString& channelId, const FChannelInfoUpdateAPI& ChannelData);
+	void UpdateChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnChannelPatchCallBack(FChannelInfoAPI ChannelData);
+	void OnUpdateChannelCallBack(const FChannelInfoAPI& ChannelData);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailChannelPatchCallBack();
+	void OnFailUpdateChannelCallBack();
 
+	// Delete Channel (DELETE /api/channel/{channelId})
 	UFUNCTION(BlueprintCallable)
-	void ChannelSearchIdGetCall(FString channeld);
-	void ChannelSearchIdGetCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	void DeleteChannelCall(const FString& channelId);
+	void DeleteChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnChannelSearchIdGetCallBack(FChannelInfoAPI ChannelData);
+	void OnDeleteChannelCallBack();
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailChannelSearchIdGetCallBack();
-
-	UFUNCTION(BlueprintCallable)
-	void ChannelSearchIdDeleteCall(FString channeld);
-	void ChannelSearchIdDeleteCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnChannelSearchIdDeleteCallBack();
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnFailChannelSearchIdDeleteCallBack();
-
+	void OnFailDeleteChannelCallBack();
 
 public:
 	UFUNCTION(BlueprintCallable)
