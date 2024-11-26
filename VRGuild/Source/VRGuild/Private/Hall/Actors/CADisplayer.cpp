@@ -314,8 +314,4 @@ void ACADisplayer::ServerPickupCommission_Implementation(ACharacter* player)
 			ActorDisplayed = nullptr;
 		}
 	}
-	else
-	{
-
-	}
 }

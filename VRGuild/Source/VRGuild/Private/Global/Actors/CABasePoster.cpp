@@ -34,8 +34,9 @@ ACABasePoster::ACABasePoster()
 	this->BackSideComp->SetRelativeLocation(FVector(-0.1, 0, 0));
 	this->BackSideComp->SetRelativeRotation(FRotator(0, 180, 0));
 	this->BackSideComp->SetDrawSize(this->WidgetDrawSize);
-	this->BackSideComp->SetTwoSided(true);
+	//this->BackSideComp->SetTwoSided(true);
 	this->BackSideComp->SetRelativeScale3D(FVector(0.1));
+	//BackSideComp->SetVisibility(false);
 
 	BackSideComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -153,7 +154,7 @@ void ACABasePoster::OnRep_bEnabled()
 	else
 	{
 		FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
-		FrontSideComp->SetTwoSided(true);
+		//FrontSideComp->SetTwoSided(true);
 	}
 
 	/*if (owner && owner->IsLocallyControlled())

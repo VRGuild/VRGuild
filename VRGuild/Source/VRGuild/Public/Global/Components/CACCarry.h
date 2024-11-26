@@ -72,9 +72,10 @@ private:
 
 	UFUNCTION()
 	void OnRep_ActorInHand();
-	
+
 	UFUNCTION(Server, Reliable)
 	void ServerHold(ACACarryInteractable* actorToHold);
+	
 	bool bProcessingHold;
 	UFUNCTION(Server, Reliable)
 	void ServerDrop();

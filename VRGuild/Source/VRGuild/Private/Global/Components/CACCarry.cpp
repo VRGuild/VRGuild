@@ -50,11 +50,11 @@ void UCACCarry::StartCarry(ACACarryInteractable* actorToHold)
 
 	bProcessingHold = true;
 
-	if (actorToHold->GetLocalRole() == ROLE_Authority)
+	if (actorToHold->GetLocalRole() == ROLE_Authority && !Owner->HasAuthority())
 	{
 		StartDrop(true);
 
-		Read(actorToHold);		
+		Read(actorToHold);
 	}
 	else
 	{
