@@ -16,10 +16,13 @@ UCLASS()
 class VRGUILD_API UCWGProjectNotice : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnSetProjectInfo(FProjectWithDetail projectInfo);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_DisplayGuide(bool bDisplay);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FProjectWithDetail ProjectInfo;

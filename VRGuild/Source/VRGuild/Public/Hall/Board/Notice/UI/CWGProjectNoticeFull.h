@@ -11,12 +11,17 @@
 /**
  * 
  */
+class UCWGProjectNotice;
+
 UCLASS()
 class VRGUILD_API UCWGProjectNoticeFull : public UCWGProjectAPI
 {
 	GENERATED_BODY()
-	
+
 public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnSetDetailInfo(FProjectWithDetail ProjectInfo);
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UCWGProjectNotice> ProjectNoticeFrontSide;
 };
