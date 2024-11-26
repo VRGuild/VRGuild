@@ -12,11 +12,11 @@
 
 ACAProjectNotice::ACAProjectNotice()
 {
-	ConstructorHelpers::FClassFinder<UUserWidget> tempBackSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeBackSide.WBP_ProjectNoticeBackSide_C'"));
+	/*ConstructorHelpers::FClassFinder<UUserWidget> tempBackSide(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Hall/Board/Notice/UI/WBP_ProjectNoticeBackSide.WBP_ProjectNoticeBackSide_C'"));
 	if (tempBackSide.Succeeded())
 	{
 		this->BackSideComp->SetWidgetClass(tempBackSide.Class);
-	}
+	}*/
 }
 
 void ACAProjectNotice::BeginPlay()
@@ -34,7 +34,7 @@ void ACAProjectNotice::BeginPlay()
 	}
 	if (this->WidgetBackSide)
 	{
-		this->BackSideComp->SetWidgetClass(this->WidgetBackSide);
+		this->BackSideComp->SetWidget(FrontSideWidget);
 	}
 }
 
@@ -77,6 +77,14 @@ UUserWidget* ACAProjectNotice::GetPosterDisplayWidget()
 	if (ensure(ProjectAPIWidget))
 	{
 		ProjectAPIWidget->OnSetDetailInfo(this->NoticeData);
+
+		if (ProjectAPIWidget->ProjectNoticeFrontSide)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Project: yes %s"), *GetNameSafe(ProjectAPIWidget->ProjectNoticeFrontSide));
+			ProjectAPIWidget->ProjectNoticeFrontSide->BP_DisplayGuide(!IsEnabled());
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("Project: Empty"));
+
 		return ProjectAPIWidget;
 	}
 	return nullptr;
