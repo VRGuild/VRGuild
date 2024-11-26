@@ -87,7 +87,7 @@ AActor* UCACTileInteraction::TileLineTrace()
 #if WITH_EDITOR 
 	DrawDebugLine(GetWorld(), start, end, hit ? FColor::Cyan : FColor::Red, false, 3);
 #endif
-
+	HitResult = hitResult;
 	if (hit)
 	{
 		HitResult = hitResult;
