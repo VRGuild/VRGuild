@@ -52,7 +52,7 @@ void UCACCarry::StartCarry(ACACarryInteractable* actorToHold)
 
 	if (actorToHold->GetLocalRole() == ROLE_Authority && !Owner->HasAuthority())
 	{
-		StartDrop(true);
+		//StartDrop(true);
 
 		Read(actorToHold);
 	}
