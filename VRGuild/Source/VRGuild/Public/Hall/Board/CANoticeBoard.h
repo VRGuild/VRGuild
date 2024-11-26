@@ -124,10 +124,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FDeveloperRequest> DevInfoList;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings")
 	EPosterType PosterType;
 
-	UPROPERTY(EditInstanceOnly, Category = "Settings")
+	UPROPERTY(EditAnywhere, Category = "Settings")
 	float SpawnedActorScale;
 
 	void RefreshBoard(ACharacter* initiator);
@@ -138,15 +138,15 @@ protected:
 	virtual void OnRep_Owner() override;
 
 private:
-	UPROPERTY(EditInstanceOnly, meta = (AllowPrivateAccess), Category = "Settings|Interactions")
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess), Category = "Settings|Interactions")
 	int32 MaxPosterNumbers;
-	UPROPERTY(EditInstanceOnly, meta = (AllowPrivateAccess), Category = "Settings|Interactions")
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess), Category = "Settings|Interactions")
 	bool bDisplayRefreshButton;
-	UPROPERTY(EditInstanceOnly, Category = "Settings|Random")
+	UPROPERTY(EditAnywhere, Category = "Settings|Random")
 	float LocRange;
-	UPROPERTY(EditInstanceOnly, Category = "Settings|Random")
+	UPROPERTY(EditAnywhere, Category = "Settings|Random")
 	float RollRange;
-	UPROPERTY(EditInstanceOnly, Category = "Settings|Random")
+	UPROPERTY(EditAnywhere, Category = "Settings|Random")
 	float ScaleRange;
 
 	void GetData(FDataP& data, const TSubclassOf<ACABasePoster>& posterClass);
