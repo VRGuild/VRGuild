@@ -105,6 +105,12 @@ public:
 	};
 
 	template<typename T>
+	void HttpPutCall(T sendData) {
+		UE_LOG(LogTemp, Display, TEXT("HttpPutCall"));
+		HttpJsonContentTypeCall<T>(sendData, "PUT");
+	};
+
+	template<typename T>
 	void HttpDeleteCall(T sendData) {
 		UE_LOG(LogTemp, Display, TEXT("HttpDeleteCall"));
 		HttpJsonContentTypeCall<T>(sendData, "DELETE");

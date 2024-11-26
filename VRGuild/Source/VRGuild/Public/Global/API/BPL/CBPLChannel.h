@@ -1,88 +1,81 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "CBPLTile.h"
 #include "CBPLChannel.generated.h"
 
-
-
+// 채널 생성 요청 구조체
 USTRUCT(BlueprintType, Atomic)
 struct FChannelnfoCreateAPI
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 public:
-	FChannelnfoCreateAPI() {};
+    FChannelnfoCreateAPI() {};
 
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FTileInfo> positionTypes;
+    UPROPERTY(BlueprintReadWrite)
+    FString channelName;
 };
 
+// 채널 업데이트 요청 구조체
 USTRUCT(BlueprintType, Atomic)
 struct FChannelInfoUpdateAPI
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 public:
-	FChannelInfoUpdateAPI() {};
+    FChannelInfoUpdateAPI() {};
 
-	FString ChannelID;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FTileInfo> positionTypes;
+    UPROPERTY(BlueprintReadWrite)
+    FString channelName;
 };
 
+// 채널 정보 구조체
 USTRUCT(BlueprintType, Atomic)
 struct FChannelInfoAPI
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 public:
-	FChannelInfoAPI() {};
+    FChannelInfoAPI() {};
 
-	UPROPERTY(BlueprintReadWrite)
-	FString ChannelId;
+    UPROPERTY(BlueprintReadWrite)
+    FString channelId;
 
-	UPROPERTY(BlueprintReadWrite)
-	FString OwnerId;
+    UPROPERTY(BlueprintReadWrite)
+    FString channelName;
 
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FTileInfo> positionTypes;
+    UPROPERTY(BlueprintReadWrite)
+    FDateTime createdAt;
 
-	UPROPERTY(BlueprintReadWrite)
-	FDateTime	createdAt;
-
-	UPROPERTY(BlueprintReadWrite)
-	FDateTime	modifiedAt;
+    UPROPERTY(BlueprintReadWrite)
+    FDateTime modifiedAt;
 };
 
+// 단일 채널 응답 데이터 구조체
 USTRUCT(BlueprintType, Atomic)
 struct FChannelInfoDataAPI
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 public:
-	FChannelInfoDataAPI() {};
+    FChannelInfoDataAPI() {};
 
-	UPROPERTY(BlueprintReadWrite)
-	FChannelInfoAPI Data;
+    UPROPERTY(BlueprintReadWrite)
+    FChannelInfoAPI Data;
 };
 
+// 채널 목록 응답 데이터 구조체
 USTRUCT(BlueprintType, Atomic)
 struct FChannelInfoDataListAPI
 {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 public:
-	FChannelInfoDataListAPI() {};
+    FChannelInfoDataListAPI() {};
 
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FChannelInfoAPI> Data;
+    UPROPERTY(BlueprintReadWrite)
+    TArray<FChannelInfoAPI> Data;
 };
 
-/**
- * 
- */
 UCLASS()
 class VRGUILD_API UCBPLChannel : public UBlueprintFunctionLibrary
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
