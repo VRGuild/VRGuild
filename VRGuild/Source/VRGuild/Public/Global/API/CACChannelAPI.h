@@ -1,5 +1,66 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
+#pragma once
+#include "Global/API/BPL/CBPLChannel.h"
+#include "CoreMinimal.h"
+#include "Global/API/CACBaseAPI.h"
+#include "CACChannelAPI.generated.h"
 
+UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class VRGUILD_API UCACChannelAPI : public UCACBaseAPI
+{
+	GENERATED_BODY()
+public:
+	UCACChannelAPI();
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
+	virtual void OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+	virtual void OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res) override;
+
+	class ACPCBasePlayerController* OwnerPlayerController;
+
+	// Register Channel (POST /api/channel/{accountId})
+	UFUNCTION(BlueprintCallable)
+	void RegisterChannelCall(const FString& accountId, const FChannelnfoCreateAPI& ChannelData);
+	void RegisterChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnRegisterChannelCallBack(const FChannelInfoAPI& ChannelData);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailRegisterChannelCallBack();
+
+	// Get Channel Info (GET /api/channel/{channelId})
+	UFUNCTION(BlueprintCallable)
+	void GetChannelInfoCall(const FString& channelId);
+	void GetChannelInfoCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnGetChannelInfoCallBack(const FChannelInfoAPI& ChannelData);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailGetChannelInfoCallBack();
+
+	// Update Channel (PUT /api/channel/{channelId})
+	UFUNCTION(BlueprintCallable)
+	void UpdateChannelCall(const FString& channelId, const FChannelInfoUpdateAPI& ChannelData);
+	void UpdateChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUpdateChannelCallBack(const FChannelInfoAPI& ChannelData);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailUpdateChannelCallBack();
+
+	// Delete Channel (DELETE /api/channel/{channelId})
+	UFUNCTION(BlueprintCallable)
+	void DeleteChannelCall(const FString& channelId);
+	void DeleteChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDeleteChannelCallBack();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailDeleteChannelCallBack();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	TArray<FTileInfo> DefaultTile();
+};
+/*
 #pragma once
 
 #include "Global/API/BPL/CBPLChannel.h"
@@ -8,10 +69,6 @@
 #include "Global/API/CACBaseAPI.h"
 #include "CACChannelAPI.generated.h"
 
-
-/**
- * 
- */
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VRGUILD_API UCACChannelAPI : public UCACBaseAPI
 {
@@ -74,5 +131,4 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FTileInfo> DefaultTile();
 };
-
-
+*/

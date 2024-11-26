@@ -24,7 +24,8 @@ AActor* UFL_TileTools::SpawnTileObject(UWorld* World, const FTileObjectInfo& Obj
     }
 
     // 클래스 로드 및 검증 
-    UClass* LoadedClass = FindObject<UClass>(ANY_PACKAGE, *ObjectInfo.objectClassName);
+    // LoadedClass = FindObject<UClass>(ANY_PACKAGE, *ObjectInfo.objectClassName);
+    UClass* LoadedClass = Cast<UClass>(StaticFindObject(UClass::StaticClass(), nullptr, *ObjectInfo.objectClassName, false));
     if (!LoadedClass)
     {
         LoadedClass = StaticLoadClass(AActor::StaticClass(), nullptr, *ObjectInfo.objectClassName);
