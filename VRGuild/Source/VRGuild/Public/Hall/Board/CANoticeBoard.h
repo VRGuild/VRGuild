@@ -96,7 +96,7 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartTrace();
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent)	
 	void EndTrace();
 
 	UFUNCTION(BlueprintImplementableEvent)

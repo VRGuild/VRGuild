@@ -112,6 +112,8 @@ void UCACCarry::Read(ACACarryInteractable* ActorToRead)
 		ReadWidget = Review->GetPosterDisplayWidget();
 
 		ReadWidget->AddToViewport(-1);
+
+		ActorRead = ActorToRead;
 	}
 
 	bProcessingHold = false;
@@ -122,6 +124,7 @@ void UCACCarry::StopReading()
 	ATP_ThirdPersonCharacter::SetInteracting(Owner, false);
 	ReadWidget->RemoveFromParent();
 	ReadWidget = nullptr;
+	ActorRead = nullptr;
 }
 
 void UCACCarry::HideCarryWidget()
@@ -189,6 +192,15 @@ ECarriedType UCACCarry::GetCarryType() const
 ACACarryInteractable* UCACCarry::GetCarriedActor() const
 {
 	return ActorInHand;
+}
+
+void UCACCarry::DestroyActorRead()
+{
+	if (ActorRead)
+	{
+		ActorRead->Destroy();
+		StopReading();
+	}
 }
 
 void UCACCarry::OnRep_ActorInHand()

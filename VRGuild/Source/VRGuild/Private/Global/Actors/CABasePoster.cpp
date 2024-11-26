@@ -148,9 +148,13 @@ void ACABasePoster::OnRep_bEnabled()
 
 	if (IsEnabled())
 	{
-		FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+		FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);	
 	}
-	else FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	else
+	{
+		FrontSideComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		FrontSideComp->SetTwoSided(true);
+	}
 
 	/*if (owner && owner->IsLocallyControlled())
 	{

@@ -63,7 +63,7 @@ ACANoticeBoard::ACANoticeBoard()
 
 	RollRange = 3.f;
 	ScaleRange = 0.05f;
-	LocRange = 7.f;
+	LocRange = 3.5f;
 }
 
 void ACANoticeBoard::BeginPlay()
@@ -104,11 +104,13 @@ void ACANoticeBoard::PostAllProjectNotice(FProjectDetailPagedResponse projectNot
 			std::normal_distribution<float> distRoll(0.f, RollRange);
 			float randRoll = distRoll(rng);
 
-			std::normal_distribution<float> distLoc(0.f, LocRange);
-			float randY = distLoc(rng);
-			float randZ = distLoc(rng);
+			std::normal_distribution<float> distLoc(-LocRange, LocRange);
+			float upDist = distLoc(rng);
+			float rightDist = distLoc(rng);
 
-			FVector randLoc = FVector(0.f, randY, randZ);
+			
+			FVector randLoc = data.heightDir * upDist;
+			randLoc += data.widthDir * rightDist;
 
 			FTransform trans;
 			FVector widthVector = data.widthDir * FMath::Abs(data.posterWidth + data.spacerWidth) * j;
@@ -154,10 +156,11 @@ void ACANoticeBoard::PostAllReviewNotice(const FDeveloperListResponse& devReview
 			float randRoll = distRoll(rng);
 
 			std::normal_distribution<float> distLoc(0.f, LocRange);
-			float randY = distLoc(rng);
-			float randZ = distLoc(rng);
+			float upDist = distLoc(rng);
+			float rightDist = distLoc(rng);
 
-			FVector randLoc = FVector(0.f, randY, randZ);
+			FVector randLoc = data.heightDir * upDist;
+			randLoc += data.widthDir * rightDist;
 
 			FTransform trans;
 			FVector widthVector = data.widthDir * FMath::Abs(data.posterWidth + data.spacerWidth) * j;

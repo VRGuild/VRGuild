@@ -51,6 +51,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	ACACarryInteractable* GetCarriedActor() const;
+	
+	UFUNCTION(BlueprintCallable)
+	void DestroyActorRead();
+
 private:
 	TObjectPtr<ACharacter> Owner;
 	UPROPERTY()
@@ -58,6 +62,7 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UUserWidget> ReadWidget;
+	TObjectPtr<AActor> ActorRead;
 
 	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess))
 	TSubclassOf<UCWScrollBase> ScrollBaseWidgetClass;
