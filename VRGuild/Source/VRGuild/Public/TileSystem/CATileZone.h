@@ -26,6 +26,19 @@ struct FTileSpaceData
 		: Position(InPosition), TileSpace(InTileSpace) {}
 };
 
+USTRUCT()
+struct FOwnerData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FVector Position;
+
+	UPROPERTY()
+	ACATileSpace* TileSpace;
+};
+
+
 UCLASS()
 class VRGUILD_API ACATileZone : public AActor
 {
@@ -71,9 +84,11 @@ protected:
 
 	TSubclassOf<class ACATileSpace> SendDataNewTileClass;
 
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class ACATileFloor> TileFloorClass;
 
+	TArray<FOwnerData> OwnerDataSave;
 public:
 
 	UFUNCTION(Server, Reliable, WithValidation)
