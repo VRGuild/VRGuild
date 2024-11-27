@@ -23,7 +23,7 @@ public:
 
 	// Register Channel (POST /api/channel/{accountId})
 	UFUNCTION(BlueprintCallable)
-	void RegisterChannelCall(const FString& accountId, const FChannelnfoCreateAPI& ChannelData);
+	void RegisterChannelCall(const FChannelnfoCreateAPI& ChannelData);
 	void RegisterChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnRegisterChannelCallBack(const FChannelInfoAPI& ChannelData);
@@ -38,6 +38,15 @@ public:
 	void OnGetChannelInfoCallBack(const FChannelInfoAPI& ChannelData);
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFailGetChannelInfoCallBack();
+
+	// Get Channel Info (GET /api/channel/{channelId})
+	UFUNCTION(BlueprintCallable)
+	void GetAllChannelInfoCall(const int32& page);
+	void GetAllChannelInfoCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnGetAllChannelInfoCallBack(const FChannelInfoDataListAPI& ChannelData);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFailGetAllChannelInfoCallBack();
 
 	// Update Channel (PUT /api/channel/{channelId})
 	UFUNCTION(BlueprintCallable)

@@ -6,8 +6,9 @@
 
 void UCWGChannelAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel/([^/]+))"));
-	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/([^/]+))"));
+	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel)"));
+	FRegexPattern GetAllChannelsPattern(TEXT(R"(GET\s+/api/channel/all/([^/]+)$)"));
+	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/(\d+)$)"));
 	FRegexPattern UpdateChannelPattern(TEXT(R"(PUT\s+/api/channel/([^/]+))"));
 	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([^/]+))"));
 
@@ -29,12 +30,18 @@ void UCWGChannelAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 	{
 		DeleteChannelCallBack(req, res);
 	}
+	else if (FRegexMatcher(GetAllChannelsPattern, UrlToMatch).FindNext())
+	{
+		GetAllChannelInfoCallBack
+		(req, res);
+	}
 }
 
 void UCWGChannelAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel/([^/]+))"));
-	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/([^/]+))"));
+	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel)"));
+	FRegexPattern GetAllChannelsPattern(TEXT(R"(GET\s+/api/channel/all/([^/]+)$)"));
+	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/(\d+)$)"));
 	FRegexPattern UpdateChannelPattern(TEXT(R"(PUT\s+/api/channel/([^/]+))"));
 	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([^/]+))"));
 
@@ -56,12 +63,16 @@ void UCWGChannelAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 	{
 		OnFailDeleteChannelCallBack();
 	}
+	else if (FRegexMatcher(GetAllChannelsPattern, UrlToMatch).FindNext())
+	{
+		OnFailGetAllChannelInfoCallBack();
+	}
 }
 
 // Register Channel Implementation
-void UCWGChannelAPI::RegisterChannelCall(const FString& accountId, const FChannelnfoCreateAPI& ChannelData)
+void UCWGChannelAPI::RegisterChannelCall(const FChannelnfoCreateAPI& ChannelData)
 {
-	this->API = FString::Printf(TEXT("api/channel/%s"), *accountId);
+	this->API = FString::Printf(TEXT("api/channel"));
 	HttpPostCall<FChannelnfoCreateAPI>(ChannelData);
 }
 
@@ -86,6 +97,20 @@ void UCWGChannelAPI::GetChannelInfoCallBack(FHttpRequestPtr req, FHttpResponsePt
 	FChannelInfoDataAPI ParseData;
 	ParseData = JsonPerse<FChannelInfoDataAPI>(jsonString);
 	OnGetChannelInfoCallBack(ParseData.Data);
+}
+
+void UCWGChannelAPI::GetAllChannelInfoCall(const int32& page)
+{
+	this->API = FString::Printf(TEXT("api/channel/%d"), page);
+	HttpGetCall();
+}
+
+void UCWGChannelAPI::GetAllChannelInfoCallBack(FHttpRequestPtr req, FHttpResponsePtr res)
+{
+	FString jsonString = res->GetContentAsString();
+	FChannelInfoDataListAPI ParseData;
+	ParseData = JsonPerse<FChannelInfoDataListAPI>(jsonString);
+	OnGetAllChannelInfoCallBack(ParseData);
 }
 
 // Update Channel Implementation

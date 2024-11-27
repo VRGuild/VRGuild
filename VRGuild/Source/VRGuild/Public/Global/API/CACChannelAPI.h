@@ -22,7 +22,7 @@ protected:
 
 	// Register Channel (POST /api/channel/{accountId})
 	UFUNCTION(BlueprintCallable)
-	void RegisterChannelCall(const FString& accountId, const FChannelnfoCreateAPI& ChannelData);
+	void RegisterChannelCall(const FChannelnfoCreateAPI& ChannelData);
 	void RegisterChannelCallBack(FHttpRequestPtr req, FHttpResponsePtr res);
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnRegisterChannelCallBack(const FChannelInfoAPI& ChannelData);

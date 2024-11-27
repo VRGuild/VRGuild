@@ -28,7 +28,7 @@ void UCACChannelAPI::InitializeComponent()
 
 void UCACChannelAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel/([^/]+))"));
+	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel)"));
 	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/([^/]+))"));
 	FRegexPattern UpdateChannelPattern(TEXT(R"(PUT\s+/api/channel/([^/]+))"));
 	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([^/]+))"));
@@ -55,7 +55,7 @@ void UCACChannelAPI::OnSuccessAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 
 void UCACChannelAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 {
-	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel/([^/]+))"));
+	FRegexPattern RegisterChannelPattern(TEXT(R"(POST\s+/api/channel)"));
 	FRegexPattern GetChannelInfoPattern(TEXT(R"(GET\s+/api/channel/([^/]+))"));
 	FRegexPattern UpdateChannelPattern(TEXT(R"(PUT\s+/api/channel/([^/]+))"));
 	FRegexPattern DeleteChannelPattern(TEXT(R"(DELETE\s+/api/channel/([^/]+))"));
@@ -81,9 +81,9 @@ void UCACChannelAPI::OnFailAPI(FHttpRequestPtr req, FHttpResponsePtr res)
 }
 
 // Register Channel Implementation
-void UCACChannelAPI::RegisterChannelCall(const FString& accountId, const FChannelnfoCreateAPI& ChannelData)
+void UCACChannelAPI::RegisterChannelCall(const FChannelnfoCreateAPI& ChannelData)
 {
-	this->API = FString::Printf(TEXT("api/channel/%s"), *accountId);
+	this->API = FString::Printf(TEXT("api/channel"));
 	HttpPostCall<FChannelnfoCreateAPI>(ChannelData);
 }
 
