@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TP_ThirdPerson/TP_ThirdPersonNpc.h"
@@ -30,5 +30,10 @@ void ATP_ThirdPersonNpc::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ATP_ThirdPersonNpc::AdjustVolume(float innerRadius)
+{
+	BP_AdjustVolume(innerRadius);
 }
 
