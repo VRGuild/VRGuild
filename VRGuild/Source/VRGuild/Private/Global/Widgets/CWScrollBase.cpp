@@ -21,8 +21,6 @@ bool UCWScrollBase::Init(UUserWidget* widgetToDisplay)
 
 void UCWScrollBase::NativeConstruct()
 {
-	Super::NativeConstruct();
-
 	OffsetSpeed = 100.f;
 	WheelScrollMultiplier = 5.f;
 	bIsHidden = false;
@@ -50,6 +48,8 @@ void UCWScrollBase::NativeConstruct()
 		EnhancedInput->BindAction(IA_UIMode, ETriggerEvent::Started, this, &UCWScrollBase::OnUIModeActive);
 		EnhancedInput->BindAction(IA_UIMode, ETriggerEvent::Completed, this, &UCWScrollBase::OnUIModeActive);
 	}
+
+	Super::NativeConstruct();
 }
 
 void UCWScrollBase::NativeDestruct()
