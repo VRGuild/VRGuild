@@ -57,7 +57,13 @@ void ACATileZone::OnRep_Owner()
 {
 	Super::OnRep_Owner();
 	if (this->SendDataNewTile)
-		SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
+	{
+		while (this->OwnerDataSave.Num())
+		{
+			FOwnerData data = this->OwnerDataSave.Pop();
+			SRPCAppendSpace(data.Position, data.TileSpace);
+		}
+	}
 	else if (this->SendDataNewTileClass)
 		SRPCSpawnSpace(this->SendDataPosition, this->SendDataNewTileClass);
 }
@@ -251,7 +257,10 @@ void ACATileZone::AttachTile(FVector position, ACATileSpace* newTile)
 	if (GetOwner() || HasAuthority())
 		SRPCAppendSpace(this->SendDataPosition, this->SendDataNewTile);
 	else
+	{
+		OwnerDataSave.Add({ position, newTile });
 		ATP_ThirdPersonCharacter::SetOwnerFor(this, GetWorld()->GetFirstPlayerController()->GetCharacter());
+	}
 }
 
 void ACATileZone::SpawnTile(FVector position, TSubclassOf<class ACATileSpace> newTile)
