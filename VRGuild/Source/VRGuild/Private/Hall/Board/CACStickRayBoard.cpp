@@ -45,7 +45,7 @@ void UCACStickRayBoard::InitializeComponent()
 	Super::InitializeComponent();
 }
 
-bool UCACStickRayBoard::RayBoard(AActor* Memo)
+bool UCACStickRayBoard::RayBoard()
 {
 //	if (!Memo)
 //		return false;
@@ -75,17 +75,22 @@ bool UCACStickRayBoard::RayBoard(AActor* Memo)
         if (hitMemoBoard)
         {
             // 여기서 메모보드에 대한 처리
-			hitMemoBoard->StickBoard(Memo, hitResult.ImpactPoint - hitMemoBoard->GetActorLocation());
+			hitMemoBoard->CreateMemo(hitResult.ImpactPoint - hitMemoBoard->GetActorLocation());
+			//hitMemoBoard->StickBoard(hitResult.ImpactPoint - hitMemoBoard->GetActorLocation());
             return true;
         }
     }
 	return false;
 }
 
+void UCACStickRayBoard::CreateBoardWord(FVector location, FString memoString)
+{
+
+}
+
 void UCACStickRayBoard::OnClicked(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Display, TEXT("Is Clicked"));
-	AActor* currentMemo = nullptr;
-	RayBoard(currentMemo);
+	RayBoard();
 }
 

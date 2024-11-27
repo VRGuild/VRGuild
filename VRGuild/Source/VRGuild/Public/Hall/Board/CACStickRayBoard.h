@@ -33,7 +33,13 @@ protected:
 public:	
 
 	UFUNCTION(BlueprintCallable)
-	bool RayBoard(AActor* Memo );
+	bool RayBoard();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PointRayForMemo(const FHitResult& result);
+	
+	UFUNCTION(BlueprintCallable)
+	void CreateBoardWord(FVector location, FString memoString);
 
 	void OnClicked(const FInputActionValue& Value);
 };
